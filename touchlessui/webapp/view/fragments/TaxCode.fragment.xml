@@ -1,0 +1,20 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="taxcodeDialog"
+		noDataText="No data"
+		title="Tax Code"
+		items="{appmodel>/valuehelps/taxcode2}"
+		search=".onSearchTaxCode"
+		confirm=".onConfirmTaxCode"
+		cancel=".onCancelTaxCode">
+		
+		<StandardListItem
+			title="{appmodel>Taxcode}"
+			description="{appmodel>Text}" />
+	</SelectDialog>
+	
+	
+	
+</core:FragmentDefinition>

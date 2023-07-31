@@ -1,0 +1,74 @@
+{
+    "filterProps": {
+        "ExtractionStatus": [
+            {
+                "id": null,
+                "status": null
+            },
+            {
+                "id": "01",
+                "status": "PENDING"
+            },
+            {
+                "id": "02",
+                "status": "DONE"
+            },
+            {
+                "id": "03",
+                "status": "FAILED"
+            },
+            {
+                "id": "04",
+                "status": "CONFIRMED"
+            }
+        ],
+        "DocumentStatus": [
+            {
+                "id": "INITIAL",
+                "status": "Unassigned"
+            },
+            {
+                "id": "ASSIGN",
+                "status": "Assigned"
+            },
+            {
+                "id": "FORWARD",
+                "status": "Forwarded"
+            },
+            {
+                "id": "REJSAP",
+                "status": "Manual Entry in SAP"
+            },
+            {
+                "id": "REJRTV",
+                "status": "Returned to Vendor"
+            },
+            {
+                "id": "POSTED",
+                "status": "Submitted"
+            }
+        ],
+        "DocumentCategory": [
+            {
+                "id": null,
+                "status": null
+            },
+            {
+                "id": "POCREDM",
+                "status": "PO Credit Memo"
+            },
+            {
+                "id": "NONPOCREDM",
+                "status": "Non-PO Credit Memo"
+            },
+            {
+                "id": "NONPOINV",
+                "status": "Non-PO Invoice"
+            },
+            {
+                "id": "POINV",
+                "status": "PO Invoice"
+            }
+        ]
+    }
+}

@@ -1,0 +1,19 @@
+<mvc:View controllerName="touchlessui.controller.MainView" displayBlock="true"
+  xmlns="sap.m"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns:wt="touchlessui.control">
+  <App id="idAppControl">
+    <pages>
+      <Page title="{i18n>title}">
+        <content>
+          <wt:OCRViewer id="ocrViewer0" class="sapUiSmallMarginBeginEnd" totalPages="2"
+            imageUrl="/resources/img/1.png" 
+          />
+          <!-- <wt:OCRViewer id="ocrViewer" class="sapUiSmallMarginBeginEnd" totalPages="2"
+            imageUrl="/control/resources/img/2.png"
+          /> -->
+        </content>
+      </Page>
+    </pages>
+  </App>
+</mvc:View>

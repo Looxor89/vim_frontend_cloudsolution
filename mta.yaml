@@ -1,0 +1,122 @@
+_schema-version: "3.2"
+ID: touchless_app_cloudsolution
+description: Fiori elements app
+version: 0.0.1
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+modules:
+  - name: touchless_app_cloudsolution-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+    - name: touchless_app_cloudsolution-repo-host
+      parameters:
+        content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+      - artifacts:
+        - touchlessui.zip
+        name: touchlessui
+        target-path: resources/
+  - name: touchlessui
+    type: html5
+    path: touchlessui
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+      - npm install
+      - npm run build:cf
+      supported-platforms: []
+  - name: touchless_app_cloudsolution-router
+    type: approuter.nodejs
+    path: router
+    properties:
+        REQUEST_TRACE: true
+        SEND_XFRAMEOPTIONS: false
+        XS_APP_LOG_LEVEL: debug
+    requires:
+    - name: touchless_app_cloudsolution-html5-repo-runtime
+    - name: touchless_app_cloudsolution-uaa
+    - name: touchless_app_cloudsolution-abap-ABAP-SCB
+    - name: touchless_app_cloudsolution-connectivity-service
+    - name: touchless_app_cloudsolution-destination-service
+      group: destinations
+      properties:
+        forwardAuthToken: false
+        name: ui5
+        url: https://ui5.sap.com
+    - name: touchless_app_cloud_backend-backend-api
+      group: destinations
+      properties:
+        forwardAuthToken: true
+        name: touchless_app_cloud_backend-backend-api
+        strictSSL: false
+        url: '~{url}'
+    parameters:
+      disk-quota: 256M
+      health-check-type: port
+      memory: 256M
+resources:
+  - name: touchless_app_cloud_backend-backend-api
+    type: configuration
+    parameters:
+      provider-nid: mta
+      provider-id: 'touchless_app_cloud_backend:touchless_app_cloud_backend-backend-api'
+  - name: touchless_app_cloudsolution-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: touchless_app_cloudsolution-xsuaa-service
+      service-plan: application
+  - name: touchless_app_cloudsolution-html5-repo-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
+  - name: touchless_app_cloudsolution-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: false
+        init_data:
+          instance:
+            destinations:
+            - Authentication: NoAuthentication
+              Name: ui5
+              ProxyType: Internet
+              Type: HTTP
+              URL: https://ui5.sap.com
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: touchless_app_cloudsolution-destination-service
+      service-plan: lite
+  - name: touchless_app_cloudsolution-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: touchless_app_cloudsolution-html5-srv
+      service-plan: app-host
+  - name: touchless_app_cloudsolution-connectivity-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-name: touchless_app_cloudsolution-connectivity-service
+      service-plan: lite
+  - name: touchless_app_cloudsolution-abap-ABAP-SCB
+    type: org.cloudfoundry.existing-service
+    parameters:
+      protocol:
+      - ODataV2
+      service: abap
+      service-name: ABAP-SCB
+      service-plan: 16_abap_64_db
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm install

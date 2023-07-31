@@ -1,0 +1,12 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="glacctDialog"
+		noDataText="No data"
+		title="GL Accounts"
+		search=".onSearchGLAcct"
+		confirm=".onConfirmGLAcct"
+		cancel=".onCancelGLAcct">
+	</SelectDialog>
+</core:FragmentDefinition>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="Validation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="http://e9hpathhdb:8001/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="API_CV_ATTACHMENT_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="AttachmentContent" m:HasStream="true" sap:label="Attachments" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="DocumentInfoRecordDocType"/>
+                    <PropertyRef Name="DocumentInfoRecordDocNumber"/>
+                    <PropertyRef Name="DocumentInfoRecordDocVersion"/>
+                    <PropertyRef Name="DocumentInfoRecordDocPart"/>
+                    <PropertyRef Name="LogicalDocument"/>
+                    <PropertyRef Name="ArchiveDocumentID"/>
+                    <PropertyRef Name="LinkedSAPObjectKey"/>
+                    <PropertyRef Name="BusinessObjectTypeName"/>
+                </Key>
+                <Property Name="DocumentInfoRecordDocType" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="DocumentInfoRecordDocType" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DocumentInfoRecordDocNumber" Type="Edm.String" Nullable="false" MaxLength="25" sap:unicode="false" sap:label="DocumentInfoRecordDocNumber" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DocumentInfoRecordDocVersion" Type="Edm.String" Nullable="false" MaxLength="2" sap:unicode="false" sap:label="DocumentInfoRecordDocVersion" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DocumentInfoRecordDocPart" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="DocumentInfoRecordDocPart" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LogicalDocument" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="LogicalDocument" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ArchiveDocumentID" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="ArchiveDocumentID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LinkedSAPObjectKey" Type="Edm.String" Nullable="false" MaxLength="90" sap:unicode="false" sap:label="LinkedSAPObjectKey" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="BusinessObjectTypeName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="BusinessObjectTypeName" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SemanticObject" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="SemanticObject" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="WorkstationApplication" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="WorkstationApplication" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FileSize" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="FileSize" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="FileName" Type="Edm.String" MaxLength="255" sap:unicode="false" sap:label="FileName" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="DocumentURL" Type="Edm.String" MaxLength="4096" sap:unicode="false" sap:label="DocumentURL" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MimeType" Type="Edm.String" MaxLength="128" sap:unicode="false" sap:label="MimeType" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="Content" Type="Edm.Binary" sap:unicode="false" sap:label="AttachmentContent" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="CreatedByUser" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="CreatedByUserFullName" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="CreatedByUserFullName" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CreationDateTime" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="CreationDateTime" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="BusinessObjectType" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="BusinessObjectType" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="LastChangedByUser" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="LastChangedByUserFullName" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="LastChangedByUserFullName" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ChangedDateTime" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="ChangedDateTime" sap:creatable="false" sap:updatable="false" sap:filterable="false"/>
+                <Property Name="StorageCategory" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="StorageCategory" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ArchiveLinkRepository" Type="Edm.String" MaxLength="2" sap:unicode="false" sap:label="ArchiveLinkRepository" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="A_DocumentInfoRecordAttchType" sap:label="Attachments for Document Info Record" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="DocumentInfoRecordDocType"/>
+                    <PropertyRef Name="DocumentInfoRecordDocNumber"/>
+                    <PropertyRef Name="DocumentInfoRecordDocVersion"/>
+                    <PropertyRef Name="DocumentInfoRecordDocPart"/>
+                </Key>
+                <Property Name="DocumentInfoRecordDocType" Type="Edm.String" Nullable="false" MaxLength="3" sap:display-format="UpperCase" sap:label="DocumentInfoRecordDocType" sap:heading="Document Type" sap:quickinfo="Document Type"/>
+                <Property Name="DocumentInfoRecordDocNumber" Type="Edm.String" Nullable="false" MaxLength="25" sap:display-format="UpperCase" sap:label="DocumentInfoRecordDocNumber" sap:heading="Document" sap:quickinfo="Document number"/>
+                <Property Name="DocumentInfoRecordDocVersion" Type="Edm.String" Nullable="false" MaxLength="2" sap:display-format="UpperCase" sap:label="DocumentInfoRecordDocVersion" sap:heading="Document Version" sap:quickinfo="Document Version"/>
+                <Property Name="DocumentInfoRecordDocPart" Type="Edm.String" Nullable="false" MaxLength="3" sap:display-format="UpperCase" sap:label="DocumentInfoRecordDocPart" sap:heading="Document Part" sap:quickinfo="Document Part"/>
+                <Property Name="DocumentInfoRecord" Type="Edm.String" MaxLength="70" sap:label="DocumentInfoRecord" sap:heading="DIR Key Concatenated" sap:quickinfo="Document Info Record key in concatenated form"/>
+                <Property Name="DocumentDescription" Type="Edm.String" MaxLength="40" sap:label="DocumentDescription" sap:heading="Description" sap:quickinfo="Document Description"/>
+                <Property Name="ExternalDocumentStatus" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="ExternalDocumentStatus" sap:heading="Document Status" sap:quickinfo="Status of a document (language-dependent)"/>
+                <Property Name="DocumentStatusName" Type="Edm.String" MaxLength="16" sap:label="DocumentStatusName" sap:heading="Status Text" sap:quickinfo="Description of document status"/>
+                <Property Name="DocInfoRecdIsMarkedForDeletion" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="DocInfoRecdIsMarkedForDeletion" sap:heading="Deletion indicator" sap:quickinfo="Deletion Indicator"/>
+                <NavigationProperty Name="DocumentInfoRecordToAttachmentNavigation" Relationship="API_CV_ATTACHMENT_SRV.DocumentInfoRecordToAttachment" FromRole="FromRole_DocumentInfoRecordToAttachment" ToRole="ToRole_DocumentInfoRecordToAttachment"/>
+            </EntityType>
+            <ComplexType Name="AttachmentsCount">
+                <Property Name="AttachmentCount" Type="Edm.Int16" Nullable="false" sap:label="AttachmentCount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </ComplexType>
+            <Association Name="DocumentInfoRecordToAttachment" sap:content-version="1">
+                <End Type="API_CV_ATTACHMENT_SRV.A_DocumentInfoRecordAttchType" Multiplicity="1" Role="FromRole_DocumentInfoRecordToAttachment"/>
+                <End Type="API_CV_ATTACHMENT_SRV.AttachmentContent" Multiplicity="*" Role="ToRole_DocumentInfoRecordToAttachment"/>
+            </Association>
+            <EntityContainer Name="API_CV_ATTACHMENT_SRV_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="AttachmentContentSet" EntityType="API_CV_ATTACHMENT_SRV.AttachmentContent" sap:label="Attachments" sap:updatable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="A_DocumentInfoRecordAttch" EntityType="API_CV_ATTACHMENT_SRV.A_DocumentInfoRecordAttchType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <AssociationSet Name="DocumentInfoRecordToAttachment_AssocSet" Association="API_CV_ATTACHMENT_SRV.DocumentInfoRecordToAttachment" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="A_DocumentInfoRecordAttch" Role="FromRole_DocumentInfoRecordToAttachment"/>
+                    <End EntitySet="AttachmentContentSet" Role="ToRole_DocumentInfoRecordToAttachment"/>
+                </AssociationSet>
+                <FunctionImport Name="GetAllOriginals" ReturnType="Collection(API_CV_ATTACHMENT_SRV.AttachmentContent)" EntitySet="AttachmentContentSet" m:HttpMethod="GET">
+                    <Parameter Name="LinkedSAPObjectKey" Type="Edm.String" Mode="In" MaxLength="90"/>
+                    <Parameter Name="BusinessObjectTypeName" Type="Edm.String" Mode="In" MaxLength="40"/>
+                    <Parameter Name="SemanticObject" Type="Edm.String" Mode="In" MaxLength="40" Nullable="true"/>
+                </FunctionImport>
+                <FunctionImport Name="GetAttachmentCount" ReturnType="API_CV_ATTACHMENT_SRV.AttachmentsCount" m:HttpMethod="GET">
+                    <Parameter Name="BusinessObjectTypeName" Type="Edm.String" Mode="In" MaxLength="40"/>
+                    <Parameter Name="LinkedSAPObjectKey" Type="Edm.String" Mode="In" MaxLength="90"/>
+                    <Parameter Name="SemanticObject" Type="Edm.String" Mode="In" MaxLength="40" Nullable="true"/>
+                </FunctionImport>
+                <FunctionImport Name="RenameAttachment" ReturnType="API_CV_ATTACHMENT_SRV.AttachmentContent" EntitySet="AttachmentContentSet" m:HttpMethod="POST" sap:action-for="API_CV_ATTACHMENT_SRV.AttachmentContent">
+                    <Parameter Name="DocumentInfoRecordDocType" Type="Edm.String" Mode="In" MaxLength="3" Nullable="true"/>
+                    <Parameter Name="DocumentInfoRecordDocVersion" Type="Edm.String" Mode="In" MaxLength="2" Nullable="true"/>
+                    <Parameter Name="LogicalDocument" Type="Edm.String" Mode="In" MaxLength="32"/>
+                    <Parameter Name="ArchiveDocumentID" Type="Edm.String" Mode="In" MaxLength="40"/>
+                    <Parameter Name="BusinessObjectTypeName" Type="Edm.String" Mode="In" MaxLength="40"/>
+                    <Parameter Name="LinkedSAPObjectKey" Type="Edm.String" Mode="In" MaxLength="90"/>
+                    <Parameter Name="SemanticObject" Type="Edm.String" Mode="In" MaxLength="40" Nullable="true"/>
+                    <Parameter Name="FileName" Type="Edm.String" Mode="In" MaxLength="255"/>
+                    <Parameter Name="DocumentInfoRecordDocNumber" Type="Edm.String" Mode="In" MaxLength="25" Nullable="true"/>
+                    <Parameter Name="DocumentInfoRecordDocPart" Type="Edm.String" Mode="In" MaxLength="3" Nullable="true"/>
+                </FunctionImport>
+                <FunctionImport Name="CreateUrlAsAttachment" ReturnType="API_CV_ATTACHMENT_SRV.AttachmentContent" EntitySet="AttachmentContentSet" m:HttpMethod="POST">
+                    <Parameter Name="SemanticObject" Type="Edm.String" Mode="In" MaxLength="40"/>
+                    <Parameter Name="LinkedSAPObjectKey" Type="Edm.String" Mode="In" MaxLength="90"/>
+                    <Parameter Name="BusinessObjectTypeName" Type="Edm.String" Mode="In" MaxLength="40"/>
+                    <Parameter Name="Url" Type="Edm.String" Mode="In" MaxLength="255"/>
+                    <Parameter Name="UrlDescription" Type="Edm.String" Mode="In" MaxLength="255"/>
+                    <Parameter Name="MIMEType" Type="Edm.String" Mode="In" MaxLength="40"/>
+                </FunctionImport>
+            </EntityContainer>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true"/>
+                <Annotation Term="Aggregation.ApplySupported">
+                    <Record>
+                        <PropertyValue Property="Transformations">
+                            <Collection>
+                                <String>aggregate</String>
+                                <String>groupby</String>
+                                <String>filter</String>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Rollup" EnumMember="None"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/AttachmentContentSet" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.ReadRestrictions">
+                    <Record>
+                        <PropertyValue Property="Description" String=""/>
+                        <PropertyValue Property="LongDescription" String=""/>
+                        <PropertyValue Property="ReadByKeyRestrictions">
+                            <Record>
+                                <PropertyValue Property="Description" String="Downloads the attachments associated with the business object."/>
+                                <PropertyValue Property="LongDescription" String="Downloads the attachments associated with the business object using the document type, document number, document version, document part, logical document name, archive document ID, business object type, and business object instance key."/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/A_DocumentInfoRecordAttch" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.ReadRestrictions">
+                    <Record>
+                        <PropertyValue Property="Description" String="Retrieves the details of all the document info records."/>
+                        <PropertyValue Property="LongDescription" String="Retrieves the details of all the document info records."/>
+                        <PropertyValue Property="ReadByKeyRestrictions">
+                            <Record>
+                                <PropertyValue Property="Description" String="Retrieves the details of a document info record."/>
+                                <PropertyValue Property="LongDescription" String="Retrieves the details of a document info record using the document number, type, part, and version."/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/AttachmentContentSet" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Description" String=" Uploads an attachment to a business object."/>
+                        <PropertyValue Property="LongDescription" String="Uploads an attachment to a business object using the file name, mime type of the attachment, business object type, and business object instance key."/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/AttachmentContentSet" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Description" String="Deletes the attachment associated with the business object."/>
+                        <PropertyValue Property="LongDescription" String="Deletes the attachment associated with the business object using the document type, document number, document version, document part, logical document name, archive document ID, business object type, and business object instance key."/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/GetAttachmentCount" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Core.Description" String="Retrieves the number of attachments for a business object instance key."/>
+                <Annotation Term="Core.LongDescription" String="Retrieves the number of attachments for a business object using the business object type and business object instance key."/>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/GetAllOriginals" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Core.Description" String="Retrieves the metadata of the attachments associated with the business object."/>
+                <Annotation Term="Core.LongDescription" String="Retrieves the metadata of the attachments associated with the business object using the business object type and business object instance key."/>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/RenameAttachment" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Core.Description" String="Renames an attachment that has been uploaded to a business object."/>
+                <Annotation Term="Core.LongDescription" String="Renames an attachment that has been uploaded to a business object using the business object type, business object instance key, logical document name, archive document ID, and new file name."/>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/CreateUrlAsAttachment" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Core.Description" String="Uploads a URL as an attachment for a business object."/>
+                <Annotation Term="Core.LongDescription" String="Uploads a URL as an attachment for a business object using the business object type, business object instance key, semantic object, URL that is to be uploaded as an attachment, URL description, and the media type of the URL. The media type must either be Text/URL or Text/HTML."/>
+            </Annotations>
+            <Annotations Target="API_CV_ATTACHMENT_SRV.API_CV_ATTACHMENT_SRV_Entities/A_DocumentInfoRecordAttch" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="DocumentInfoRecordToAttachmentNavigation"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Description" String="Creates an attachment for a document info record."/>
+                                            <PropertyValue Property="LongDescription" String="Creates an attachment for a document info record using the file name, mime type of the attachment, and the file that you upload."/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="DocumentInfoRecordToAttachmentNavigation"/>
+                                    <PropertyValue Property="ReadRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Description" String="Reads the attachments associated with a document info record."/>
+                                            <PropertyValue Property="LongDescription" String="Reads the attachments associated with a document info record using the document number, type, part, and version."/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <atom:link rel="self" href="http://e9hpathhdb:8001/sap/opu/odata/sap/API_CV_ATTACHMENT_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://e9hpathhdb:8001/sap/opu/odata/sap/API_CV_ATTACHMENT_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

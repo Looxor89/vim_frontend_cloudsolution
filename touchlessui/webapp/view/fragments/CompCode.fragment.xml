@@ -1,0 +1,12 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="compcodeDialog"
+		noDataText="No data"
+		title="Company Code"
+		search=".onSearchCompCode"
+		confirm=".onConfirmCompCode"
+		cancel=".onCancelCompCode">
+	</SelectDialog>
+</core:FragmentDefinition>

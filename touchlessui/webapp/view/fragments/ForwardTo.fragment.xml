@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="idAssignToDialog"
+		noDataText="No Users found"
+		title="{appmodel>/sDialogTitle}"
+		search=".onFwdSearch"
+		confirm=".onFwdConfirm"
+		cancel=".onFwdClose"
+		items="{
+			path: 'appmodel>/UserList'
+		}">
+		<StandardListItem
+            id="assignedToList"
+			title="{appmodel>FirstName} {appmodel>LastName}"
+			description="{appmodel>Email}"
+			icon="sap-icon://employee"
+			iconDensityAware="false"
+			iconInset="false"
+			type="Active" />
+	</SelectDialog>
+</core:FragmentDefinition>

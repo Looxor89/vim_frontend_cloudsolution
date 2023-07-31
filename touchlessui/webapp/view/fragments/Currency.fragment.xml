@@ -1,0 +1,20 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="currencyDialog"
+		noDataText="No data"
+		title="Currency"
+		search=".onSearchCurrency"
+		liveChange=".onSearchCurrency"
+		confirm=".onConfirmCurrency"
+		cancel=".onCancelCurrency"
+		items="{
+			path: 'appmodel>/valuehelps/currency'
+		}">
+		<StandardListItem
+			title="{appmodel>code}"
+			description="{appmodel>name}"
+      />
+	</SelectDialog>
+</core:FragmentDefinition>

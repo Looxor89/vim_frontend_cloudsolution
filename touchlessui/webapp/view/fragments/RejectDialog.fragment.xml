@@ -1,0 +1,17 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Dialog id="idRejectInvoice" title="Reject Invoice">
+        <FlexBox>
+            <VBox justifyContent="Center" width="600px" class="sapUiResponsiveMargin">
+                <Label text="Reason for rejection:"/>
+                <TextArea id="idRejText" width="100%" rows="5" />
+            </VBox>
+
+        </FlexBox>
+        <buttons>
+            <Button text="Return to Vendor" press="onRejectInvoice" icon="sap-icon://sys-back"/>
+            <Button text="Enter manually in SAP" press="onRejectInvoice" icon="sap-icon://sap-logo-shape"/>
+            <Button text="Cancel" press="onCancelReject"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

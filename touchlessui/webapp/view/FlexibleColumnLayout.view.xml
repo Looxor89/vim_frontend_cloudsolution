@@ -1,0 +1,10 @@
+<mvc:View xmlns="sap.m" xmlns:f="sap.f" xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+ controllerName="touchlessui.controller.FlexibleColumnLayout" height="100%" class="sapUiSizeCompact">
+    <App id="myApp">
+        <f:FlexibleColumnLayout
+            id="fcl"
+            stateChange="onStateChanged"
+            layout="{/layout}"
+            backgroundDesign="Transparent"/>
+    </App>
+</mvc:View>

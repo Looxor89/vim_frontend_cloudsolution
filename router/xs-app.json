@@ -1,0 +1,69 @@
+{
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/sap/(.*)$",
+      "target": "/sap/$1",
+      "service": "com.sap.cloud.abap",
+      "endpoint": "abap",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },{
+      "source": "^/ior/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "iormta-backend-api",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sql/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "LookupDestV3"
+    },
+    {
+      "source": "^/api/dox/(.*)$",
+      "target": "$1",
+      "destination": "BTP_AISERVICE_DOX"
+    },
+    {
+      "source": "^/api/objstore/(.*)$",
+      "target": "/api/objstore/$1",
+      "destination": "OBJSTORE_API_DEST"
+    },
+    {
+      "source": "^/api/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "touchless_app_cloud_backend-backend-api",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/attach_sap/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "AP_S3_ATTACH_SAP",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/dar/(.*)$",
+      "target": "/api/v3/$1",
+      "destination": "DAR_INFERENCE_DEST"
+    },
+    {
+      "source": "^/darbackend/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "darmta-backend-api",
+      "csrfProtection": false
+    }
+  ],
+  "welcomeFile": "/touchlessui"
+}

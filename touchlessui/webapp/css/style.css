@@ -1,0 +1,111 @@
+/* Enter your custom styles here */
+.cfl50{
+  border-left: 5px #b00 solid;
+  border-radius: 6px;
+}
+
+.cfl80 {
+  border-left: 5px #e9730c solid;
+  border-radius: 6px;
+}
+
+.cfl100 {
+  border-left: 5px #107e3e solid;
+  border-radius: 6px;
+}
+
+/* Enter your custom styles here */
+.annotation {
+  position: absolute;
+  border: 2px solid #286eb4CC;
+  border-radius: 4px;
+}
+.annotation.header {
+  border: 2px solid #286eb4CC;
+}
+.annotation .value {
+  visibility: hidden;
+  height: 20px;
+  width: max-content;
+  background-color: #286eb4CC;
+  color: #fff;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  position: absolute;
+  top: -20px;
+  left: -7px;
+  z-index: 1;
+  padding: 0px 5px 0px 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.annotation .label {
+  visibility: hidden;
+  height: 20px;
+  width: max-content;
+  background-color: #286eb4CC;
+  color: #fff;
+  position: absolute;
+  top: -20px;
+  z-index: 1;
+  padding: 0px 0px 0px 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.annotationitem {
+  position: absolute;
+  border: 2px solid #EE9065;
+  border-radius: 4px;
+}
+.annotationitem.header {
+  border: 2px solid #EE9065;
+}
+.annotationitem .value {
+  visibility: hidden;
+  height: 20px;
+  width: max-content;
+  background-color: #EE9065;
+  color: #fff;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  position: absolute;
+  top: -20px;
+  left: -7px;
+  z-index: 1;
+  padding: 0px 5px 0px 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.annotationitem .label {
+  visibility: hidden;
+  height: 20px;
+  width: max-content;
+  background-color: #EE9065;
+  color: #fff;
+  position: absolute;
+  top: -20px;
+  z-index: 1;
+  padding: 0px 0px 0px 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.x-custom-ap {
+  position: relative !important;
+  width: fit-content !important;
+}
+.box-hover {
+  visibility: visible;
+}
+.ocr-area {
+  position: relative !important;
+  width: fit-content !important;
+}
+.ocr-annotation {
+  position: absolute;
+  background-color: #00000022;
+}
+.ocr-annotation:hover {
+  background-color: rgba(255, 255, 0, 0.247);
+}
