@@ -1,0 +1,17 @@
+<mvc:View
+    controllerName="vim_ui.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+	class="sapUiSizeCompact"
+>
+	<Shell id="shell">
+		<App id="app">
+			<pages>
+				<Page id="page" title="{i18n>title}">
+					
+				</Page>
+			</pages>
+		</App>
+	</Shell>
+</mvc:View>

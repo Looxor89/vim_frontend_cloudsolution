@@ -1,0 +1,85 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+    <Dialog id="idPOLines_VH" title="Purchase Order Details">
+        <subHeader>
+            <Toolbar>
+                <SearchField search="onPOSearch" width="100%" placeholder="Input complete PO Number - eg 4100000001"/>
+            </Toolbar>
+        </subHeader>
+
+        <content>
+            <l:Grid id="poHeaderBox0" class="sapUiResponsiveContentPadding sapUiTinyMargin">
+                <ObjectAttribute title="Purchase Order" text="{PurchaseOrder}" />
+                <ObjectAttribute title="Purchasing Org." text="{PurchasingOrganization}" />
+                <ObjectAttribute title="Company Code" text="{CompanyCode}" />
+                <ObjectAttribute title="Customer" text="{Kunnr}" />
+                <ObjectAttribute title="Vendor" text="{Supplier}" />
+                <ObjectAttribute title="Document Category" text="{Bstyp}" />
+                <ObjectAttribute title="Order Type" text="{PurchaseOrderType}" />
+                <ObjectAttribute title="Status" text="{PurchasingDocumentOrigin}" />
+                <ObjectAttribute title="Payment Terms" text="{PaymentTerms}" />
+                <ObjectAttribute title="Payment in" text="{CashDiscount1Days}" />
+                <ObjectAttribute title="Payment in" text="{CashDiscount2Days}" />
+                <ObjectAttribute title="Payment in" text="{NetPaymentDays}" />
+                <ObjectAttribute title="Currency" text="{DocumentCurrency}" />
+                <ObjectAttribute title="Deletion Indicator" text="{PurchasingDocumentDeletionCode}" />
+                <ObjectAttribute title="Created by" text="{CreatedByUser}" />
+                <ObjectAttribute title="Changed on" text="{path: 'LastChangeDateTime', formatter:'.formatter.formatDateString'}" />
+                <ObjectAttribute title="PO Date" text="{path: 'PurchaseOrderDate', formatter:'.formatter.formatDateString'}" />
+                <ObjectAttribute title="Discount % 1" text="{CashDiscount1Percent}" />
+                <ObjectAttribute title="Discount % 2" text="{CashDiscount2Percent}" />
+            </l:Grid>
+            <Table id="idVHPOLines" class="sapUiLargeMarginTop" items="{/A_PurchaseOrderItem}">
+            <!-- polineitemSet  -->
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Purchase Order Lines" level="H2" class="sapUiTinyMargin" />
+                        <ToolbarSpacer />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="Line #" />
+                    </Column>
+                    <Column>
+                        <Text text="Material" />
+                    </Column>
+                    <Column>
+                        <Text text="Material Group" />
+                    </Column>
+                    <Column>
+                        <Text text="Plant" />
+                    </Column>
+                    <Column>
+                        <Text text="Qty" />
+                    </Column>
+                    <Column>
+                        <Text text="UoM" />
+                    </Column>
+                    <Column>
+                        <Text text="Net Price" />
+                    </Column>
+
+                </columns>
+                <items>
+                    <ColumnListItem id="POlineItems" vAlign="Middle" type="Active" press="onPressPOLineItem">
+                        <cells>
+                            <Text text="{PurchaseOrderItem}" />
+                            <Text text="{Material} - {APModel>Txz01}" wrapping="true" />
+                            <Text text="{MaterialGroup}" />
+                            <Text text="{Plant}" />
+                            <Text text="{NetPriceQuantity}" />
+                            <Text text="{PurchaseOrderQuantityUnit}" />
+                            <Text text="{NetPriceAmount}" />
+                        </cells>
+
+                    </ColumnListItem>
+                </items>
+            </Table>
+
+        </content>
+
+        <endButton>
+            <Button text="Cancel" press="onPOLinesDialogClose" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,412 @@
+{
+  "_version": "1.28.0",
+  "sap.app": {
+    "id": "vim_ui",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "crossNavigation": {
+      "inbounds": {        
+        "vimDocument-process": {
+          "semanticObject": "vimDocument",
+          "action": "process",
+          "title": "{{flpTitle}}",
+          "subTitle": "{{flpSubtitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    },
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.9.7",
+      "toolsId": "9a2d50e6-5c85-4a4e-87eb-a4eba0acf318"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/Z_SB_INVOICE_POSTING/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZGW_AP_PROCESS_SRC": {
+        "uri": "/sap/opu/odata/sap/ZGW_AP_PROCESS_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "ZTAP_INV_POST_SRV": {
+        "uri": "/sap/opu/odata/sap/ZTAP_INV_POST_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "ZCEL_MOVE_INV_SRV": {
+        "uri": "/sap/opu/odata/sap/ZCEL_MOVE_INV_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_CV_ATTACHMENT_SRV": {
+        "uri": "/sap/opu/odata/sap/API_CV_ATTACHMENT_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_COMPANYCODE_SRV": {
+        "uri": "/sap/opu/odata/sap/API_COMPANYCODE_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_GlAccount_SRV": {
+        "uri": "/sap/opu/odata/sap/C_GLACCOUNTVALUEHELP_CDS",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_COSTCENTER_SRV": {
+        "uri": "/sap/opu/odata/sap/API_COSTCENTER_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_PROFITCENTER_SRV": {
+        "uri": "/sap/opu/odata/sap/API_PROFITCENTER_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "ZSB_AP_PROCESS": {
+        "uri": "/sap/opu/odata/sap/ZSB_AP_PROCESS",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_WbsElement_SRV": {
+        "uri": "/sap/opu/odata/sap/PS_WBSELEMENT_OVW_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "C_SUPPLIER_FS_SRV": {
+        "uri": "/sap/opu/odata/sap/C_SUPPLIER_FS_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "API_PURCHASEORDER_PROCESS_SRV": {
+        "uri": "/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "FAC_GL_JOURNALENTRY_VER_SRV": {
+        "uri": "/sap/opu/odata/sap/FAC_GL_JOURNALENTRY_VER_SRV",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "C_BILLGDOCREDACTED": {
+        "uri": "/sap/opu/odata/sap/C_BILLGDOCREDACTED",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.84.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {},
+        "sap.suite.ui.generic.template": {},
+        "sap.ui.comp": {},
+        "sap.ui.generic.app": {},
+        "sap.ui.table": {},
+        "sap.ushell": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "config": {
+      "fullWidth": true,
+      "files": [
+        "view/DetailDetail.view.xml",
+        "manifest.json"
+      ]
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "vim_ui.i18n.i18n"
+        }
+      },
+      "InvPostModel": {
+        "dataSource": "mainService",
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Request"
+        },
+        "preload": true
+      },
+      "APModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "ZGW_AP_PROCESS_SRC"
+      },
+      "MoveInv": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Request",
+          "useBatch": false,
+          "headers": {
+            "X-Requested-with": "X"
+          }
+        },
+        "dataSource": "ZCEL_MOVE_INV_SRV"
+      },
+      "AttachAPISet": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Request",
+          "useBatch": false,
+          "headers": {
+            "X-Requested-with": "X"
+          }
+        },
+        "dataSource": "API_CV_ATTACHMENT_SRV"
+      },
+      "CompCodeModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "API_COMPANYCODE_SRV"
+      },
+      "ApProcessModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "ZSB_AP_PROCESS"
+      },
+      "GlAccountModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "API_GlAccount_SRV"
+      },
+      "ProfitCenterModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "API_PROFITCENTER_SRV"
+      },
+      "CostCenterModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "API_COSTCENTER_SRV"
+      },
+      "WbsElementModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "API_WbsElement_SRV"
+      },
+      "VendorModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "C_SUPPLIER_FS_SRV"
+      },
+      "PurchaseOrderModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "API_PURCHASEORDER_PROCESS_SRV"
+      },
+      "DocTypeModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "FAC_GL_JOURNALENTRY_VER_SRV"
+      },
+      "BillGDocModel": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "OneWay",
+          "defaultCountMode": "Request",
+          "useBatch": false
+        },
+        "dataSource": "C_BILLGDOCREDACTED"
+      },
+      "mimeTypes": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "json/mimeTypes.json"
+      },
+      "extensions": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "json/extensions.json"
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.f.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "vim_ui.view",
+        "controlAggregation": "pages",
+        "controlId": "fcl",
+        "transition": "slide",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "pattern": "page2",
+          "name": "page2",
+          "target": "page2",
+          "layout": "EndColumnFullScreen"
+        },
+        {
+          "pattern": ":layout:",
+          "name": "master",
+          "target": [
+            "master"
+          ]
+        },
+        {
+          "pattern": "detailDetail/{packageId}/{layout}",
+          "name": "detailDetail",
+          "target": [
+            "detailDetail"
+          ]
+        }
+      ],
+      "targets": {
+        "master": {
+          "viewName": "Master",
+          "controlAggregation": "beginColumnPages"
+        },
+        "detailDetail": {
+          "viewName": "DetailDetail",
+          "controlAggregation": "midColumnPages"
+        },
+        "page2": {
+          "viewName": "AboutPage",
+          "controlAggregation": "midColumnPages"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "vim_ui.view.FlexibleColumnLayout",
+      "type": "XML",
+      "async": true,
+      "id": "View1"
+    }
+  },
+  "sap.cloud": {
+    "service": "vim_ui"
+  }
+}

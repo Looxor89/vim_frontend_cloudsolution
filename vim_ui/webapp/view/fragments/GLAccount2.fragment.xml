@@ -1,0 +1,56 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<Dialog id="idGLAcc2_VH" title="G/L Account Search help">
+		<!-- CAP refactory: Inizio <subHeader>
+			<Toolbar design="Info">
+				<ToolbarSpacer />
+				<Label text="Recommendations" />
+				<Switch state="true" change="onSwitchGL">
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>
+				</Switch>
+			</Toolbar>
+		</subHeader> CAP refactory: Fine -->
+
+		<content>
+			<!-- <List items="{path: 'appmodel>/valuehelps/HKONTData'}" 
+				visible="{= ${appmodel>/props/ior_hkont}}" mode="SingleSelectMaster" 
+				selectionChange="onConfirmGLAcct2">
+				<CustomListItem>
+					<HBox>
+						<VBox class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+							<Title text="{appmodel>HKONT}" />
+							<ObjectStatus class="sapUiSmallMarginBottom" title="Confidence" text="{path:'appmodel>Conf', formatter: '.formatter.formatConf'}" active="true" state="{path:'appmodel>Conf', formatter: '.formatter.formatConfState'}" inverted="true" />
+						</VBox>
+					</HBox>
+				</CustomListItem>
+			</List> -->
+			<!-- List populating recommendations from DAR service -->
+			<!-- CAP refactory: Inizio <List items="{path: 'appmodel>/valuehelps/HKONT'}" 
+				visible="{= ${appmodel>/props/ior_hkont}}" mode="SingleSelectMaster" id="idGLAccount_VH"
+				selectionChange="onConfirmGLAcct2">
+				<CustomListItem>
+					<HBox>
+						<VBox class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+							<Title text="{appmodel>value}"/>
+							<ObjectStatus class="sapUiSmallMarginBottom" title="Confidence" text="{path:'appmodel>probability', formatter: '.formatter.formatConf'}" active="true" state="{path:'appmodel>probability', formatter: '.formatter.formatConfState'}" inverted="true" />
+						</VBox>
+					</HBox>
+				</CustomListItem>
+			</List> CAP refactory: Fine -->
+
+			<List visible="{= !${appmodel>/props/ior_hkont}}" mode="SingleSelectMaster"
+				selectionChange="onConfirmGLAcct2Odata">
+				<headerToolbar>
+					<Toolbar>
+						<SearchField search="onSearchGLAcct2" width="100%" placeholder="G/L Account #" visible="true" />
+					</Toolbar>
+				</headerToolbar>
+			</List>
+		</content>
+
+		<endButton>
+			<Button text="Cancel" press="onCancelGLAcct2" />
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

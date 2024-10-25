@@ -1,5 +1,5 @@
 {
-  "xsappname": "touchless_app_cloudsolution",
+  "xsappname": "vim_app_cloudsolution",
   "tenant-mode": "dedicated",
   "description": "Security profile of called application",
   "scopes": [
@@ -7,7 +7,6 @@
         "name": "uaa.user",
         "description": "UAA"
     },
-   
     {
         "name": "$XSAPPNAME.admin",
         "description": "Admin"
@@ -108,5 +107,12 @@
             "$XSAPPNAME.download"
         ]
     }
-  ]
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "http://localhost:**",
+      "https://*.hana.ondemand.com/**",
+      "https://*.applicationstudio.cloud.sap/**"
+    ]
+  }
 }

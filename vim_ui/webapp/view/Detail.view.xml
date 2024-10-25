@@ -1,0 +1,82 @@
+<mvc:View displayBlock="true" controllerName="vim_ui.controller.Detail" height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:f="sap.f" xmlns:l="sap.ui.layout" xmlns:ocr="vim_ui.control" class="sapUiSizeCompact">
+
+    <f:DynamicPage id="dynamicPageId" toggleHeaderOnTitleClick="true" headerExpanded="false" preserveHeaderStateOnScroll="true" class="sapUiNoContentPadding">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Document View" textAlign="Center" />
+                </f:heading>
+                <f:expandedContent>
+                    <Label text="File: {appmodel>/detail/header/FILENAME}" />
+                </f:expandedContent>
+                <f:snappedContent>
+                    <Label text="File: {appmodel>/detail/header/FILENAME}" />
+                </f:snappedContent>
+                <f:actions>
+                    <!-- <MenuButton text="Forward" buttonMode="Split" type="Default" defaultAction="onDefaultActionAccept" useDefaultActionOnly="true">
+                            <menu>
+                                <Menu itemSelected="onMenuAction">
+                                    <MenuItem text="Enter manually in SAP" icon="sap-icon://response" />
+                                    <MenuItem text="Return to vendor" icon="sap-icon://edit-outside" />
+                                </Menu>
+                            </menu>
+                        </MenuButton> -->
+                    <Button text="Assign" icon="sap-icon://activity-individual" press="onForwardPress" 
+                        visible="{ parts:['appmodel>/detail/header/DOC_STATUS', 'props>/action/assign'], formatter: '.formatter.allowActions' }"
+                        >
+                        <layoutData>
+                            <OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
+                        </layoutData>
+                    </Button>
+                    <Button text="Forward" icon="sap-icon://forward" press="onForwardPress" 
+                        visible="{ parts:['appmodel>/detail/header/DOC_STATUS', 'props>/action/forward'], formatter: '.formatter.allowActions' }"
+                        >
+                        <layoutData>
+                            <OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
+                        </layoutData>
+                    </Button>
+                    <Button text="Reject" icon="sap-icon://employee-rejections" press="onRejectPress" 
+                        type="Reject"
+                        visible="{ parts:['appmodel>/detail/header/DOC_STATUS', 'props>/action/reject'], formatter: '.formatter.allowActions' }"
+                        >
+                        <layoutData>
+                            <OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
+                        </layoutData>
+                    </Button>
+                    <Button icon="sap-icon://decline" press="onCancelPress" tooltip="Close" type="Transparent">
+                        <layoutData>
+                            <OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
+                        </layoutData>
+                    </Button>
+                </f:actions>
+                <f:navigationActions>
+
+                    <!-- <Button icon="sap-icon://full-screen" type="Transparent" /> -->
+                    <!-- <Button icon="sap-icon://exit-full-screen" type="Transparent" /> -->
+                    <!-- <Button icon="sap-icon://decline" tooltip="Close" type="Transparent">
+                        <layoutData>
+                            <OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
+                        </layoutData>
+                    </Button> -->
+                </f:navigationActions>
+
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader pinnable="false">
+                <l:Grid>
+                    <ObjectAttribute title="PackageId" text="{appmodel>/detail/header/PACKAGEID}" />
+                    <ObjectAttribute title="Main JobId" text="{appmodel>/detail/header/JOBID}" />
+                    <ObjectAttribute title="Received from" text="{appmodel>/detail/header/CREATEDBY}" />
+                    <ObjectStatus title="Received At" text="{path:'appmodel>/detail/header/CREATEDAT', formatter:'.formatter.formatDateString'}" />
+                </l:Grid>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <VBox id="idViewerArea" class="x-custom-ap">
+                <ocr:OCRViewer id="ocrViewer0" class="sapUiSmallMarginBeginEnd" totalPages="{appmodel>/pages}" currentPage="1" imageUrl="{appmodel>/imgurl}" doxObject="{appmodel>/job}" onPageChange="_handlePageChange" />
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+
+</mvc:View>

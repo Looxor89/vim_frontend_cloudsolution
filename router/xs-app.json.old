@@ -1,6 +1,6 @@
 {
   "authenticationMethod": "route",
-  "welcomeFile": "/vim_ui",
+  "welcomeFile": "/cp.portal",
   "routes": [
     {
       "source": "^/resources/(.*)$",
@@ -63,15 +63,16 @@
       "csrfProtection": false
     },
     {
-      "source": "^/odata/(.*)$",
-      "target": "/odata/v4/catalog/$1",
-      "destination": "VIM_backend_TE",
+      "source": "^/sap/opu/odata/sap/C_BILLGDOCREDACTED/(.*)$",      
+      "destination": "m19https",
       "authenticationType": "xsuaa",
       "csrfProtection": false
     },
     {
-      "source": "^/sap/opu/odata/sap/C_BILLGDOCREDACTED/(.*)$",      
-      "destination": "m19https",
+      "source": "^/sap/(.*)$",
+      "target": "/sap/$1",
+      "service": "com.sap.cloud.abap",
+      "endpoint": "abap",
       "authenticationType": "xsuaa",
       "csrfProtection": false
     },

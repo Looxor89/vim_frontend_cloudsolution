@@ -1,0 +1,14 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="multiplePODialog"
+		noDataText="No data"
+		title="Purchase Order"
+		search=".onSearchMultPO"
+		confirm=".onConfirmMultPO"
+		cancel=".onCancelMultPO"
+        items="{appmodel>/valuehelps/multiplePOValueHelp}">
+        <StandardListItem  title="{appmodel>PONumber}" />    
+	</SelectDialog>
+</core:FragmentDefinition>

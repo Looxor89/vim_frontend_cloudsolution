@@ -1,8 +1,0 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-	<Menu id="idMenuFragment" itemSelected="onMenuAction">
-		<MenuItem text="Assign" icon="sap-icon://add-employee" press="onForwardPress" visible="{props>/action/assign}" />
-		<MenuItem text="Forward" icon="sap-icon://forward" press="onForwardPress" visible="{props>/action/forward}" />
-		<MenuItem text="Unlock" icon="sap-icon://unlocked" visible="{props>/action/managelock}" press=".onUnlock" />
-		<MenuItem text="Info" icon="sap-icon://message-information" visible="false" />
-	</Menu>
-</core:FragmentDefinition>

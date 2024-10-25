@@ -1,0 +1,210 @@
+<mvc:View
+    displayBlock="true"
+    controllerName="vim_ui.controller.Master"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+    class="sapUiSizeCompact"
+    xmlns:ui="sap.ui.unified"
+    busyIndicatorDelay="0">
+
+    <!-- Dynamic Page Structure -->
+    <f:DynamicPage id="dynamicPageId" toggleHeaderOnTitleClick="true" headerExpanded="true">
+        
+        <!-- DynamicPage Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Extracted Documents" textAlign="Center" />
+                </f:heading>
+                <f:actions>
+                    <!-- Add any actions like buttons if needed -->
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <!-- DynamicPage Header -->
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <!-- Filter Bar for search and filters -->
+                    <fb:FilterBar id="filterbar" reset="onReset" search="onGoPress" useToolbar="false" showGoOnFB="true" showClearOnFB="true" clear="onClearFilterBar" showFilterConfiguration="false">
+                        <fb:filterGroupItems>
+
+                            <!-- Document Status Filter -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="B" label="Document Status" visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiComboBox id="idSelectDocStatus" items="{path: 'prmodel>/filterProps/DocumentStatus'}">
+                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
+                                    </MultiComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <!-- Extraction Status Filter (currently hidden) -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="C" label="Extraction Status" visible="false" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Select id="idSelectExtractionStatus" forceSelection="false" items="{prmodel>/filterProps/ExtractionStatus}">
+                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <!-- Sent By Filter -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="Sent By" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="idSentByInp" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <!-- Assigned To Filter -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="Assigned To" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="idAssignedToInp" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <!-- Document Category Filter -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="Document Category" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Select id="idSelectDocumentCategory" forceSelection="false" items="{prmodel>/filterProps/DocumentCategory}">
+                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <!-- Received Between Filter (Date Range) -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="Received Between" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DateRangeSelection id="idSentOn" displayFormat="long" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <!-- DynamicPage Content -->
+        <f:content>
+
+            <!-- Document Table -->
+            <Table
+                id="masterTable"
+                inset="false"
+                items="{
+                    path: 'masterModel>/list',
+                    sorter: { path: 'LASTCHANGEDON', descending: true }
+                }"
+                mode="MultiSelect"
+                selectionChange="onSelectionChange"
+                alternateRowColors="true"
+                class="sapFDynamicPageAlignContent sapUiLargeMarginBottom"
+                autoPopinMode="true"
+                fixedLayout="true"
+                width="auto">
+                <headerToolbar>
+                    <OverflowToolbar >
+                        <ToolbarSpacer/>
+                        <Button icon="sap-icon://edit" press="onQuickMassiveEditPress" tooltip="Massive action"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+
+                <columns>
+                    <!-- Company Code Column -->
+                    <Column hAlign="Initial" width="10%">
+                        <Text text="Company Code" />
+                    </Column>
+
+                    <!-- Document Status Column -->
+                    <Column hAlign="Initial" width="12%">
+                        <Text text="Document Status" />
+                    </Column>
+
+                    <!-- ReceivedOn Column -->
+                    <Column hAlign="Initial" width="16%">
+                        <Text text="Received on" />
+                    </Column>
+
+                    <!-- Vendor name Column -->
+                    <Column hAlign="Initial" width="15%">
+                        <Text text="Vendor name" />
+                    </Column>
+
+                    <!-- Assigned To Column -->
+                    <Column hAlign="Initial" width="15%">
+                        <Text text="Assigned To" />
+                    </Column>
+
+                    <!-- Category Column -->
+                    <Column hAlign="Initial" width="10%">
+                        <Text text="Category" />
+                    </Column>
+
+                    <!-- Last Changed Column -->
+                    <Column hAlign="Initial" width="17%">
+                        <Text text="Last Changed" />
+                    </Column>
+
+                    <!-- Action Column -->
+                    <Column hAlign="Initial" width="5%">
+                        <Text text="Action" />
+                    </Column>
+                </columns>
+
+                <!-- Table Items -->
+                <items>
+                    <ColumnListItem
+                        type="Navigation"
+                        press="onListItemPress"
+                        highlight="{path: 'masterModel>DOC_STATUS', formatter: '.formatter.statusText'}">
+                        <cells>
+                            <!-- Company Code and Description -->
+                            <ObjectIdentifier title="{masterModel>COMPANYCODE}" text="{masterModel>COMPANYCODEDESC}" />
+                            
+                            <!-- Document Status and Actions -->
+                            <ObjectIdentifier
+                                title="{parts: ['masterModel>DOC_STATUS', 'masterModel>ASSIGNEDTO', 'masterModel>ACTIONBY', 'masterModel>'], formatter: '.formatter.formatDocStatus'}"
+                                text="{parts: ['masterModel>ACTION', 'masterModel>ACTIONBYNAME', 'masterModel>'], formatter: '.formatter.calcStatus'}"
+                            />
+                            
+                            <!-- Received on -->
+                            <Text text="{masterModel>CREATEDAT}" />
+
+                            <!-- Sent By -->
+                            <Text text="{masterModel>CREATEDBY}" />
+                            
+                            <!-- Assigned To Name -->
+                            <Text text="{masterModel>ASSIGNEDTONAME}" />
+
+                            <!-- Document Category -->
+                            <Text text="{masterModel>DOCCATEGORY}" />
+
+                            <!-- Last Changed and Last Changed By -->
+                            <ObjectIdentifier
+                                title="{path:'masterModel>LASTCHANGEDON', formatter:'.formatter.formatDateString'}"
+                                text="{masterModel>LASTCHANGEDBYNAME}"
+                            />
+
+                            <!-- Edit Button -->
+                            <Button tooltip="Edit" icon="sap-icon://edit" press="onQuickEditPress" type="Transparent" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+
+        </f:content>
+
+        <!-- DynamicPage Footer -->
+        <f:footer>
+            <OverflowToolbar >
+                <ToolbarSpacer />
+                <Button type="Accept" text="Submit" press="onSubmitPress"/>
+            </OverflowToolbar>
+        </f:footer>
+
+    </f:DynamicPage>
+
+</mvc:View>

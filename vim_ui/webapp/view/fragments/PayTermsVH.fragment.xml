@@ -1,0 +1,58 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<Dialog id="idPayDialog_VH" title="Payment Terms Search help">
+		<!-- CAP refactory: Inizio <subHeader>
+			<Toolbar design="Info">
+				<ToolbarSpacer />
+				<Label text="Recommendations" />
+				<Switch state="true" change="onSwitchKOSTL">
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>
+				</Switch>
+			</Toolbar>
+		</subHeader> CAP refactory: Fine -->
+
+		<content>
+			<!-- <List items="{path: 'appmodel>/valuehelps/KOSTLData'}" 
+				visible="{= ${appmodel>/props/ior_kostl}}" mode="SingleSelectMaster" 
+				selectionChange="onConfirmCostCenter2">
+				<CustomListItem>
+					<HBox>
+						<VBox class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+							<Title text="{appmodel>KOSTL}" />
+							<ObjectStatus class="sapUiSmallMarginBottom" title="Confidence" 
+							text="{path:'appmodel>Conf', formatter: '.formatter.formatConf'}" 
+							active="true" state="{path:'appmodel>Conf', formatter: '.formatter.formatConfState'}" 
+							inverted="true" />
+						</VBox>
+					</HBox>
+				</CustomListItem>
+			</List> -->
+			<!-- CAP refactory: Inizio <List items="{path: 'appmodel>/valuehelps/Paymentterms'}" 
+				visible="true" mode="SingleSelectMaster" id="idPayTermsVH"
+				selectionChange="onConfirmPayTerms">
+				<CustomListItem>
+					<HBox>
+						<VBox class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+							<Title text="{appmodel>value}"/>
+							<ObjectStatus class="sapUiSmallMarginBottom" title="Confidence" text="{path:'appmodel>probability', formatter: '.formatter.formatConf'}" active="true" state="{path:'appmodel>probability', formatter: '.formatter.formatConfState'}" inverted="true" />
+						</VBox>
+					</HBox>
+				</CustomListItem>
+			</List> CAP refactory: Fine -->
+			<List items="{path: 'appmodel>/valuehelps/paymentterms'}" visible="{= !${appmodel>/props/ior_kostl}}" mode="SingleSelectMaster"
+				selectionChange="onConfirmPayTerms2">
+				<headerToolbar>
+					<Toolbar>
+						<SearchField search="onSearchPayTerms" width="100%" placeholder="Payment Terms #" visible="true" />
+					</Toolbar>
+				</headerToolbar>
+				<StandardListItem title="{appmodel>CustomerPaymentTerms}" />				
+			</List>			
+		</content>
+
+		<endButton>
+			<Button text="Cancel" press="onCancelPaymentTermsVH" />
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

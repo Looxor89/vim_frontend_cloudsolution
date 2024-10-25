@@ -1,0 +1,20 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="invdoctypDialog"
+		noDataText="No data"
+		title="Document Type"
+		search=".onSearchDocTyp"
+		liveChange=".onSearchDocTyp"
+		confirm=".onConfirmDocTyp"
+		cancel=".onCancelDocTyp"
+		items="{
+			path: 'DocTypeModel>/I_AccountingDocumentType'
+		}">
+		<StandardListItem
+			title="{DocTypeModel>AccountingDocumentType}"
+			description="{DocTypeModel>AccountingDocumentType_Text}"
+      />
+	</SelectDialog>
+</core:FragmentDefinition>
