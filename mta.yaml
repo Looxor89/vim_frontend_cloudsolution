@@ -1,11 +1,39 @@
 _schema-version: "3.2"
 ID: vim_app_cloudsolution
-description: Fiori elements app
-version: 0.0.1
-parameters:
-  deploy_mode: html5-repo
-  enable-parallel-deployments: true
+description: Vendor Invoice Management
+version: 1.0.0
 modules:
+  - name: vim_app_cloudsolution-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: vim_app_cloudsolution-destination-service
+        parameters:
+          content-target: true
+      - name: vim_app_cloudsolution-repo-host
+        parameters:
+          service-key:
+            name: vim_app_cloudsolution-repo-host-key
+      - name: vim_app_cloudsolution-uaa
+        parameters:
+          service-key:
+            name: vim_app_cloudsolution-uaa-key
+      - name: vim_app_cloudsolution-connectivity-service
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: vim_app_cloudsolution-repo-host
+              ServiceInstanceName: vim_app_cloudsolution-html5-srv
+              ServiceKeyName: vim_app_cloudsolution-repo-host-key
+              sap.cloud.service: Vim_App_CloudSolution
+            - Authentication: OAuth2UserTokenExchange
+              Name: Vim_App_CloudSolution_vim_app_cloudsolution-uaa
+              ServiceInstanceName: vim_app_cloudsolution-xsuaa-service
+              ServiceKeyName: vim_app_cloudsolution-uaa-key
+              sap.cloud.service: Vim_App_CloudSolution
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
   - name: vim_app_cloudsolution-app-content
     type: com.sap.application.content
     path: .
@@ -30,65 +58,6 @@ modules:
       - npm install
       - npm run build:cf
       supported-platforms: []
-  - name: vim_app_cloudsolution-router
-    type: approuter.nodejs
-    path: router
-    properties:
-        REQUEST_TRACE: true
-        SEND_XFRAMEOPTIONS: false
-        XS_APP_LOG_LEVEL: debug
-    requires:
-    - name: vim_app_cloudsolution-html5-repo-runtime
-    - name: vim_app_cloudsolution-uaa
-    # - name: vim_app_cloudsolution-abap-ABAP-SCB
-    - name: vim_app_cloudsolution-connectivity-service
-    # - name: wf
-    - name: vim_app_cloudsolution-destination-service
-      group: destinations
-      properties:
-        forwardAuthToken: false
-        name: ui5
-        url: https://ui5.sap.com
-    # - name: vim_app_cloud_backend-backend-api
-    #   group: destinations
-    #   properties:
-    #     forwardAuthToken: true
-    #     name: vim_app_cloud_backend-backend-api
-    #     strictSSL: false
-    #     url: '~{url}'
-    # - name: portal_resources_vim_app_cloudsolution
-    # parameters:
-    #   disk-quota: 256M
-    #   health-check-type: port
-    #   memory: 256M
-  - name: vim_app_cloudsolution_ui_deployer
-    type: com.sap.application.content
-    path: .
-    requires:
-      - name: vim_app_cloudsolution-repo-host
-        parameters:
-          content-target: true
-    build-parameters:
-      build-result: resources
-      requires:
-        - artifacts:
-            - vim_ui.zip
-          name: vim_ui
-          target-path: resources/
-  - name: flp
-    type: com.sap.application.content
-    path: flp
-    requires:
-      # - name: portal_resources_vim_app_cloudsolution
-      #   parameters:
-      #     content-target: true
-      #     service-key:
-      #       config:
-      #         content-endpoint: developer
-      #       name: content-deploy-key
-      - name: vim_app_cloudsolution-repo-host
-      - name: vim_app_cloudsolution_ui_deployer
-      - name: vim_app_cloudsolution-uaa
 resources:
   # - name: vim_app_cloud_backend-backend-api
   #   type: configuration
@@ -106,12 +75,12 @@ resources:
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
-      service-plan: app-runtime
+      service-plan: app-host
   - name: vim_app_cloudsolution-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
       config:
-        HTML5Runtime_enabled: false
+        HTML5Runtime_enabled: true
         init_data:
           instance:
             destinations:
@@ -137,24 +106,9 @@ resources:
       service: connectivity
       service-name: vim_app_cloudsolution-connectivity-service
       service-plan: lite
-  # - name: vim_app_cloudsolution-abap-ABAP-SCB
-  #   type: org.cloudfoundry.existing-service
-  #   parameters:
-  #     protocol:
-  #     - ODataV2
-  #     service: abap
-  #     service-name: ABAP-SCB
-  #     service-plan: 16_abap_64_db
-  # - name: wf
-  #   type: org.cloudfoundry.existing-service
-  #   parameters:
-  #     service: workflow_service
-  #     service-plan: standard
-  # - name: portal_resources_vim_app_cloudsolution
-  #   type: org.cloudfoundry.managed-service
-  #   parameters:
-  #     service: portal
-  #     service-plan: standard
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
 build-parameters:
   before-all:
   - builder: custom

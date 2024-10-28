@@ -4,11 +4,15 @@ sap.ui.define([
   "vim_ui/utils/formatter"
 ], function (BaseController, JSONModel, formatter) {
   "use strict";
+  //manifest base URL
+  var baseManifestUrl;
 
   return BaseController.extend("vim_ui.controller.Detail", {
     formatter: formatter,
 
     onInit: function () {
+      //set manifest base URL
+      baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
       this.oRouter = this.getOwnerComponent().getRouter();
       this.oRouter.getRoute("detailDetail").attachPatternMatched(this._onRouteMatched, this);
       var bus = this.getOwnerComponent().getEventBus();
@@ -60,7 +64,7 @@ sap.ui.define([
         console.log("packageId not passed");
         return null;
       }
-      var aURL = "/odata/extended()?PACKAGEID=" + packageId + "";
+      var aURL = baseManifestUrl + "/odata/extended()?PACKAGEID=" + packageId + "";
 
       return new Promise(function (resolve, reject) {
 

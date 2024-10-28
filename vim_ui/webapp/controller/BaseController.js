@@ -26,7 +26,7 @@ sap.ui.define([
          */
         executeRequest: function (sUrl, sMethod, oBody, oSuccessFunction, oErrorFunction) {
             // Return a Promise to handle asynchronous request
-            return new Promise (function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 $.ajax({
                     url: sUrl,
                     method: sMethod,
@@ -61,7 +61,7 @@ sap.ui.define([
 
         loadDashboard: function () {
 
-            var aURL = "/odata/extended()";
+            var aURL = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + "/odata/extended()";
             sap.ui.core.BusyIndicator.show()
             $.ajax({
                 url: aURL,
@@ -129,7 +129,7 @@ sap.ui.define([
             var body = undefined;
 
             if (this.sAction === 'Assign') {
-                url = '/odata/assign';
+                url = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + '/odata/assign';
                 body = {
                     payload: {
                         PackageId: this.packageId,
@@ -160,7 +160,7 @@ sap.ui.define([
                 });
 
             } else if (this.sAction === 'Forward') {
-                url = '/odata/forward';
+                url = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + '/odata/forward';
                 body = {
                     payload: {
                         PackageId: this.packageId,
@@ -228,7 +228,7 @@ sap.ui.define([
 
         onRejectInvoice: function (oEvent) {
 
-            var url = "/odata/reject?sMode="
+            var url = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + "/odata/reject?sMode="
             var oModel = this.getOwnerComponent().getModel("appmodel");
             var sButtonTxt = oEvent.getSource().getText();
             var packageId = oModel.getProperty("/detail/header/PACKAGEID");
@@ -290,7 +290,7 @@ sap.ui.define([
 
         getUsers: function (oModel) {
             var oView = this.getView();
-            var url = "/odata/users()";
+            var url = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + "/odata/users()";
 
             $.ajax({
                 url: url,

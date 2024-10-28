@@ -107,12 +107,5 @@
             "$XSAPPNAME.download"
         ]
     }
-  ],
-  "oauth2-configuration": {
-    "redirect-uris": [
-      "http://localhost:**",
-      "https://*.hana.ondemand.com/**",
-      "https://*.applicationstudio.cloud.sap/**"
-    ]
-  }
+  ]
 }

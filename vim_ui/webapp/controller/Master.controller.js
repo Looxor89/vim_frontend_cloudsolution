@@ -9,6 +9,8 @@ sap.ui.define([
     "vim_ui/utils/formatter"
 ], function (BaseController, JSONModel, Sorter, MessageToast, MessageBox, Fragment, ValueState, formatter) {
     "use strict";
+    //manifest base URL
+    var baseManifestUrl;
 
     return BaseController.extend("vim_ui.controller.Master", {
         formatter: formatter,
@@ -18,6 +20,8 @@ sap.ui.define([
          * Set up router and attach the route pattern matcher.
          */
         onInit: function () {
+            //set manifest base URL
+            baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
             this.oRouter = this.getOwnerComponent().getRouter();
             this.oRouter.getRoute("master").attachPatternMatched(this._onRouteMatched, this);
             this._bDescendingSort = false;
@@ -83,7 +87,7 @@ sap.ui.define([
          * Helper method to build the query URL with the given parameters.
          */
         _buildFilterQuery: function (sDocStatus, sAssignedTo, sDocCategory, sCreatedBy, sCreatedDateFrom, sCreatedDateTo) {
-            var url = "/odata/extended()?";
+            var url = baseManifestUrl + "/odata/extended()?";
             var aParams = [];
 
             if (sDocStatus.length) {
@@ -131,7 +135,7 @@ sap.ui.define([
          * Unlocks a document by sending an AJAX POST request.
          */
         onUnlock: function (oEvent) {
-            var url = "/odata/unlock";
+            var url = baseManifestUrl + "/odata/unlock";
             var sPackageId = this.getView().getModel("masterModel").getProperty(this.oCtx + "/PACKAGEID");
 
             if (!sPackageId) {

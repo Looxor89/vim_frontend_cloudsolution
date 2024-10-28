@@ -19,11 +19,15 @@ sap.ui.define([
   "use strict";
 
   var sResponsivePaddingClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer";
+  //manifest base URL
+  var baseManifestUrl;
 
   return BaseController.extend("vim_ui.controller.DetailDetail", {
     formatter: formatter,
     _sTestVar: "test",
     onInit: function () {
+      //set manifest base URL
+      baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
       // Create a MessagePopover for showing messages and notifications
       this.createMessagePopover();
 
@@ -513,32 +517,32 @@ sap.ui.define([
 
       // Check if the current mode is PO (Purchase Order) mode
       if (oDetailDetailModel.getProperty("/props/POMode")) {
-          var oTable = this.getView().byId("idInvLineItemTable"); // Get PO table
+        var oTable = this.getView().byId("idInvLineItemTable"); // Get PO table
 
-          // Bind PO-related line items to the table and set keyboard mode
-          oTable.bindAggregation("items", {
-              path: "detailDetailModel>/DocxLines", // Path to PO line items
-              template: oTemplate,
-              templateShareable: true, // Ensure the template is shareable
-              key: "InvoiceLineItem" // Define the key for each item
-          }).setKeyboardMode(sKeyboardMode); // Set keyboard navigation mode
+        // Bind PO-related line items to the table and set keyboard mode
+        oTable.bindAggregation("items", {
+          path: "detailDetailModel>/DocxLines", // Path to PO line items
+          template: oTemplate,
+          templateShareable: true, // Ensure the template is shareable
+          key: "InvoiceLineItem" // Define the key for each item
+        }).setKeyboardMode(sKeyboardMode); // Set keyboard navigation mode
 
       } else {
-          var oTable = this.getView().byId("idNPOInvGLAccountLineTable"); // Get Non-PO table
+        var oTable = this.getView().byId("idNPOInvGLAccountLineTable"); // Get Non-PO table
 
-          // Bind Non-PO-related line items to the table and set keyboard mode
-          oTable.bindAggregation("items", {
-              path: "detailDetailModel>/NonPoDocxLines", // Path to Non-PO line items
-              template: oTemplate,
-              templateShareable: true,
-              key: "InvoiceLineItem"
-          }).setKeyboardMode(sKeyboardMode); // Set keyboard navigation mode
+        // Bind Non-PO-related line items to the table and set keyboard mode
+        oTable.bindAggregation("items", {
+          path: "detailDetailModel>/NonPoDocxLines", // Path to Non-PO line items
+          template: oTemplate,
+          templateShareable: true,
+          key: "InvoiceLineItem"
+        }).setKeyboardMode(sKeyboardMode); // Set keyboard navigation mode
       }
     },
 
     // Function to fetch notes associated with a package ID from the backend
     fetchNotes: function (packageId) {
-      var sURL = "/odata/notes()?PackageId=" + packageId; // Construct the API URL
+      var sURL = baseManifestUrl + "/odata/notes()?PackageId=" + packageId; // Construct the API URL
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
@@ -557,13 +561,13 @@ sap.ui.define([
     // Function to add a new note via a POST request to the backend
     onAddNotes: function (oEvent) {
       var sNotes = this.getView().byId("idNotesTxtArea").getValue(); // Get user-entered note
-      var sUrl = "/odata/addNotes"; // API URL for adding a new note
+      var sUrl = baseManifestUrl + "/odata/addNotes"; // API URL for adding a new note
       var obj = {
-          payload: {
-              PackageId: this._packageId, // Current package ID
-              Subject: 'Comment', // Set subject to "Comment"
-              Note: sNotes // Note content entered by the user
-          }
+        payload: {
+          PackageId: this._packageId, // Current package ID
+          Subject: 'Comment', // Set subject to "Comment"
+          Note: sNotes // Note content entered by the user
+        }
       };
 
       const oSuccessFunction = (data) => {
@@ -589,12 +593,12 @@ sap.ui.define([
     },
 
     fetchFileList: function (packageId) {
-      var sURL = `/odata/DOC_PACK?$filter=PackageId eq ${packageId}&$expand=Invoice($expand=body($expand=allegati))`,
-      oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = this.getView().getModel("currentInvoice"),
-      oTable = this.getView().byId("idFileList");
+      var sURL = baseManifestUrl + `/odata/DOC_PACK?$filter=PackageId eq ${packageId}&$expand=Invoice($expand=body($expand=allegati))`,
+        oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+        oCurrentInvoice = this.getView().getModel("currentInvoice"),
+        oTable = this.getView().byId("idFileList");
       oTable.setBusy(true);
-      
+
       const oSuccessFunction = (data) => {
         oDetailDetailModel.setProperty("/Filelist", data.value[0].Invoice.body[0].allegati);
         oCurrentInvoice.setProperty("/body/0/allegati");
@@ -618,9 +622,9 @@ sap.ui.define([
 
       // Build the request payload
       var body = {
-          payload: {
-              PackageId: this._packageId  // Include the package ID for unlocking
-          }
+        payload: {
+          PackageId: this._packageId  // Include the package ID for unlocking
+        }
       };
 
       // Set the model properties to indicate that the edit mode is disabled
@@ -639,15 +643,15 @@ sap.ui.define([
 
         // If in PO mode, rebind the table to make it uneditable
         if (oDetailDetailModel.getProperty("/props/POMode")) {
-            this.rebindTable(this.oReadOnlyTemplate, "Navigation");
-            this.getView().byId("idInvLineItemTable").setMode("None");  // Disable table actions
+          this.rebindTable(this.oReadOnlyTemplate, "Navigation");
+          this.getView().byId("idInvLineItemTable").setMode("None");  // Disable table actions
         } else {
-            // Rebind non-PO mode table to make it uneditable
-            this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation");
-            this.getView().byId("idNPOInvGLAccountLineTable").setMode("None");  // Disable table actions
+          // Rebind non-PO mode table to make it uneditable
+          this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation");
+          this.getView().byId("idNPOInvGLAccountLineTable").setMode("None");  // Disable table actions
         }
         return data;
-      }; 
+      };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
         console.log("FAILED TO REMOVE LOCK", err);  // Log the error
@@ -665,7 +669,7 @@ sap.ui.define([
           PackageId: this._packageId
         }
       };
-      var sURL = "/odata/lock";
+      var sURL = baseManifestUrl + "/odata/lock";
 
       const oSuccessFunction = (data) => {
         // if success means lock was set
@@ -895,7 +899,7 @@ sap.ui.define([
         console.log("packageId not passed");
         return null;
       }
-      var sUrl = "/odata/extended()?PACKAGEID=" + packageId + "";
+      var sUrl = baseManifestUrl + "/odata/extended()?PACKAGEID=" + packageId + "";
 
       const oSuccessFunction = (oData) => {
         var data = oData.value[0].result.pop();
@@ -933,7 +937,7 @@ sap.ui.define([
     /* Value Helps Block */
     /* Currency */
     fetchCurrency: function (code) {
-      var aURL = "/odata/currency()";
+      var aURL = baseManifestUrl + "/odata/currency()";
       if (code) {
         aURL = aURL + "?code=" + code + "";
       }
@@ -2603,7 +2607,7 @@ sap.ui.define([
     readSavedDataOld: function () {
       // this.I_JOBID 
       // var hMap = deepExtend({}, this.appmodel.getProperty("/ui/header"));
-      var aURL = "/odata/getMetadata()?jobId=" + this.I_JOBID + "&$top=1";
+      var aURL = baseManifestUrl + "/odata/getMetadata()?jobId=" + this.I_JOBID + "&$top=1";
 
       if (!this.I_JOBID) {
         console.log("JobID not passed");
@@ -3047,7 +3051,7 @@ sap.ui.define([
       }
 
       this.I_PACKAGEID = packageId; // Set the package ID as a global variable
-      var aURL = "/odata/extended()?PACKAGEID=" + packageId; // Create API URL
+      var aURL = baseManifestUrl + "/odata/extended()?PACKAGEID=" + packageId; // Create API URL
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
@@ -3076,7 +3080,7 @@ sap.ui.define([
 
     // Function to read saved data from the backend for the current package
     readSavedData: function () {
-      var aURL = "/odata/DOC_PACK?$expand=Invoice($expand=body($expand=datiGenerali_DatiGeneraliDocumento_DatiRitenuta,datiGenerali_DatiGeneraliDocumento_DatiCassaPrevidenziale,datiGenerali_DatiGeneraliDocumento_ScontoMaggiorazione,datiGenerali_DatiOrdineAcquisto($expand=riferimentoNumeroLinea),datiBeniServizi_DettaglioLinee($expand=codiceArticolo,scontoMaggiorazione,altriDatiGestionali),datiBeniServizi_DatiRiepilogo,datiPagamento($expand=dettaglioPagamento),allegati,datiGenerali_DatiDDT($expand=riferimentoNumeroLinea)))&$filter=PackageId eq " + this.I_PACKAGEID;
+      var aURL = baseManifestUrl + "/odata/DOC_PACK?$expand=Invoice($expand=body($expand=datiGenerali_DatiGeneraliDocumento_DatiRitenuta,datiGenerali_DatiGeneraliDocumento_DatiCassaPrevidenziale,datiGenerali_DatiGeneraliDocumento_ScontoMaggiorazione,datiGenerali_DatiOrdineAcquisto($expand=riferimentoNumeroLinea),datiBeniServizi_DettaglioLinee($expand=codiceArticolo,scontoMaggiorazione,altriDatiGestionali),datiBeniServizi_DatiRiepilogo,datiPagamento($expand=dettaglioPagamento),allegati,datiGenerali_DatiDDT($expand=riferimentoNumeroLinea)))&$filter=PackageId eq " + this.I_PACKAGEID;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
@@ -3094,7 +3098,7 @@ sap.ui.define([
         // Store attachments (if any)
         oDetailDetailModel.setProperty("/Filelist", oBody.allegati);
         this.getView().setModel(new JSONModel(record.Invoice), "currentInvoice");
-        
+
         // Process data differently for PO mode and Non-PO mode
         if (bPOMode) {
           let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
@@ -3267,7 +3271,7 @@ sap.ui.define([
         //   }
         // }
 
-        return(record);
+        return (record);
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -3325,48 +3329,48 @@ sap.ui.define([
 
       // Function that performs the loop and checks the lock status every 60 seconds
       function myLoop() {
-          console.log("Auto Refresh started");  // Log that auto-refresh has started
-          that.getLockStatus(that._packageId);  // Call function to check the lock status of the package
+        console.log("Auto Refresh started");  // Log that auto-refresh has started
+        that.getLockStatus(that._packageId);  // Call function to check the lock status of the package
 
-          // If 'keepGoing' is still true, schedule the next iteration of the loop after 60 seconds
-          if (that.keepGoing) {
-              setTimeout(myLoop, 60000);  // 60000 milliseconds = 60 seconds
-          }
+        // If 'keepGoing' is still true, schedule the next iteration of the loop after 60 seconds
+        if (that.keepGoing) {
+          setTimeout(myLoop, 60000);  // 60000 milliseconds = 60 seconds
+        }
       }
 
       // Function to start the looping process
       function startLoop() {
-          that.keepGoing = true;  // Set 'keepGoing' to true, ensuring the loop continues
-          myLoop();  // Initiate the first loop
+        that.keepGoing = true;  // Set 'keepGoing' to true, ensuring the loop continues
+        myLoop();  // Initiate the first loop
       }
 
       // Function to stop the looping process
       function stopLoop() {
-          that.keepGoing = false;  // Set 'keepGoing' to false, stopping the loop
+        that.keepGoing = false;  // Set 'keepGoing' to false, stopping the loop
       }
 
       // Conditional logic to either start or stop the loop based on the current value of 'keepGoing'
       if (this.keepGoing) {
-          startLoop();  // Start the loop if 'keepGoing' is true
-          // Optionally, display a message to indicate auto-sync has started
-          // sap.m.MessageToast.show("Auto-sync : Started");
+        startLoop();  // Start the loop if 'keepGoing' is true
+        // Optionally, display a message to indicate auto-sync has started
+        // sap.m.MessageToast.show("Auto-sync : Started");
       } else {
-          stopLoop();  // Stop the loop if 'keepGoing' is false
-          // Optionally, display a message to indicate auto-sync has stopped
-          // sap.m.MessageToast.show("Auto-sync : Stopped");
+        stopLoop();  // Stop the loop if 'keepGoing' is false
+        // Optionally, display a message to indicate auto-sync has stopped
+        // sap.m.MessageToast.show("Auto-sync : Stopped");
       }
     },
 
     getLockStatus: function (packageId) {
       // Check if packageId is provided, log error and return null if not
       if (!packageId) {
-          console.log("packageId not passed");
-          return null;
+        console.log("packageId not passed");
+        return null;
       }
-  
+
       // Construct the URL for the OData service call with the provided packageId
-      var aURL = "/odata/lockStatus()?PackageId=" + packageId;
-      
+      var aURL = baseManifestUrl + "/odata/lockStatus()?PackageId=" + packageId;
+
       // Get the 'detailDetailModel' from the view's model for future data binding
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
@@ -3531,7 +3535,7 @@ sap.ui.define([
           msg = "Are you sure you want to set attachment " + fileName + " as the Primary Document?";
         }
 
-        var url = "/odata/setMainJob";
+        var url = baseManifestUrl + "/odata/setMainJob";
 
         MessageBox.warning(msg, {
           actions: ["Switch Primary", MessageBox.Action.CLOSE],
@@ -3579,11 +3583,11 @@ sap.ui.define([
 
     handleFileChange: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      aFiles = oEvent.getParameter("files");  // Get the list of files
+        aFiles = oEvent.getParameter("files");  // Get the list of files
 
 
       if (aFiles && aFiles.length) {
-          var oFile = aFiles[0],  // Get the first file
+        var oFile = aFiles[0],  // Get the first file
           sBodyId = this.getView().getModel("currentInvoice").getProperty("/body")[0].ID,
           sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/detail/header/COMPANYCODE"),
           sFiscalYear = this.getView().getModel("detailDetailModel").getProperty("/detail/header/FISCALYEAR"),
@@ -3594,40 +3598,40 @@ sap.ui.define([
           sReferenceDocument = this.getView().getModel("detailDetailModel").getProperty("/detail/header/REFERENCEDOCUMENT"),
           sPackageId = this._packageId;
 
-          // Define what to do when file is successfully read
-          oReader.onload = function (oEvent) {
-              var sBase64 = oEvent.target.result;  // The Base64 encoded file content
-              console.log("Base64 file content:", sBase64);
-              
-              // If you want only the base64 part, remove the prefix like "data:image/png;base64,"
-              var sBase64Data = sBase64.split(",")[1];
-              // Set property model NewUploadedFile
-              oDetailDetailModel.setProperty("/NewUploadedFile", {
-                "PackageId": sPackageId,
-                "CompanyCode": sCompanyCode,
-                "ReferenceDocument": sReferenceDocument,
-                "FiscalYear": sFiscalYear,
-                "BodyId": sBodyId,
-                "AttachmentName": sName,
-                "AttachmentType": sType,
-                "AttachmentExtension": sExtension,
-                "Attachment": sBase64Data
-              });
-          };
+        // Define what to do when file is successfully read
+        oReader.onload = function (oEvent) {
+          var sBase64 = oEvent.target.result;  // The Base64 encoded file content
+          console.log("Base64 file content:", sBase64);
 
-          // Read the file as Data URL to get Base64
-          oReader.readAsDataURL(oFile);
+          // If you want only the base64 part, remove the prefix like "data:image/png;base64,"
+          var sBase64Data = sBase64.split(",")[1];
+          // Set property model NewUploadedFile
+          oDetailDetailModel.setProperty("/NewUploadedFile", {
+            "PackageId": sPackageId,
+            "CompanyCode": sCompanyCode,
+            "ReferenceDocument": sReferenceDocument,
+            "FiscalYear": sFiscalYear,
+            "BodyId": sBodyId,
+            "AttachmentName": sName,
+            "AttachmentType": sType,
+            "AttachmentExtension": sExtension,
+            "Attachment": sBase64Data
+          });
+        };
+
+        // Read the file as Data URL to get Base64
+        oReader.readAsDataURL(oFile);
       }
     },
 
     handleUploadPress: function (oEvent) {
       var oFileUploader = this.getView().byId("fileUploader"),
-      oNewUploadedFile = this.getView().getModel("detailDetailModel").getProperty("/NewUploadedFile"),
-      oBody = {
-        payload: oNewUploadedFile
-      },
-      table = this.getView().byId("idFileList"),
-      sUrl = `/odata/addAttachment`;
+        oNewUploadedFile = this.getView().getModel("detailDetailModel").getProperty("/NewUploadedFile"),
+        oBody = {
+          payload: oNewUploadedFile
+        },
+        table = this.getView().byId("idFileList"),
+        sUrl = baseManifestUrl + `/odata/addAttachment`;
 
       if (oFileUploader.getValue() !== '') {
 
@@ -3636,26 +3640,26 @@ sap.ui.define([
           table.setBusy(false);
           // Show success message to the user
           MessageBox.success("Attachment uploaded with success", {
-              actions: [MessageBox.Action.CLOSE],
-              title: "Success",
-              details: data,  // Provide details of the response
-              styleClass: sResponsivePaddingClasses,
-              onClose: function () {
-                this.fetchFileList(this._packageId);
-              }.bind(this)
+            actions: [MessageBox.Action.CLOSE],
+            title: "Success",
+            details: data,  // Provide details of the response
+            styleClass: sResponsivePaddingClasses,
+            onClose: function () {
+              this.fetchFileList(this._packageId);
+            }.bind(this)
           });
           oFileUploader.clear();
         };
 
         const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
           console.log(errorThrown);  // Log the error
-          
+
           table.setBusy(false);
           // Show error message to the user
           MessageBox.error("An unexpected error occurred in the backend system.\nPlease try again later.", {
-              title: "Error",
-              details: errorThrown,  // Provide error details
-              styleClass: sResponsivePaddingClasses
+            title: "Error",
+            details: errorThrown,  // Provide error details
+            styleClass: sResponsivePaddingClasses
           });
           oFileUploader.clear();
         };
@@ -4346,26 +4350,26 @@ sap.ui.define([
     // Handler for the "Save" button press
     onSavePress: function (oEvent) {
       var body = {}; // Initialize request body
-      var sUrl = `/odata/save`; // API endpoint for saving data
+      var sUrl = baseManifestUrl + `/odata/save`; // API endpoint for saving data
 
       // Retrieve the current invoice data from the model
       var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
 
       // Build the request payload
       body = {
-          payload: {
-              PackageId: this._packageId,  // Package ID
-              Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
-          }
+        payload: {
+          PackageId: this._packageId,  // Package ID
+          Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
+        }
       };
 
       const oSuccessFunction = (data) => {
         console.log(data);  // Log the successful response
         // Show success message to the user
         MessageBox.success("Successfully saved record", {
-            title: "Success",
-            details: data,  // Provide details of the response
-            styleClass: sResponsivePaddingClasses
+          title: "Success",
+          details: data,  // Provide details of the response
+          styleClass: sResponsivePaddingClasses
         });
 
         // Call the cancel handler to release the lock
@@ -4377,9 +4381,9 @@ sap.ui.define([
 
         // Show error message to the user
         MessageBox.error("An unexpected error occurred in the backend system.\nPlease try again later.", {
-            title: "Error",
-            details: errorThrown,  // Provide error details
-            styleClass: sResponsivePaddingClasses
+          title: "Error",
+          details: errorThrown,  // Provide error details
+          styleClass: sResponsivePaddingClasses
         });
 
         // Call the cancel handler to release the lock even in case of failure
@@ -4439,26 +4443,26 @@ sap.ui.define([
 
     onSubmitPress: function (oEvent) {
       var body = {}; // Initialize request body
-      var sUrl = this.getView().getModel("detailDetailModel").getProperty("/props/POMode") ? `/odata/submitPO` : `/odata/submitGLAccount`; // API endpoint for saving data
+      var sUrl = this.getView().getModel("detailDetailModel").getProperty("/props/POMode") ? baseManifestUrl + `/odata/submitPO` : baseManifestUrl + `/odata/submitGLAccount`; // API endpoint for saving data
 
       // Retrieve the current invoice data from the model
       var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
 
       // Build the request payload
       body = {
-          payload: {
-              PackageId: this._packageId,  // Package ID
-              Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
-          }
+        payload: {
+          PackageId: this._packageId,  // Package ID
+          Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
+        }
       };
 
       const oSuccessFunction = (data) => {
         console.log(data);  // Log the successful response
         // Show success message to the user
         MessageBox.success("Successfully saved record", {
-            title: "Success",
-            details: data,  // Provide details of the response
-            styleClass: sResponsivePaddingClasses
+          title: "Success",
+          details: data,  // Provide details of the response
+          styleClass: sResponsivePaddingClasses
         });
 
         // Call the cancel handler to release the lock
@@ -4470,9 +4474,9 @@ sap.ui.define([
 
         // Show error message to the user
         MessageBox.error("An unexpected error occurred in the backend system.\nPlease try again later.", {
-            title: "Error",
-            details: errorThrown,  // Provide error details
-            styleClass: sResponsivePaddingClasses
+          title: "Error",
+          details: errorThrown,  // Provide error details
+          styleClass: sResponsivePaddingClasses
         });
 
         // Call the cancel handler to release the lock even in case of failure

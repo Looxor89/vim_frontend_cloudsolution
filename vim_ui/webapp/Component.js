@@ -59,7 +59,7 @@ sap.ui.define([
         },
 
         getProps: function () {
-            var url = "/odata/capabilities()"
+            var url = jQuery.sap.getModulePath(this.getMetadata().getManifest()["sap.app"].id) + "/odata/capabilities()"
 
             $.ajax({
                 url: url,

@@ -1,25 +1,124 @@
 {
-    "welcomeFile": "/index.html",
-    "authenticationMethod": "route",
-    "routes": [
-      {
-        "source": "^/resources/(.*)$",
-        "target": "/resources/$1",
-        "authenticationType": "none",
-        "destination": "ui5"
-      },
-      {
-        "source": "^/test-resources/(.*)$",
-        "target": "/test-resources/$1",
-        "authenticationType": "none",
-        "destination": "ui5"
-      },
-      {
-        "source": "^(.*)$",
-        "target": "$1",
-        "service": "html5-apps-repo-rt",
-        "authenticationType": "xsuaa"
-      }
-    ]
-  }
-  
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/sap/opu/odata/sap/API_COMPANYCODE_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/API_PROFITCENTER_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/API_COSTCENTER_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/C_SUPPLIER_FS_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/C_GLACCOUNTVALUEHELP_CDS/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/PS_WBSELEMENT_OVW_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },    
+    {
+      "source": "^/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/FAC_GL_JOURNALENTRY_VER_SRV/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/odata/(.*)$",
+      "target": "/odata/v4/catalog/$1",
+      "destination": "VIM_backend_TE",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sap/opu/odata/sap/C_BILLGDOCREDACTED/(.*)$",      
+      "destination": "m19https",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/sql/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "LookupDestV3"
+    },
+    {
+      "source": "^/api/dox/(.*)$",
+      "target": "$1",
+      "destination": "BTP_AISERVICE_DOX"
+    },
+    {
+      "source": "^/api/objstore/(.*)$",
+      "target": "/api/objstore/$1",
+      "destination": "OBJSTORE_API_DEST"
+    },
+    {
+      "source": "^/api/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "vim_app_cloud_backend-backend-api",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/attach_sap/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "AP_S3_ATTACH_SAP",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/dar/(.*)$",
+      "target": "/api/v3/$1",
+      "destination": "DAR_INFERENCE_DEST"
+    },
+    {
+      "source": "^/darbackend/(.*)$",
+      "target": "/v1/api/$1",
+      "destination": "darmta-backend-api",
+      "csrfProtection": false
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa",
+      "scope": "$XSAPPNAME.admin"
+    }
+  ]
+}
