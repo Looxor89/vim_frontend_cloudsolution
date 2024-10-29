@@ -81,7 +81,7 @@ sap.ui.define([
         // calculate UTC offset
         var offset = new Date().getTimezoneOffset();
         offset = offset * (-1);
-        // format monent
+        // format moment
         return moment(sDate).utcOffset(offset).format('LLL');
       } else {
         return "";
@@ -170,6 +170,8 @@ sap.ui.define([
             return "ASSIGNED"
           }
           return "FORWARDED";
+        case "RELEASED":
+          return "RELEASED FOR APPROVAL";
         case "REJSAP":
           return "REJECTED (Manual entry in SAP)";
         case "REJRTV":
