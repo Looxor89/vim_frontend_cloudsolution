@@ -52,7 +52,7 @@
                             </fb:FilterGroupItem>
 
                             <!-- Sent By Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="Sent By" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="Vendor name" visibleInFilterBar="true">
                                 <fb:control>
                                     <Input id="idSentByInp" />
                                 </fb:control>
@@ -108,7 +108,7 @@
                 <headerToolbar>
                     <OverflowToolbar >
                         <ToolbarSpacer/>
-                        <Button icon="sap-icon://edit" press="onQuickMassiveEditPress" tooltip="Massive action"/>
+                        <Button id="quickMassiveActionButton" icon="sap-icon://edit" text="Quick Massive Edit" enabled="false" press="onQuickMassiveEditPress" tooltip="Massive action"/>
                     </OverflowToolbar>
                 </headerToolbar>
 
@@ -159,6 +159,7 @@
                     <ColumnListItem
                         type="Navigation"
                         press="onListItemPress"
+                        modelContextChange="onModelContextChange"
                         highlight="{path: 'masterModel>DOC_STATUS', formatter: '.formatter.statusText'}">
                         <cells>
                             <!-- Company Code and Description -->
@@ -171,7 +172,7 @@
                             />
                             
                             <!-- Received on -->
-                            <Text text="{masterModel>CREATEDAT}" />
+                            <Text text="{path:'masterModel>CREATEDAT', formatter:'.formatter.formatDateString'}" />
 
                             <!-- Sent By -->
                             <Text text="{masterModel>CREATEDBY}" />

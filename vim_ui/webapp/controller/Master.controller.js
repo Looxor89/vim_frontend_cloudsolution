@@ -240,14 +240,18 @@ sap.ui.define([
         onSelectionChange: function (oEvent) {
 			var oTable = oEvent.getSource(),
             aItems = oTable.getSelectedItems(),
-            bShowFooter = aItems.length > 0;
+            bShowFooter = aItems.length > 0,
+            bEnableQuickMassiveEdit = aItems.length > 1;
             oTable.getItems().forEach(oItem => {
                 if (aItems.length > 1) {
                     oItem.getAggregation("cells")[7].setEnabled(false);
+                } else {
+                    oItem.getAggregation("cells")[7].setEnabled(true);
                 }
                 oItem.setHighlight(ValueState.None);
             });
             this.getView().byId("dynamicPageId").setShowFooter(bShowFooter);
+            this.getView().byId("quickMassiveActionButton").setEnabled(bEnableQuickMassiveEdit);
         },
 
         onSubmitPress: function () {
@@ -257,10 +261,12 @@ sap.ui.define([
             that = this;
 
             aSelectedItems = aSelectedItems.map((oItem) => {
-                return {
-                    "PackageId": oItem.getBindingContext("masterModel").getProperty("PACKAGEID"),
-                    "DocCategory": oItem.getBindingContext("masterModel").getProperty("DOCCATEGORY")
-                };
+                if (oItem.getBindingContext("masterModel").getProperty("DOC_STATUS") == "SUBMITTED") {
+                    return {
+                        "PackageId": oItem.getBindingContext("masterModel").getProperty("PACKAGEID"),
+                        "DocCategory": oItem.getBindingContext("masterModel").getProperty("DOCCATEGORY")
+                    };
+                }
             });
 
             MessageBox.warning("Do you really want to submit selected invoices?", {
