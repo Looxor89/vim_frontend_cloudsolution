@@ -301,336 +301,211 @@
                                                         >
                                                     <core:Item id="idTaxCodeTmp" key="{detailDetailModel>Taxcode}" text="{detailDetailModel>Taxcode} - {detailDetailModel>Text}" />
                                                 </m:Select>
-                                                <!-- <m:Input id="idTaxCode" showValueHelp="true" valueHelpRequest=".onTaxCodeVH" /> -->
-
-                                                <!-- <m:Label text="Calculate Tax" />
-                                                <m:CheckBox id="idCalcTaxInd" select=".onCalcTax" />CAP refactory  -->
-
-                                                <!-- <core:Title text="Unplanned Freight" visible="false"/> -->
-                                                <!-- <m:Toolbar ariaLabelledBy="Title2" visible="{= ${appmodel>/props/POMode}}">
-                                                    <m:Title id="Title2" text="Unplanned Freight" />
-                                                    <m:ToolbarSpacer />
-                                                </m:Toolbar>CAP refactory  -->
-
-                                                <!-- <m:Label text="Delivery/Shipping Amount" visible="{= ${appmodel>/props/POMode}}" />
-                                                <m:Input id="idShippingAmount" 
-                                                    value="{
-                                                    type: 'sap.ui.model.odata.type.Decimal',
-                                                    formatOptions: {
-                                                    minFractionDigits: 1,
-                                                    maxFractionDigits: 3
-                                                    },
-                                                    constraints: {
-                                                    precision: 23,
-                                                    scale: 4
-                                                    }}"
-                                                    liveChange="calcTotals"
-                                                    type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" 
-                                                    placeholder="0.00" visible="{= ${appmodel>/props/POMode}}" />CAP refactory  -->
-
-                                                <!-- <m:Toolbar ariaLabelledBy="LineItemsTypeTitle" visible="{= !${detailDetailModel>/props/POMode}}">
-                                                    <m:Title id="LineItemsTypeTitle" text="Line items type" visible="{= !${detailDetailModel>/props/POMode}}"/>
-                                                    <m:Select
-                                                        id="idLineItemsType"
-                                                        forceSelection="false"
-                                                        change="onChangeGlAccountAsset"
-                                                        visible="{= !${detailDetailModel>/props/POMode}}">
-                                                        <core:ListItem key="idGLAccountItem" text="G/L Account" />
-                                                        <core:ListItem key="idAssetItem" text="Asset" />
-                                                    </m:Select>
-                                                </m:Toolbar> -->
                                             </form:content>
                                         </form:SimpleForm>
                                     </l:BlockLayoutCell>
                                 </l:BlockLayoutRow>
 
-                                <l:BlockLayoutRow visible="{= ${detailDetailModel>/props/POMode}}">
+                                <l:BlockLayoutRow>
                                     <l:BlockLayoutCell>
-                                        <m:Table id="idInvLineItemTable" items="{
-                                                    path: 'detailDetailModel>/DocxLines',
-                                                    sorter: {
-                                                        path: 'Name'
-                                                    }
-                                                }" class="sapUiNoMargin">
-                                            <m:headerToolbar>
-                                                <m:Toolbar>
-                                                    <m:Title text="Line Items ({= ${detailDetailModel>/DocxLines/length}}) Purchase Order" level="H2" />
-                                                    <m:ToolbarSpacer />
-                                                    <m:Button text="Add" press="onAddRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                    <m:Button text="Delete" press="onDeleteSelectedRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                    <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
-                                                </m:Toolbar>
-                                            </m:headerToolbar>
-                                            <m:columns>
-                                                <m:Column minScreenWidth="Tablet" demandPopin="true">
-                                                    <m:Label text="Doc. Line No." required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Tablet" demandPopin="true" visible="{detailDetailModel>/props/bMultiplePO}">
-                                                    <m:Label text="Purchase Order" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="PO Line No." required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Amount" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Qty" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Order Unit" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Description" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Tax Code" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Business area" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Cost center" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="WBS Element" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Order" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Supplier" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Material" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Valuation type" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Material group" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Plant" required="true"/>
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Label text="Valuation area" required="true"/>
-                                                </m:Column>
+                                     <m:IconTabBar id="iconTabBarBodyInvoice" applyContentPadding="false" class="sapUiNoContentPadding" expandable="false">
+                                        <m:items>
+                                            <m:IconTabFilter text="Purchase Order" count="{= ${detailDetailModel>/DocxLines/length}}">
+                                                <m:Table id="idInvLineItemTable" items="{
+                                                        path: 'detailDetailModel>/DocxLines',
+                                                        sorter: {
+                                                            path: 'Name'
+                                                        }
+                                                    }" class="sapUiNoMargin">
+                                                    <m:headerToolbar>
+                                                        <m:Toolbar>
+                                                            <m:Title text="Line Items ({= ${detailDetailModel>/DocxLines/length}}) Purchase Order" level="H2" />
+                                                            <m:ToolbarSpacer />
+                                                            <m:Button text="Add" press="onAddPORow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button text="Delete" press="onDeleteSelectedPORows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
+                                                        </m:Toolbar>
+                                                    </m:headerToolbar>
+                                                    <m:columns>
+                                                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                                                            <m:Label text="Doc. Line No." required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Tablet" demandPopin="true" visible="{detailDetailModel>/props/bMultiplePO}">
+                                                            <m:Label text="Purchase Order" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="PO Line No." required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Amount" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Qty" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Order Unit" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Description" />
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Tax Code" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Business area" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Cost center" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="WBS Element" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Order" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Supplier" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Material" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Valuation type" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Material group" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Plant" required="true"/>
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Label text="Valuation area" required="true"/>
+                                                        </m:Column>
 
-                                            </m:columns>
-                                            <m:items>
-                                                <m:ColumnListItem id="readTemplate" vAlign="Middle">
-                                                    <m:cells>
-                                                        <m:Text text="{detailDetailModel>InvoiceLineItem}" />
-                                                        <m:Text text="{detailDetailModel>PONumber}" visible="{detailDetailModel>/props/bMultiplePO}" />
-                                                        <m:Text text="{detailDetailModel>PONumber} - {detailDetailModel>POLineItem}" />
-                                                        <m:Text text="{detailDetailModel>Amount}" />
-                                                        <m:Text text="{detailDetailModel>Quantity}" />
-                                                        <m:Text text="{detailDetailModel>OrderUnit}" />
-                                                        <m:Text text="{detailDetailModel>Description}" wrapping="true" />
-                                                        <m:Text text="{detailDetailModel>TaxCode}" />
-                                                        <m:Text text="{detailDetailModel>BusinessArea}" />
-                                                        <m:Text text="{detailDetailModel>CostCenter}" />
-                                                        <m:Text text="{detailDetailModel>WBSElement}" />
-                                                        <m:Text text="{detailDetailModel>Order}" />
-                                                        <m:Text text="{detailDetailModel>Supplier}" />
-                                                        <m:Text text="{detailDetailModel>Material}" />
-                                                        <m:Text text="{detailDetailModel>ValuationType}" />
-                                                        <m:Text text="{detailDetailModel>MaterialGroup}" />
-                                                        <m:Text text="{detailDetailModel>Plant}" />
-                                                        <m:Text text="{detailDetailModel>ValuationArea}" />
-                                                    </m:cells>
+                                                    </m:columns>
+                                                    <m:items>
+                                                        <m:ColumnListItem id="readTemplate" vAlign="Middle">
+                                                            <m:cells>
+                                                                <m:Text text="{detailDetailModel>InvoiceLineItem}" />
+                                                                <m:Text text="{detailDetailModel>PONumber}" visible="{detailDetailModel>/props/bMultiplePO}" />
+                                                                <m:Text text="{detailDetailModel>PONumber} - {detailDetailModel>POLineItem}" />
+                                                                <m:Text text="{detailDetailModel>Amount}" />
+                                                                <m:Text text="{detailDetailModel>Quantity}" />
+                                                                <m:Text text="{detailDetailModel>OrderUnit}" />
+                                                                <m:Text text="{detailDetailModel>Description}" wrapping="true" />
+                                                                <m:Text text="{detailDetailModel>TaxCode}" />
+                                                                <m:Text text="{detailDetailModel>BusinessArea}" />
+                                                                <m:Text text="{detailDetailModel>CostCenter}" />
+                                                                <m:Text text="{detailDetailModel>WBSElement}" />
+                                                                <m:Text text="{detailDetailModel>Order}" />
+                                                                <m:Text text="{detailDetailModel>Supplier}" />
+                                                                <m:Text text="{detailDetailModel>Material}" />
+                                                                <m:Text text="{detailDetailModel>ValuationType}" />
+                                                                <m:Text text="{detailDetailModel>MaterialGroup}" />
+                                                                <m:Text text="{detailDetailModel>Plant}" />
+                                                                <m:Text text="{detailDetailModel>ValuationArea}" />
+                                                            </m:cells>
 
-                                                </m:ColumnListItem>
-                                            </m:items>
-                                        </m:Table>
+                                                        </m:ColumnListItem>
+                                                    </m:items>
+                                                </m:Table>
+                                            </m:IconTabFilter>
+                                            <m:IconTabFilter text="G/L Account" count="{= ${detailDetailModel>/NonPoDocxLines/length}}">
+                                                <m:Table id="idNPOInvGLAccountLineTable" items="{
+                                                        path: 'detailDetailModel>/NonPoDocxLines'
+                                                    }" autoPopinMode="true" class="sapUiNoMargin">
+                                                    <m:headerToolbar>
+                                                        <m:Toolbar>
+                                                            <m:Title text="Line Items ({= ${detailDetailModel>/NonPoDocxLines/length}}) G/L Account" level="H2" />
+                                                            <m:ToolbarSpacer />
+                                                            <m:Button text="Add" press="onAddGLAccountRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button text="Delete" press="onDeleteSelectedGLAccountRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
+                                                        </m:Toolbar>
+                                                    </m:headerToolbar>
+                                                    <m:columns>
+                                                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                                                            <m:Text text="Doc. Line No." />
+                                                        </m:Column>
+                                                        <!-- <m:Column minScreenWidth="Tablet" demandPopin="true">
+                                                            <m:Text text="D/C" />
+                                                        </m:Column> -->
+                                                        <!-- <m:Column>
+                                                            <m:Text text="Description" />
+                                                        </m:Column> -->
+                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Company Code" />
+                                                        </m:Column> -->
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="G/L Account" />
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Amount" />
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Tax Code" />
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Assignment" />
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Text" />
+                                                        </m:Column>
+                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Business area" />
+                                                        </m:Column> -->
+                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Tax Amount" />
+                                                        </m:Column> -->
+                                                        <!-- <m:Column>
+                                                            <m:Text text="Quantity" /> -->
+                                                        <!-- </m:Column> -->
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Cost Center" />
+                                                        </m:Column>
+                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Order" />
+                                                        </m:Column> -->
+                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Sales order" />
+                                                        </m:Column> -->
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="Profit Center" />
+                                                        </m:Column>
+                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <m:Text text="WBS Element" />
+                                                        </m:Column>
 
-                                        <!-- CAP refactory <m:Table id="idTotalAmountTable" autoPopinMode="true" class="sapUiNoMargin">
-                                            <m:columns>
-                                                <m:Column>
-                                                    <m:Text text="Balance Amount" />
-                                                </m:Column>
-                                            </m:columns>
-                                            <m:items>
-                                                <m:ColumnListItem vAlign="Middle">
-                                                    <m:cells>
-                                                        <m:Text text="{appmodel>/props/totalAmount}" />
-                                                    </m:cells>
-                                                </m:ColumnListItem>
-                                            </m:items>
-                                        </m:Table> -->
-
+                                                    </m:columns>
+                                                    <m:items>
+                                                        <m:ColumnListItem id="readNonPOGLAccountTemplate" vAlign="Middle">
+                                                            <m:cells>
+                                                                <m:Text text="{detailDetailModel>InvoiceLineItem}" />
+                                                                <!-- <m:Text text="{ path:'appmodel>CDInd', formatter: '.formatter.parseCDInd' }" /> -->
+                                                                <!-- <m:Text text="{appmodel>Description}" wrapping="true"/> -->
+                                                                <!-- <m:Text text="{appmodel>Bukrs}" /> -->
+                                                                <m:Text text="{detailDetailModel>GLAcc}"/>
+                                                                <m:Text text="{detailDetailModel>Amount}" />
+                                                                <m:Text text="{detailDetailModel>TaxCode}"/>
+                                                                <!-- <m:Text text="{appmodel>TaxAmount}" /> -->
+                                                                <!-- <m:Input value="{appmodel>Quantity}" /> -->
+                                                                <m:Text text="{detailDetailModel>Assignment}"/>
+                                                                <m:Text text="{detailDetailModel>Text}"/>
+                                                                <!-- <m:Text text="{detailDetailModel>BusinessArea}"/> -->
+                                                                <!-- <m:Text text="{detailDetailModel>Order}"/> -->
+                                                                <!-- <m:Text text="{detailDetailModel>SalesOrder}"/> -->
+                                                                <m:Text text="{detailDetailModel>CostCen}"/>
+                                                                <m:Text text="{detailDetailModel>ProfitCen}" />
+                                                                <m:Text text="{detailDetailModel>WBSElem}" />
+                                                            </m:cells>
+                                                        </m:ColumnListItem>
+                                                    </m:items>
+                                                </m:Table>
+                                            </m:IconTabFilter>
+                                        </m:items>
+                                    </m:IconTabBar>
                                     </l:BlockLayoutCell>
                                 </l:BlockLayoutRow>
-
-                                <l:BlockLayoutRow visible="{ parts:['detailDetailModel>/props/POMode', 'detailDetailModel>/props/NONPOModeGLaccount'], formatter: '.formatter.allowGLAccountTable' }">
-                                    <l:BlockLayoutCell>
-                                        <m:Table id="idNPOInvGLAccountLineTable" items="{
-                                                    path: 'detailDetailModel>/NonPoDocxLines'
-                                                }" autoPopinMode="true" class="sapUiNoMargin">
-                                            <m:headerToolbar>
-                                                <m:Toolbar>
-                                                    <m:Title text="Line Items ({= ${detailDetailModel>/NonPoDocxLines/length}}) G/L Account" level="H2" />
-                                                    <m:ToolbarSpacer />
-                                                    <m:Button text="Add" press="onAddRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                    <m:Button text="Delete" press="onDeleteSelectedRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                    <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
-                                                </m:Toolbar>
-                                            </m:headerToolbar>
-                                            <m:columns>
-                                                <m:Column minScreenWidth="Tablet" demandPopin="true">
-                                                    <m:Text text="Doc. Line No." />
-                                                </m:Column>
-                                                <!-- <m:Column minScreenWidth="Tablet" demandPopin="true">
-                                                    <m:Text text="D/C" />
-                                                </m:Column> -->
-                                                <!-- <m:Column>
-                                                    <m:Text text="Description" />
-                                                </m:Column> -->
-                                                <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Company Code" />
-                                                </m:Column> -->
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="G/L Account" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Amount" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Tax Code" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Assignment" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Text" />
-                                                </m:Column>
-                                                <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Business area" />
-                                                </m:Column> -->
-                                                <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Tax Amount" />
-                                                </m:Column> -->
-                                                <!-- <m:Column>
-                                                    <m:Text text="Quantity" /> -->
-                                                <!-- </m:Column> -->
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Cost Center" />
-                                                </m:Column>
-                                                <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Order" />
-                                                </m:Column> -->
-                                                <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Sales order" />
-                                                </m:Column> -->
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Profit Center" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="WBS Element" />
-                                                </m:Column>
-
-                                            </m:columns>
-                                            <m:items>
-                                                <m:ColumnListItem id="readNonPOGLAccountTemplate" vAlign="Middle">
-                                                    <m:cells>
-                                                        <m:Text text="{detailDetailModel>InvoiceLineItem}" />
-                                                        <!-- <m:Text text="{ path:'appmodel>CDInd', formatter: '.formatter.parseCDInd' }" /> -->
-                                                        <!-- <m:Text text="{appmodel>Description}" wrapping="true"/> -->
-                                                        <!-- <m:Text text="{appmodel>Bukrs}" /> -->
-                                                        <m:Text text="{detailDetailModel>GLAcc}"/>
-                                                        <m:Text text="{detailDetailModel>Amount}" />
-                                                        <m:Text text="{detailDetailModel>TaxCode}"/>
-                                                        <!-- <m:Text text="{appmodel>TaxAmount}" /> -->
-                                                        <!-- <m:Input value="{appmodel>Quantity}" /> -->
-                                                        <m:Text text="{detailDetailModel>Assignment}"/>
-                                                        <m:Text text="{detailDetailModel>Text}"/>
-                                                        <!-- <m:Text text="{detailDetailModel>BusinessArea}"/> -->
-                                                        <!-- <m:Text text="{detailDetailModel>Order}"/> -->
-                                                        <!-- <m:Text text="{detailDetailModel>SalesOrder}"/> -->
-                                                        <m:Text text="{detailDetailModel>CostCen}"/>
-                                                        <m:Text text="{detailDetailModel>ProfitCen}" />
-                                                        <m:Text text="{detailDetailModel>WBSElem}" />
-                                                    </m:cells>
-                                                </m:ColumnListItem>
-                                            </m:items>
-                                        </m:Table>
-                                    </l:BlockLayoutCell>
-                                </l:BlockLayoutRow>
-                                <!-- <l:BlockLayoutRow visible="{ parts:['detailDetailModel>/props/POMode', 'detailDetailModel>/props/NONPOModeGLaccount'], formatter: '.formatter.allowAssetTable' }">
-                                    <l:BlockLayoutCell>
-                                        <m:Table id="idNPOInvAssetLineTable" items="{
-                                                    path: 'detailDetailModel>/NonPoDocxLines'
-                                                }" autoPopinMode="true" class="sapUiNoMargin">
-                                            <m:headerToolbar>
-                                                <m:Toolbar>
-                                                    <m:Title text="Line Items ({= ${detailDetailModel>/NonPoDocxLines/length}}) Asset" level="H2" />
-                                                    <m:ToolbarSpacer />
-                                                    <m:Button text="Add" press="onAddRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                    <m:Button text="Delete" press="onDeleteSelectedRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                    <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
-                                                </m:Toolbar>
-                                            </m:headerToolbar>
-                                            <m:columns>
-                                                <m:Column minScreenWidth="Tablet" demandPopin="true">
-                                                    <m:Text text="Doc. Line No." />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Company Code" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Asset number" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Asset secondary number" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Amount" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Quantity" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Base unit of measure" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Tax Code" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Assignment" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Text" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Profit Center" />
-                                                </m:Column>
-                                                <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                    <m:Text text="Asset value date" />
-                                                </m:Column>
-
-                                            </m:columns>
-                                            <m:items>
-                                                <m:ColumnListItem id="readNonPOAssetTemplate" vAlign="Middle">
-                                                    <m:cells>
-                                                        <m:Text text="{detailDetailModel>InvoiceLineItem}" />
-                                                        <m:Text text="{detailDetailModel>Bukrs}" />
-                                                        <m:Text text="{detailDetailModel>AssetNumber}"/>
-                                                        <m:Text text="{detailDetailModel>AssetSecondaryNumber}"/>
-                                                        <m:Text text="{detailDetailModel>Amount}" />
-                                                        <m:Text text="{detailDetailModel>Quantity}" />
-                                                        <m:Text text="{detailDetailModel>BaseUnitOfMeasure}"/>
-                                                        <m:Text text="{detailDetailModel>TaxCode}"/>
-                                                        <m:Text text="{detailDetailModel>Assignment}"/>
-                                                        <m:Text text="{detailDetailModel>Text}"/>
-                                                        <m:Text text="{detailDetailModel>ProfitCen}" />
-                                                        <m:Text text="{detailDetailModel>AssetValueDate}" />
-                                                    </m:cells>
-                                                </m:ColumnListItem>
-                                            </m:items>
-                                        </m:Table>
-                                    </l:BlockLayoutCell>
-                                </l:BlockLayoutRow> -->
                             </l:BlockLayout>
                         </l:VerticalLayout>
                     </m:IconTabFilter>

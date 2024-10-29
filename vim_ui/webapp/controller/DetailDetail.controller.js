@@ -512,11 +512,11 @@ sap.ui.define([
     },
 
     // Function to rebind the table based on the PO mode and update the keyboard mode
-    rebindTable: function (oTemplate, sKeyboardMode) {
+    rebindTable: function (oTemplate, sKeyboardMode, bPOTemplate) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       // Check if the current mode is PO (Purchase Order) mode
-      if (oDetailDetailModel.getProperty("/props/POMode")) {
+      if (bPOTemplate) {
         var oTable = this.getView().byId("idInvLineItemTable"); // Get PO table
 
         // Bind PO-related line items to the table and set keyboard mode
@@ -640,16 +640,11 @@ sap.ui.define([
 
         // Show a message to indicate the document has been unlocked
         MessageToast.show("Document unlocked");
-
-        // If in PO mode, rebind the table to make it uneditable
-        if (oDetailDetailModel.getProperty("/props/POMode")) {
-          this.rebindTable(this.oReadOnlyTemplate, "Navigation");
-          this.getView().byId("idInvLineItemTable").setMode("None");  // Disable table actions
-        } else {
-          // Rebind non-PO mode table to make it uneditable
-          this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation");
-          this.getView().byId("idNPOInvGLAccountLineTable").setMode("None");  // Disable table actions
-        }
+        
+        this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
+        this.getView().byId("idInvLineItemTable").setMode("None");  // Disable table actions
+        this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation", false);
+        this.getView().byId("idNPOInvGLAccountLineTable").setMode("None");  // Disable table actions
         return data;
       };
 
@@ -680,20 +675,12 @@ sap.ui.define([
         oDetailDetailModel.setProperty("/props/lineItemTable/editMode", true);
 
         MessageToast.show("Document locked");
-
-        // Make PO_INV_LINE table editable
-        if (oDetailDetailModel.getProperty("/props/POMode")) {
-          this.getView().byId("idInvLineItemTable").setMode("MultiSelect");
-          this.rebindTable(this.oEditableTemplate, "Edit");
-        } else {
-          if (oDetailDetailModel.getProperty("/props/NONPOModeGLaccount")) {
-            this.getView().byId("idNPOInvGLAccountLineTable").setMode("MultiSelect");
-            this.rebindTable(this.oEditableTemplateGLAccountNPo, "Edit");
-          } else {
-            // this.getView().byId("idNPOInvAssetLineTable").setMode("MultiSelect");
-            // this.rebindTable(this.oEditableTemplateAssetNPo, "Edit");
-          }
-        }
+          
+        this.getView().byId("idInvLineItemTable").setMode("MultiSelect");
+        this.rebindTable(this.oEditableTemplate, "Edit", true);
+        this.getView().byId("idNPOInvGLAccountLineTable").setMode("MultiSelect");
+        this.rebindTable(this.oEditableTemplateGLAccountNPo, "Edit", false);
+        
         return data;
       };
 
@@ -715,145 +702,113 @@ sap.ui.define([
 
       if (oEvent.getParameter("pressed")) {
         this.getView().byId("idInvLineItemTable").setMode("MultiSelect");
-        this.rebindTable(this.oEditableTemplate, "Edit");
+        this.rebindTable(this.oEditableTemplate, "Edit", true);
       } else {
-        this.rebindTable(this.oReadOnlyTemplate, "Navigation");
+        this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
         this.getView().byId("idInvLineItemTable").setMode("None");
       }
     },
 
-    onAddRow: function (oEvent) {
-      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
-      if (oDetailDetailModel.getProperty("/props/POMode")) {
-        var aDocxLines = oDetailDetailModel.getProperty("/DocxLines");
-        aDocxLines.push({
-          "InvoiceLineItem": "",
-          "PONumber": null,
-          "POLineItem": null,
-          "Amount": 0,
-          "Quantity": 1,
-          "OrderUnit": null,
-          "Description": "",
-          "TaxCode": null,
-          "BusinessArea": null,
-          "CostCenter": null,
-          "WBSElement": null,
-          "Order": null,
-          "Supplier": null,
-          "Material": null,
-          "ValuationType": null,
-          "MaterialGroup": null,
-          "Plant": null,
-          "ValuationArea": null
-        });
-        oDetailDetailModel.setProperty("/DocxLines", aDocxLines);
-      } else {
-        if (oDetailDetailModel.getProperty("/props/NONPOModeGLaccount")) {
-          var aNonPoDocxLines = oDetailDetailModel.getProperty("/NonPoDocxLines");
-          // aNonPoDocxLines.push({
-          //   "InvoiceLineItem": "",
-          //   "GLAcc": "",
-          //   "Amount": "",
-          //   "TaxCode": null,
-          //   "Assignment": 0,
-          //   "Text": null,
-          //   "BusinessArea": 1,
-          //   "Order": null,
-          //   "SalesOrder": null,
-          //   "CostCen": null,
-          //   "ProfitCen": null,
-          //   "WBSElem": null
-          // });
-          aNonPoDocxLines.push({
-            "InvoiceLineItem": "",
-            "GLAcc": "",
-            "Amount": "",
-            "TaxCode": null,
-            "Assignment": 0,
-            "Text": null,
-            "CostCen": null,
-            "ProfitCen": null,
-            "WBSElem": null
-          });
-          oDetailDetailModel.setProperty("/NonPoDocxLines", aNonPoDocxLines);
-        } else {
-          // var aNonPoDocxLines = oDetailDetailModel.getProperty("/NonPoDocxLines");
-          // aNonPoDocxLines.push({
-          //   "InvoiceLineItem": "",
-          //   "Bukrs": "",
-          //   "AssetNumber": "",
-          //   "AssetSecondaryNumber": null,
-          //   "Amount": 0,
-          //   "Quantity": 1,
-          //   "BaseUnitOfMeasure": null,
-          //   "TaxCode": null,
-          //   "Assignment": null,
-          //   "Text": null,
-          //   "ProfitCen": null,
-          //   "AssetValueDate": null
-          // });
-          // oDetailDetailModel.setProperty("/NonPoDocxLines", aNonPoDocxLines);
-        }
+    onAddPORow: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+        aDocxLines = oDetailDetailModel.getProperty("/DocxLines");
+      aDocxLines.push({
+        "InvoiceLineItem": "",
+        "PONumber": null,
+        "POLineItem": null,
+        "Amount": 0,
+        "Quantity": 1,
+        "OrderUnit": null,
+        "Description": "",
+        "TaxCode": null,
+        "BusinessArea": null,
+        "CostCenter": null,
+        "WBSElement": null,
+        "Order": null,
+        "Supplier": null,
+        "Material": null,
+        "ValuationType": null,
+        "MaterialGroup": null,
+        "Plant": null,
+        "ValuationArea": null
+      });
+      oDetailDetailModel.setProperty("/DocxLines", aDocxLines);
+    },
+
+    onAddGLAccountRow: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+        aNonPoDocxLines = oDetailDetailModel.getProperty("/NonPoDocxLines");
+      aNonPoDocxLines.push({
+        "InvoiceLineItem": "",
+        "GLAcc": "",
+        "Amount": "",
+        "TaxCode": null,
+        "Assignment": 0,
+        "Text": null,
+        "CostCen": null,
+        "ProfitCen": null,
+        "WBSElem": null
+      });
+      oDetailDetailModel.setProperty("/NonPoDocxLines", aNonPoDocxLines);
+    },
+
+    onDeleteSelectedPORows: function () {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+        oTable = this.getView().byId("idInvLineItemTable"),
+        selectedContexts = oTable.getSelectedContexts();
+
+      var aBindingContext = oTable.getItems().map(function (oItem) {
+        return oItem.getBindingContext("detailDetailModel");
+      });
+
+      let a = new Set(aBindingContext);
+      let b = new Set(selectedContexts);
+      let diff = new Set([...a].filter(x => !b.has(x)));
+
+      var aDiff = [...diff];
+
+      var values = aDiff.map(function (ctx) {
+        return ctx.getObject();
+      });
+
+      if (values.length <= 0) {
+        MessageToast.show("Select rows for deletion!")
+      }
+      else {
+        oDetailDetailModel.setProperty("/DocxLines", values);
+        oTable.removeSelections(true);
       }
 
     },
 
-    onDeleteSelectedRows: function () {
-      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
-      if (oDetailDetailModel.getProperty("/props/POMode")) {
-        var oTable = this.getView().byId("idInvLineItemTable");
-        var selectedContexts = oTable.getSelectedContexts();
+    onDeleteSelectedGLAccountRows: function () {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+        oTable = this.getView().byId("idNPOInvGLAccountLineTable"),
+        selectedContexts = oTable.getSelectedContexts();
 
-        var aBindingContext = oTable.getItems().map(function (oItem) {
-          return oItem.getBindingContext("detailDetailModel");
-        });
+      var aBindingContext = oTable.getItems().map(function (oItem) {
+        return oItem.getBindingContext("detailDetailModel");
+      });
 
-        let a = new Set(aBindingContext);
-        let b = new Set(selectedContexts);
-        let diff = new Set([...a].filter(x => !b.has(x)));
+      let a = new Set(aBindingContext);
+      let b = new Set(selectedContexts);
+      let diff = new Set([...a].filter(x => !b.has(x)));
 
-        var aDiff = [...diff];
+      var aDiff = [...diff];
 
-        var values = aDiff.map(function (ctx) {
-          return ctx.getObject();
-        });
+      var values = aDiff.map(function (ctx) {
+        return ctx.getObject();
+      });
 
-        if (values.length <= 0) {
-          MessageToast.show("Select rows for deletion!")
-        }
-        else {
-          oDetailDetailModel.setProperty("/DocxLines", values);
-          oTable.removeSelections(true);
-          // this.calcTotals(); CAP refactory: not present in functional analysis
-        }
+      if (values.length <= 0) {
+        MessageToast.show("Select rows for deletion!")
       }
       else {
-        var oTable = this.getView().byId("idNPOInvGLAccountLineTable");
-        var selectedContexts = oTable.getSelectedContexts();
-
-        var aBindingContext = oTable.getItems().map(function (oItem) {
-          return oItem.getBindingContext("detailDetailModel");
-        });
-
-        let a = new Set(aBindingContext);
-        let b = new Set(selectedContexts);
-        let diff = new Set([...a].filter(x => !b.has(x)));
-
-        var aDiff = [...diff];
-
-        var values = aDiff.map(function (ctx) {
-          return ctx.getObject();
-        });
-
-        if (values.length <= 0) {
-          MessageToast.show("Select rows for deletion!")
-        }
-        else {
-          oDetailDetailModel.setProperty("/NonPoDocxLines", values);
-          oTable.removeSelections(true);
-          // this.calcTotals(); CAP refactory: not present in functional analysis
-        }
+        oDetailDetailModel.setProperty("/NonPoDocxLines", values);
+        oTable.removeSelections(true);
+        // this.calcTotals(); CAP refactory: not present in functional analysis
       }
+
     },
 
 
@@ -3084,194 +3039,199 @@ sap.ui.define([
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
-        var record = data.value[0]; // Get the main record
-        var oBody = record.Invoice.body[0]; // Extract the body of the invoice
-        var aLineDetails = oBody.datiBeniServizi_DettaglioLinee; // Get line details
-        var oHeader = record.Invoice; // Header info of the invoice
-        var bPOMode = oDetailDetailModel.getProperty("/props/POMode"); // Check if in PO mode
-        var bMultiplePO = false; // Flag for multiple POs
-        var sPOnumber = null; // PO number
-        var oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
-        var aLineItems = []; // Array to store PO line items
-        var aLineItems2 = []; // Array to store Non-PO line items
+        try {
+          var record = data.value[0]; // Get the main record
+          var oBody = record.Invoice.body[0]; // Extract the body of the invoice
+          var aLineDetails = oBody.datiBeniServizi_DettaglioLinee; // Get line details
+          var oHeader = record.Invoice; // Header info of the invoice
+          var bPOMode = oDetailDetailModel.getProperty("/props/POMode"); // Check if in PO mode
+          var bMultiplePO = false; // Flag for multiple POs
+          var sPOnumber = null; // PO number
+          var oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
+          var aLineItems = []; // Array to store PO line items
+          var aLineItems2 = []; // Array to store Non-PO line items
 
         // Store attachments (if any)
         oDetailDetailModel.setProperty("/Filelist", oBody.allegati);
         this.getView().setModel(new JSONModel(record.Invoice), "currentInvoice");
-
+        
         // Process data differently for PO mode and Non-PO mode
         if (bPOMode) {
           let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
           let aLineDetailRefNumberAlreadyProcessed = [];
 
-          // Check if there are multiple POs
-          bMultiplePO = aPurchaseOrderData.length > 1;
+            // Check if there are multiple POs
+            bMultiplePO = aPurchaseOrderData.length > 1;
 
-          // If invoice contains just one purchase order
-          if (!bMultiplePO) {
-            sPOnumber = aPurchaseOrderData[0].idDocumento; // Get PO number
-          }
-
-          // Helper function to create a PO line item
-          function createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder) {
-            return {
-              "InvoiceLineItem": index + 1,
-              "Description": oLineDetail.descrizione || null,
-              "Amount": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
-              "Quantity": oLineDetail.quantita || 1,
-              "PONumber": oPurchaseOrder.idDocumento || null,
-              "POLineItem": oLineDetail.numeroLinea || null,
-              "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
-              "BusinessArea": null,
-              "CostCenter": null,
-              "WbsElem": null,
-              "Order": null,
-              "OrderUnit": null,
-              "Supplier": null,
-              "Material": null,
-              "ValuationType": null,
-              "MaterialGroup": null,
-              "Plant": null,
-              "ValuationArea": null
-            };
-          }
-
-          // Process line items based on PO references
-          aPurchaseOrderData.forEach(oPurchaseOrder => {
-            if (oPurchaseOrder.riferimentoNumeroLinea.length > 0) {
-              oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
-                let nRefLineNumber = oLineNumberRef.riferimentoNumeroLinea;
-                aLineDetailRefNumberAlreadyProcessed.push(nRefLineNumber);
-                aLineDetails.forEach((oLineDetail, index) => {
-                  if (nRefLineNumber == oLineDetail.numeroLinea) {
-                    aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder));
-                  }
-                });
-              });
+            // If invoice contains just one purchase order
+            if (!bMultiplePO) {
+              sPOnumber = aPurchaseOrderData[0].idDocumento; // Get PO number
             }
-          });
 
-          // Add remaining line items
-          let afilteredLineDetails = aLineDetails.filter(item => !aLineDetailRefNumberAlreadyProcessed.includes(item.numeroLinea));
-          afilteredLineDetails.forEach((oLineDetail, index) => {
-            aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, {}));
-          });
+            // Helper function to create a PO line item
+            function createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder) {
+              return {
+                "InvoiceLineItem": index + 1,
+                "Description": oLineDetail.descrizione || null,
+                "Amount": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
+                "Quantity": oLineDetail.quantita || 1,
+                "PONumber": oPurchaseOrder.idDocumento || null,
+                "POLineItem": oLineDetail.numeroLinea || null,
+                "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
+                "BusinessArea": null,
+                "CostCenter": null,
+                "WbsElem": null,
+                "Order": null,
+                "OrderUnit": null,
+                "Supplier": null,
+                "Material": null,
+                "ValuationType": null,
+                "MaterialGroup": null,
+                "Plant": null,
+                "ValuationArea": null
+              };
+            }
 
-        } else {
-          // Helper function to create a Non-PO line item
-          function createLineItemForNONPOInvoices(index, oLineDetail) {
-            // return {
-            //   "InvoiceLineItem": index + 1,
-            //   "Description": null,
-            //   "CompanyCode": null,
-            //   "Amount": null,
-            //   "Currency": null,
-            //   "Quantity": 1,
-            //   "UoM": null,
-            //   "TaxCode": null,
-            //   "TaxAmount": null,
-            //   "UoM": null,
-            //   "Bukrs": null,
-            //   "GLAcc": null,
-            //   "AmountInDocCurrency": null,
-            //   "Assignment": null,
-            //   "Text": null,
-            //   "WBSElem": null,
-            //   "ProfitCen": null,
-            //   "TaxName": null,
-            //   "BusinessArea": null,
-            //   "CostCenter": null,
-            //   "WbsElem": null,
-            //   "Order": null,
-            //   "SalesOrder": null,
-            //   "Supplier": null,
-            //   "Material": null,
-            //   "ValuationType": null,
-            //   "MaterialGroup": null,
-            //   "Plant": null,
-            //   "ValuationArea": null,
-            //   "AssetSecondaryNumber": null,
-            //   "AssetValueDate": null
-            // };
-            return {
-              "InvoiceLineItem": index + 1,
-              "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
-              "GLAcc": null,
-              "AmountInDocCurrency": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
-              "Assignment": null,
-              "Text": oLineDetail.descrizione || null,
-              "WBSElem": null,
-              "ProfitCen": null,
-              "CostCenter": null
-            };
+            // Process line items based on PO references
+            aPurchaseOrderData.forEach(oPurchaseOrder => {
+              if (oPurchaseOrder.riferimentoNumeroLinea.length > 0) {
+                oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
+                  let nRefLineNumber = oLineNumberRef.riferimentoNumeroLinea;
+                  aLineDetailRefNumberAlreadyProcessed.push(nRefLineNumber);
+                  aLineDetails.forEach((oLineDetail, index) => {
+                    if (nRefLineNumber == oLineDetail.numeroLinea) {
+                      aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder));
+                    }
+                  });
+                });
+              }
+            });
+
+            // Add remaining line items
+            let afilteredLineDetails = aLineDetails.filter(item => !aLineDetailRefNumberAlreadyProcessed.includes(item.numeroLinea));
+            afilteredLineDetails.forEach((oLineDetail, index) => {
+              aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, {}));
+            });
+
+          } else {
+            // Helper function to create a Non-PO line item
+            function createLineItemForNONPOInvoices(index, oLineDetail) {
+              // return {
+              //   "InvoiceLineItem": index + 1,
+              //   "Description": null,
+              //   "CompanyCode": null,
+              //   "Amount": null,
+              //   "Currency": null,
+              //   "Quantity": 1,
+              //   "UoM": null,
+              //   "TaxCode": null,
+              //   "TaxAmount": null,
+              //   "UoM": null,
+              //   "Bukrs": null,
+              //   "GLAcc": null,
+              //   "AmountInDocCurrency": null,
+              //   "Assignment": null,
+              //   "Text": null,
+              //   "WBSElem": null,
+              //   "ProfitCen": null,
+              //   "TaxName": null,
+              //   "BusinessArea": null,
+              //   "CostCenter": null,
+              //   "WbsElem": null,
+              //   "Order": null,
+              //   "SalesOrder": null,
+              //   "Supplier": null,
+              //   "Material": null,
+              //   "ValuationType": null,
+              //   "MaterialGroup": null,
+              //   "Plant": null,
+              //   "ValuationArea": null,
+              //   "AssetSecondaryNumber": null,
+              //   "AssetValueDate": null
+              // };
+              return {
+                "InvoiceLineItem": index + 1,
+                "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
+                "GLAcc": null,
+                "AmountInDocCurrency": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
+                "Assignment": null,
+                "Text": oLineDetail.descrizione || null,
+                "WBSElem": null,
+                "ProfitCen": null,
+                "CostCenter": null
+              };
+            }
+
+            // Process Non-PO line items
+            aLineDetails.forEach((oLineDetail, index) => {
+              aLineItems2.push(createLineItemForNONPOInvoices(index, oLineDetail));
+            });
           }
 
-          // Process Non-PO line items
-          aLineDetails.forEach((oLineDetail, index) => {
-            aLineItems2.push(createLineItemForNONPOInvoices(index, oLineDetail));
-          });
+          // Update the model with the line items for PO and Non-PO invoices
+          oDetailDetailModel.setProperty("/DocxLines", aLineItems);
+          oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", aLineItems);
+          oDetailDetailModel.setProperty("/NonPoDocxLines", aLineItems2);
+
+          // Set header information like dates, amounts, and tax info
+          // General data
+          let dInvoiceReceiptDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
+            dInvoiceDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
+            sReference = oBody.datiGenerali_DatiGeneraliDocumento_Numero,
+            sCurrency = oBody.datiGenerali_DatiGeneraliDocumento_Divisa,
+            sDocumentType = oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento,
+            sInvoicingPartyVendorCode = oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese + " " + oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdCodice,
+            // Amounts
+            sAmount = oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento,
+            sPaymentMethod = oBody.datiPagamento[0].dettaglioPagamento[0] ? oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento : null,
+            // Banking Details
+            // Tax
+            sTaxAmount = oBody.datiBeniServizi_DatiRiepilogo[0] ? oBody.datiBeniServizi_DatiRiepilogo[0].imposta : null,
+            sTaxCode = oBody.datiBeniServizi_DettaglioLinee[0].aliquotaIVA + " " + oBody.datiBeniServizi_DettaglioLinee[0].natura,
+            sWithholdingTaxCode = oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] ? oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0].tipoRitenuta : null,
+            // Unplanned Freight
+            // Goods and services data
+            sBusinessArea;
+
+          oDetailDetailModel.setProperty("/props/bMultiplePO", bMultiplePO);
+          if (bMultiplePO) {
+            this.bindTaxCode(this.getView(), oApProcessModel, null, null);
+
+          } else if (!sPOnumber) {
+            this.setPOMode(sPOnumber);
+          }
+
+          oDetailDetailModel.setProperty("/header/documentDate", dInvoiceReceiptDate);
+          // oDetailDetailModel.setProperty("/header/baselineDate", dBaselineDate);
+          oDetailDetailModel.setProperty("/header/invoiceDate", dInvoiceDate);
+          oDetailDetailModel.setProperty("/header/invoicingPartyVendorCode", sInvoicingPartyVendorCode);
+          oDetailDetailModel.setProperty("/header/reference", sReference);
+          // oDetailDetailModel.setProperty("/header/headerText", sHeaderText);
+          oDetailDetailModel.setProperty("/header/businessArea", sBusinessArea);
+          // oDetailDetailModel.setProperty("/header/assignment", sAssignment);
+          // oDetailDetailModel.setProperty("/header/postingDate", dPostingDate);
+          oDetailDetailModel.setProperty("/header/currency", sCurrency);
+          oDetailDetailModel.setProperty("/header/netAmount", sAmount);
+          // oDetailDetailModel.setProperty("/header/paymentTerms", sPaymentTerms);
+          oDetailDetailModel.setProperty("/header/paymentMethod", sPaymentMethod);
+          oDetailDetailModel.setProperty("/header/documentType", sDocumentType);
+          oDetailDetailModel.setProperty("/header/taxAmount", sTaxAmount);
+          oDetailDetailModel.setProperty("/header/taxCode", sTaxCode);
+          oDetailDetailModel.setProperty("/header/withholdingTaxCode", sWithholdingTaxCode);
+
+          // if (!oDetailDetailModel.getProperty("/props/POMode")) {
+          //   if (oDetailDetailModel.getProperty("/props/NONPOModeGLaccount")) {
+          //     this.getView().byId("idLineItemsType").setSelectedKey("idGLAccountItem");
+          //   } else {
+          //     this.getView().byId("idLineItemsType").setSelectedKey("idAssetItem");
+          //   }
+          // }
+
+          return (record);
+        } catch (error) {
+          console.log(error);      
+          MessageBox.error("Something failed with the invoice. Please contact your administrator for support");
         }
-
-        // Update the model with the line items for PO and Non-PO invoices
-        oDetailDetailModel.setProperty("/DocxLines", aLineItems);
-        oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", aLineItems);
-        oDetailDetailModel.setProperty("/NonPoDocxLines", aLineItems2);
-
-        // Set header information like dates, amounts, and tax info
-        // General data
-        let dInvoiceReceiptDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
-          dInvoiceDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
-          sReference = oBody.datiGenerali_DatiGeneraliDocumento_Numero,
-          sCurrency = oBody.datiGenerali_DatiGeneraliDocumento_Divisa,
-          sDocumentType = oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento,
-          sInvoicingPartyVendorCode = oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese + " " + oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdCodice,
-          // Amounts
-          sAmount = oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento,
-          sPaymentMethod = oBody.datiPagamento[0].dettaglioPagamento[0] ? oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento : null,
-          // Banking Details
-          // Tax
-          sTaxAmount = oBody.datiBeniServizi_DatiRiepilogo[0] ? oBody.datiBeniServizi_DatiRiepilogo[0].imposta : null,
-          sTaxCode = oBody.datiBeniServizi_DettaglioLinee[0].aliquotaIVA + " " + oBody.datiBeniServizi_DettaglioLinee[0].natura,
-          sWithholdingTaxCode = oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] ? oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0].tipoRitenuta : null,
-          // Unplanned Freight
-          // Goods and services data
-          sBusinessArea;
-
-        oDetailDetailModel.setProperty("/props/bMultiplePO", bMultiplePO);
-        if (bMultiplePO) {
-          this.bindTaxCode(this.getView(), oApProcessModel, null, null);
-
-        } else if (!sPOnumber) {
-          this.setPOMode(sPOnumber);
-        }
-
-        oDetailDetailModel.setProperty("/header/documentDate", dInvoiceReceiptDate);
-        // oDetailDetailModel.setProperty("/header/baselineDate", dBaselineDate);
-        oDetailDetailModel.setProperty("/header/invoiceDate", dInvoiceDate);
-        oDetailDetailModel.setProperty("/header/invoicingPartyVendorCode", sInvoicingPartyVendorCode);
-        oDetailDetailModel.setProperty("/header/reference", sReference);
-        // oDetailDetailModel.setProperty("/header/headerText", sHeaderText);
-        oDetailDetailModel.setProperty("/header/businessArea", sBusinessArea);
-        // oDetailDetailModel.setProperty("/header/assignment", sAssignment);
-        // oDetailDetailModel.setProperty("/header/postingDate", dPostingDate);
-        oDetailDetailModel.setProperty("/header/currency", sCurrency);
-        oDetailDetailModel.setProperty("/header/netAmount", sAmount);
-        // oDetailDetailModel.setProperty("/header/paymentTerms", sPaymentTerms);
-        oDetailDetailModel.setProperty("/header/paymentMethod", sPaymentMethod);
-        oDetailDetailModel.setProperty("/header/documentType", sDocumentType);
-        oDetailDetailModel.setProperty("/header/taxAmount", sTaxAmount);
-        oDetailDetailModel.setProperty("/header/taxCode", sTaxCode);
-        oDetailDetailModel.setProperty("/header/withholdingTaxCode", sWithholdingTaxCode);
-
-        // if (!oDetailDetailModel.getProperty("/props/POMode")) {
-        //   if (oDetailDetailModel.getProperty("/props/NONPOModeGLaccount")) {
-        //     this.getView().byId("idLineItemsType").setSelectedKey("idGLAccountItem");
-        //   } else {
-        //     this.getView().byId("idLineItemsType").setSelectedKey("idAssetItem");
-        //   }
-        // }
-
-        return (record);
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
