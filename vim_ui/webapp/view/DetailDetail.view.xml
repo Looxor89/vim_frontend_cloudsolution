@@ -1,4 +1,5 @@
-<mvc:View displayBlock="true" controllerName="vim_ui.controller.DetailDetail" height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns:f="sap.f" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified" xmlns:m="sap.m" xmlns:form="sap.ui.layout.form" xmlns:core="sap.ui.core" xmlns:c="sap.suite.ui.commons" class="sapUiSizeCompact">
+<mvc:View displayBlock="true" controllerName="vim_ui.controller.DetailDetail" height="100%" xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.ui.table" xmlns:f="sap.f" xmlns:l="sap.ui.layout" xmlns:u="sap.ui.unified" xmlns:m="sap.m" xmlns:form="sap.ui.layout.form" xmlns:core="sap.ui.core" xmlns:c="sap.suite.ui.commons" class="sapUiSizeCompact">
 
     <f:DynamicPage id="DDPage" toggleHeaderOnTitleClick="true" showFooter="true" stickySubheaderProvider="iconTabBar" headerExpanded="false" preserveHeaderStateOnScroll="true" class="sapUiNoContentPadding">
         <f:title>
@@ -147,7 +148,7 @@
                                                 <m:Input id="idBusinessArea" value="{detailDetailModel>/header/businessArea}"/> -->
 
                                                 <m:Label text="Assignment" required="true" />
-                                                <m:Input id="idAssignment" value="{detailDetailModel>/header/assignment}"/>
+                                                <m:Input id="idAssignment" value="{detailDetailModel>/header/assignment}" maxLength="18"/>
 
                                                 <!-- <m:Label text="Due Date" visible="{= ${appmodel>/props/POMode}}" />
                                                 <m:DatePicker id="idDueDate" placeholder="YYYY-DD-MM" valueFormat="yyyy-dd-MM" displayFormat="yyyy-dd-MM" change="handleDateChange" visible="{= ${appmodel>/props/POMode}}" /> -->
@@ -163,7 +164,7 @@
                                                     maxLength="3"/>
 
                                                 <m:Label text="Text" />
-                                                <m:Input id="idFreeTxt" value="{detailDetailModel>/header/headerText}" maxLength="{ path: 'detailDetailModel>/props/POMode', formatter: '.formatter.limitFreeTxt' }"/>
+                                                <m:Input id="idFreeTxt" value="{detailDetailModel>/header/headerText}" maxLength="50"/>
 
                                                 <!-- <m:Label text="Credit Memo" />
                                                 <m:CheckBox id="idInvInd" select=".onCredMemoToggle"/>CAP refactory  -->
@@ -307,7 +308,7 @@
                                 </l:BlockLayoutRow>
 
                                 <l:BlockLayoutRow>
-                                    <l:BlockLayoutCell>
+                                    <l:BlockLayoutCell class="sapUiNoContentPadding">
                                      <m:IconTabBar id="iconTabBarBodyInvoice" applyContentPadding="false" class="sapUiNoContentPadding" expandable="false">
                                         <m:items>
                                             <m:IconTabFilter text="Purchase Order" count="{= ${detailDetailModel>/DocxLines/length}}">
@@ -316,13 +317,14 @@
                                                         sorter: {
                                                             path: 'Name'
                                                         }
-                                                    }" class="sapUiNoMargin">
+                                                    }" class="sapUiNoMargin"
+                                                        selectionChange="onSelectionPOChange">
                                                     <m:headerToolbar>
                                                         <m:Toolbar>
                                                             <m:Title text="Line Items ({= ${detailDetailModel>/DocxLines/length}}) Purchase Order" level="H2" />
                                                             <m:ToolbarSpacer />
                                                             <m:Button text="Add" press="onAddPORow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <m:Button text="Delete" press="onDeleteSelectedPORows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button id="deleteRowFromPOLineTable" text="Delete" press="onDeleteSelectedPORows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
                                                         </m:Toolbar>
                                                     </m:headerToolbar>
@@ -413,13 +415,14 @@
                                             <m:IconTabFilter text="G/L Account" count="{= ${detailDetailModel>/NonPoDocxLines/length}}">
                                                 <m:Table id="idNPOInvGLAccountLineTable" items="{
                                                         path: 'detailDetailModel>/NonPoDocxLines'
-                                                    }" autoPopinMode="true" class="sapUiNoMargin">
+                                                    }" autoPopinMode="true" class="sapUiNoMargin"
+                                                        selectionChange="onSelectionGLAccountChange">
                                                     <m:headerToolbar>
                                                         <m:Toolbar>
                                                             <m:Title text="Line Items ({= ${detailDetailModel>/NonPoDocxLines/length}}) G/L Account" level="H2" />
                                                             <m:ToolbarSpacer />
                                                             <m:Button text="Add" press="onAddGLAccountRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <m:Button text="Delete" press="onDeleteSelectedGLAccountRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button id="deleteRowFromGLAccountLineTable" text="Delete" press="onDeleteSelectedGLAccountRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
                                                         </m:Toolbar>
                                                     </m:headerToolbar>
