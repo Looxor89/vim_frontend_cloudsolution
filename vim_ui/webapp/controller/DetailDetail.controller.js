@@ -753,8 +753,27 @@ sap.ui.define([
     },
 
     onDeleteSelectedPORows: function () {
+      this._onDeleteSelectedRows("idInvLineItemTable", "/DocxLines");
+    },
+
+    onSelectionPOChange: function () {
+      this._enableDeleteButton("idInvLineItemTable", "deleteRowFromPOLineTable");
+    },
+
+    onSelectionGLAccountChange: function () {
+      this._enableDeleteButton("idNPOInvGLAccountLineTable", "deleteRowFromGLAccountLineTable");
+    },
+
+    _enableDeleteButton : function (sTableId, sDeleteButtonId) {
+      var oTable = this.getView().byId(sTableId),
+        aItems = oTable.getSelectedItems(),
+        bEnableDeleteButton = aItems.length > 0;
+        this.getView().byId(sDeleteButtonId).setEnabled(bEnableDeleteButton);
+    },
+
+    _onDeleteSelectedRows: function (sTableId, sPropertyLine) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        oTable = this.getView().byId("idInvLineItemTable"),
+        oTable = this.getView().byId(sTableId),
         selectedContexts = oTable.getSelectedContexts();
 
       var aBindingContext = oTable.getItems().map(function (oItem) {
@@ -771,44 +790,13 @@ sap.ui.define([
         return ctx.getObject();
       });
 
-      if (values.length <= 0) {
-        MessageToast.show("Select rows for deletion!")
-      }
-      else {
-        oDetailDetailModel.setProperty("/DocxLines", values);
-        oTable.removeSelections(true);
-      }
-
+      oDetailDetailModel.setProperty(sPropertyLine, values);
+      oTable.removeSelections(true);
+      this.onSelectionGLAccountChange();
     },
 
     onDeleteSelectedGLAccountRows: function () {
-      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        oTable = this.getView().byId("idNPOInvGLAccountLineTable"),
-        selectedContexts = oTable.getSelectedContexts();
-
-      var aBindingContext = oTable.getItems().map(function (oItem) {
-        return oItem.getBindingContext("detailDetailModel");
-      });
-
-      let a = new Set(aBindingContext);
-      let b = new Set(selectedContexts);
-      let diff = new Set([...a].filter(x => !b.has(x)));
-
-      var aDiff = [...diff];
-
-      var values = aDiff.map(function (ctx) {
-        return ctx.getObject();
-      });
-
-      if (values.length <= 0) {
-        MessageToast.show("Select rows for deletion!")
-      }
-      else {
-        oDetailDetailModel.setProperty("/NonPoDocxLines", values);
-        oTable.removeSelections(true);
-        // this.calcTotals(); CAP refactory: not present in functional analysis
-      }
-
+      this._onDeleteSelectedRows("idNPOInvGLAccountLineTable", "/NonPoDocxLines");
     },
 
 
