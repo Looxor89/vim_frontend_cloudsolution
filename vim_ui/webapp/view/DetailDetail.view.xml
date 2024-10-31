@@ -63,7 +63,7 @@
             <f:DynamicPageHeader pinnable="false">
                 <l:Grid>
                     <!-- <m:ObjectAttribute title="Extraction Status" text="{appmodel>/detail/header/DOX_STATUS}" /> -->
-                    <m:ObjectAttribute title="Document Status" text="{detailDetailModel>/detail/header/DOC_STATUS}" />
+                    <m:ObjectAttribute title="Document Status" text="{path: 'detailDetailModel>/detail/header/DOC_STATUS', formatter: '.formatter.statusText'}" />
                     <!-- <m:ObjectAttribute title="Invoice Document Type" text="{detailDetailModel>/detail/header/DOCUMENTTYPE}" /> -->
                     <m:ObjectAttribute title="Type/Category" text="{detailDetailModel>/detail/header/DOCCATEGORY}" />
                     <m:ObjectAttribute title="Assigned To" text="{detailDetailModel>/detail/header/ASSIGNEDTO}" />
@@ -308,128 +308,198 @@
                                 </l:BlockLayoutRow>
 
                                 <l:BlockLayoutRow>
-                                    <l:BlockLayoutCell class="sapUiNoContentPadding">
+                                    <l:BlockLayoutCell>
                                      <m:IconTabBar id="iconTabBarBodyInvoice" applyContentPadding="false" class="sapUiNoContentPadding" expandable="false">
                                         <m:items>
                                             <m:IconTabFilter text="Purchase Order" count="{= ${detailDetailModel>/DocxLines/length}}">
-                                                <m:Table id="idInvLineItemTable" items="{
+                                                <Table id="idInvLineItemTable" rows="{
                                                         path: 'detailDetailModel>/DocxLines',
                                                         sorter: {
                                                             path: 'Name'
                                                         }
                                                     }" class="sapUiNoMargin"
-                                                        selectionChange="onSelectionPOChange">
-                                                    <m:headerToolbar>
+                                                        rowSelectionChange="onSelectionPOChange"
+                                                        selectionMode="None">
+                                                    <extension>
                                                         <m:Toolbar>
                                                             <m:Title text="Line Items ({= ${detailDetailModel>/DocxLines/length}}) Purchase Order" level="H2" />
                                                             <m:ToolbarSpacer />
                                                             <m:Button text="Add" press="onAddPORow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             <m:Button id="deleteRowFromPOLineTable" text="Delete" press="onDeleteSelectedPORows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
+                                                            <!-- <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" /> -->
                                                         </m:Toolbar>
-                                                    </m:headerToolbar>
-                                                    <m:columns>
-                                                        <m:Column minScreenWidth="Tablet" demandPopin="true">
+                                                    </extension>
+                                                    <columns>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Doc. Line No." required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Tablet" demandPopin="true" visible="{detailDetailModel>/props/bMultiplePO}">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>InvoiceLineItem}" type="Number" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" visible="{detailDetailModel>/props/bMultiplePO}">
                                                             <m:Label text="Purchase Order" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>PONumber}" showValueHelp="true" valueHelpRequest="onMultiplePOVH" change="onMultiPOInputChange" maxLength="10" visible="{detailDetailModel>/props/bMultiplePO}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="PO Line No." required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>PONumber} - {detailDetailModel>POLineItem}" showValueHelp="true" valueHelpRequest="onPurchaseOrderVH" maxLength="16" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" > 
                                                             <m:Label text="Amount" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{
+                                                                    path: 'detailDetailModel>Amount',
+                                                                    type: 'sap.ui.model.odata.type.Decimal',
+                                                                    formatOptions: {
+                                                                        minFractionDigits: 0,
+                                                                        maxFractionDigits: 3,
+                                                                        groupingEnabled: false
+                                                                    },
+                                                                    constraints: {
+                                                                        precision: 23,
+                                                                        scale: 4
+                                                                    }
+                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Qty" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{
+                                                                    path: 'detailDetailModel>Quantity',
+                                                                    type: 'sap.ui.model.odata.type.Decimal',
+                                                                    formatOptions: {
+                                                                        minFractionDigits: 0,
+                                                                        maxFractionDigits: 3,
+                                                                        groupingEnabled: false
+                                                                    },
+                                                                    constraints: {
+                                                                        precision: 13,
+                                                                        scale: 3
+                                                                    }
+                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Order Unit" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{
+                                                                    path: 'detailDetailModel>OrderUnit',
+                                                                    type: 'sap.ui.model.odata.type.Decimal',
+                                                                    formatOptions: {
+                                                                        minFractionDigits: 0,
+                                                                        maxFractionDigits: 3,
+                                                                        groupingEnabled: false
+                                                                    },
+                                                                    constraints: {
+                                                                        precision: 13,
+                                                                        scale: 3
+                                                                    }
+                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Text text="Description" />
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Description}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Tax Code" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Business area" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>BusinessArea}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Cost center" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>CostCenter}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="WBS Element" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>WBSElement}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Order" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Order}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Supplier" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Supplier}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Material" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Material}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Valuation type" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>ValuationType}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Material group" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>MaterialGroup}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Plant" required="true"/>
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Plant}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
                                                             <m:Label text="Valuation area" required="true"/>
-                                                        </m:Column>
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>ValuationArea}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
 
-                                                    </m:columns>
-                                                    <m:items>
-                                                        <m:ColumnListItem id="readTemplate" vAlign="Middle">
-                                                            <m:cells>
-                                                                <m:Text text="{detailDetailModel>InvoiceLineItem}" />
-                                                                <m:Text text="{detailDetailModel>PONumber}" visible="{detailDetailModel>/props/bMultiplePO}" />
-                                                                <m:Text text="{detailDetailModel>PONumber} - {detailDetailModel>POLineItem}" />
-                                                                <m:Text text="{detailDetailModel>Amount}" />
-                                                                <m:Text text="{detailDetailModel>Quantity}" />
-                                                                <m:Text text="{detailDetailModel>OrderUnit}" />
-                                                                <m:Text text="{detailDetailModel>Description}" wrapping="true" />
-                                                                <m:Text text="{detailDetailModel>TaxCode}" />
-                                                                <m:Text text="{detailDetailModel>BusinessArea}" />
-                                                                <m:Text text="{detailDetailModel>CostCenter}" />
-                                                                <m:Text text="{detailDetailModel>WBSElement}" />
-                                                                <m:Text text="{detailDetailModel>Order}" />
-                                                                <m:Text text="{detailDetailModel>Supplier}" />
-                                                                <m:Text text="{detailDetailModel>Material}" />
-                                                                <m:Text text="{detailDetailModel>ValuationType}" />
-                                                                <m:Text text="{detailDetailModel>MaterialGroup}" />
-                                                                <m:Text text="{detailDetailModel>Plant}" />
-                                                                <m:Text text="{detailDetailModel>ValuationArea}" />
-                                                            </m:cells>
-
-                                                        </m:ColumnListItem>
-                                                    </m:items>
-                                                </m:Table>
+                                                    </columns>
+                                                </Table>
                                             </m:IconTabFilter>
                                             <m:IconTabFilter text="G/L Account" count="{= ${detailDetailModel>/NonPoDocxLines/length}}">
-                                                <m:Table id="idNPOInvGLAccountLineTable" items="{
+                                                <Table id="idNPOInvGLAccountLineTable" rows="{
                                                         path: 'detailDetailModel>/NonPoDocxLines'
-                                                    }" autoPopinMode="true" class="sapUiNoMargin"
-                                                        selectionChange="onSelectionGLAccountChange">
-                                                    <m:headerToolbar>
+                                                    }" class="sapUiNoMargin"
+                                                        rowSelectionChange="onSelectionGLAccountChange"
+                                                        selectionMode="None">
+                                                    <extension>
                                                         <m:Toolbar>
                                                             <m:Title text="Line Items ({= ${detailDetailModel>/NonPoDocxLines/length}}) G/L Account" level="H2" />
                                                             <m:ToolbarSpacer />
                                                             <m:Button text="Add" press="onAddGLAccountRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             <m:Button id="deleteRowFromGLAccountLineTable" text="Delete" press="onDeleteSelectedGLAccountRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" />
+                                                            <!-- <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" /> -->
                                                         </m:Toolbar>
-                                                    </m:headerToolbar>
-                                                    <m:columns>
-                                                        <m:Column minScreenWidth="Tablet" demandPopin="true">
-                                                            <m:Text text="Doc. Line No." />
-                                                        </m:Column>
+                                                    </extension>
+                                                    <columns>
+                                                        <Column width="8rem">
+                                                            <m:Label text="Doc. Line No." />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>InvoiceLineItem}" type="Number" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
                                                         <!-- <m:Column minScreenWidth="Tablet" demandPopin="true">
                                                             <m:Text text="D/C" />
                                                         </m:Column> -->
@@ -439,21 +509,47 @@
                                                         <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
                                                             <m:Text text="Company Code" />
                                                         </m:Column> -->
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="G/L Account" />
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Amount" />
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Tax Code" />
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Assignment" />
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Text" />
-                                                        </m:Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="G/L Account" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>GLAcc}" showValueHelp="true" valueHelpRequest="onGLAcctVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="Amount" />
+                                                            <template>
+                                                                <m:Input value="{
+                                                                    path: 'detailDetailModel>Amount',
+                                                                    type: 'sap.ui.model.odata.type.Decimal',
+                                                                    formatOptions: {
+                                                                        minFractionDigits: 1,
+                                                                        maxFractionDigits: 3,
+                                                                        groupingEnabled: false
+                                                                    },
+                                                                    constraints: {
+                                                                        precision: 23,
+                                                                        scale: 4
+                                                                    }}" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="Tax Code" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="Assignment" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Assignment}" showValueHelp="true" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="20rem">
+                                                            <m:Label text="Text" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>Text}" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
                                                         <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
                                                             <m:Text text="Business area" />
                                                         </m:Column> -->
@@ -463,47 +559,33 @@
                                                         <!-- <m:Column>
                                                             <m:Text text="Quantity" /> -->
                                                         <!-- </m:Column> -->
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Cost Center" />
-                                                        </m:Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="Cost Center" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>CostCen}" showValueHelp="true" valueHelpRequest="onCostCenterVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
                                                         <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
                                                             <m:Text text="Order" />
                                                         </m:Column> -->
                                                         <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
                                                             <m:Text text="Sales order" />
                                                         </m:Column> -->
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Profit Center" />
-                                                        </m:Column>
-                                                        <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="WBS Element" />
-                                                        </m:Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="Profit Center" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>ProfitCen}" showValueHelp="true" valueHelpRequest="onProfitCenterVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem">
+                                                            <m:Label text="WBS Element" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>WBSElem}" showValueHelp="true" valueHelpRequest="onWBSElementVH" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                            </template>
+                                                        </Column>
 
-                                                    </m:columns>
-                                                    <m:items>
-                                                        <m:ColumnListItem id="readNonPOGLAccountTemplate" vAlign="Middle">
-                                                            <m:cells>
-                                                                <m:Text text="{detailDetailModel>InvoiceLineItem}" />
-                                                                <!-- <m:Text text="{ path:'appmodel>CDInd', formatter: '.formatter.parseCDInd' }" /> -->
-                                                                <!-- <m:Text text="{appmodel>Description}" wrapping="true"/> -->
-                                                                <!-- <m:Text text="{appmodel>Bukrs}" /> -->
-                                                                <m:Text text="{detailDetailModel>GLAcc}"/>
-                                                                <m:Text text="{detailDetailModel>Amount}" />
-                                                                <m:Text text="{detailDetailModel>TaxCode}"/>
-                                                                <!-- <m:Text text="{appmodel>TaxAmount}" /> -->
-                                                                <!-- <m:Input value="{appmodel>Quantity}" /> -->
-                                                                <m:Text text="{detailDetailModel>Assignment}"/>
-                                                                <m:Text text="{detailDetailModel>Text}"/>
-                                                                <!-- <m:Text text="{detailDetailModel>BusinessArea}"/> -->
-                                                                <!-- <m:Text text="{detailDetailModel>Order}"/> -->
-                                                                <!-- <m:Text text="{detailDetailModel>SalesOrder}"/> -->
-                                                                <m:Text text="{detailDetailModel>CostCen}"/>
-                                                                <m:Text text="{detailDetailModel>ProfitCen}" />
-                                                                <m:Text text="{detailDetailModel>WBSElem}" />
-                                                            </m:cells>
-                                                        </m:ColumnListItem>
-                                                    </m:items>
-                                                </m:Table>
+                                                    </columns>
+                                                </Table>
                                             </m:IconTabFilter>
                                         </m:items>
                                     </m:IconTabBar>

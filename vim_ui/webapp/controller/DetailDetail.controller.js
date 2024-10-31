@@ -197,76 +197,76 @@ sap.ui.define([
        * Define editable templates for NON-PO G/L account line items
        * Includes inputs for G/L account, amount, tax code, cost center, and more
        */
-      this.oEditableTemplateGLAccountNPo = new sap.m.ColumnListItem({
-        cells: [
-          new sap.m.Input({
-            value: "{detailDetailModel>InvoiceLineItem}",
-            type: "Number",
-            maxLength: 10
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>GLAcc}",
-            showValueHelp: true,
-            valueHelpRequest: this.onGLAcctVH2.bind(this), // Value help for G/L account selection
-            maxLength: 10
-          }),
-          new sap.m.Input({
-            value: {
-              path: 'detailDetailModel>Amount',
-              type: 'sap.ui.model.odata.type.Decimal',
-              formatOptions: {
-                minFractionDigits: 1,
-                maxFractionDigits: 3,
-                groupingEnabled: false
-              },
-              constraints: {
-                precision: 23,
-                scale: 4
-              }
-            }
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>TaxCode}",
-            showValueHelp: true,
-            valueHelpRequest: this.onTaxCodeVH.bind(this), // Value help for tax code
-            maxLength: 2
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>Assignment}",
-            showValueHelp: true
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>Text}"
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>Business area}"
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>CostCen}",
-            showValueHelp: true,
-            valueHelpRequest: this.onCostCenterVH2.bind(this), // Value help for cost center
-            maxLength: 10
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>Order}"
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>SalesOrder}"
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>ProfitCen}",
-            showValueHelp: true,
-            valueHelpRequest: this.onProfitCenterVH.bind(this), // Value help for profit center
-            maxLength: 10
-          }),
-          new sap.m.Input({
-            value: "{detailDetailModel>WBSElem}",
-            showValueHelp: true,
-            valueHelpRequest: this.onWBSElementVH.bind(this), // Value help for WBS element
-            maxLength: 24
-          })
-        ]
-      });
+      // this.oEditableTemplateGLAccountNPo = new sap.m.ColumnListItem({
+      //   cells: [
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>InvoiceLineItem}",
+      //       type: "Number",
+      //       maxLength: 10
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>GLAcc}",
+      //       showValueHelp: true,
+      //       valueHelpRequest: this.onGLAcctVH2.bind(this), // Value help for G/L account selection
+      //       maxLength: 10
+      //     }),
+      //     new sap.m.Input({
+      //       value: {
+      //         path: 'detailDetailModel>Amount',
+      //         type: 'sap.ui.model.odata.type.Decimal',
+      //         formatOptions: {
+      //           minFractionDigits: 1,
+      //           maxFractionDigits: 3,
+      //           groupingEnabled: false
+      //         },
+      //         constraints: {
+      //           precision: 23,
+      //           scale: 4
+      //         }
+      //       }
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>TaxCode}",
+      //       showValueHelp: true,
+      //       valueHelpRequest: this.onTaxCodeVH.bind(this), // Value help for tax code
+      //       maxLength: 2
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>Assignment}",
+      //       showValueHelp: true
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>Text}"
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>Business area}"
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>CostCen}",
+      //       showValueHelp: true,
+      //       valueHelpRequest: this.onCostCenterVH2.bind(this), // Value help for cost center
+      //       maxLength: 10
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>Order}"
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>SalesOrder}"
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>ProfitCen}",
+      //       showValueHelp: true,
+      //       valueHelpRequest: this.onProfitCenterVH.bind(this), // Value help for profit center
+      //       maxLength: 10
+      //     }),
+      //     new sap.m.Input({
+      //       value: "{detailDetailModel>WBSElem}",
+      //       showValueHelp: true,
+      //       valueHelpRequest: this.onWBSElementVH.bind(this), // Value help for WBS element
+      //       maxLength: 24
+      //     })
+      //   ]
+      // });
 
       /**
        * Define editable templates for NON-PO Asset line items.
@@ -488,26 +488,12 @@ sap.ui.define([
 
       // Bind read only template
       var oTable = this.getView().byId("idInvLineItemTable");
-      oTable.bindAggregation("items", {
-        path: "detailDetailModel>/DocxLines",
-        template: this.oReadOnlyTemplate,
-        templateShareable: true,
-        key: "InvoiceLineItem"
-      }).setKeyboardMode("Navigation");
+      oTable.setSelectionMode("None");
       var oTable = this.getView().byId("idNPOInvGLAccountLineTable");
-      oTable.bindAggregation("items", {
-        path: "detailDetailModel>/NonPoDocxLines",
-        template: this.oReadOnlyGLAccountTemplateNPo,
-        templateShareable: true,
-        key: "InvoiceLineItem"
-      }).setKeyboardMode("Navigation");
-      // var oTable = this.getView().byId("idNPOInvAssetLineTable");
-      // oTable.bindAggregation("items", {
-      //   path: "detailDetailModel>/NonPoDocxLines",
-      //   template: this.oReadOnlyAssetTemplateNPo,
-      //   templateShareable: true,
-      //   key: "InvoiceLineItem"
-      // }).setKeyboardMode("Navigation");
+      oTable.setSelectionMode("None");
+      // Select first body IconTabFilter
+      var oTabBarBodyInvoice = this.byId("iconTabBarBodyInvoice");
+      oTabBarBodyInvoice.setSelectedKey(oTabBarBodyInvoice.getItems()[0].sId);
 
     },
 
@@ -617,8 +603,21 @@ sap.ui.define([
 
     // Handler to cancel the "edit" mode and unlock the document
     handleCancelGEdit: function () {
+      var that = this;
+      MessageBox.warning("Do you really want to cancel edit? Every unsaved edit will be lost.", {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if (sAction === MessageBox.Action.YES) {
+            that._confirmCancelEdit().then(result => that._getData());
+          }
+        }
+      });
+    },
+
+    _confirmCancelEdit: function () {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");  // Get the model for details
-      var URL = "/odata/unlock";  // API endpoint to unlock the document
+      var URL = baseManifestUrl + "/odata/unlock";  // API endpoint to unlock the document
 
       // Build the request payload
       var body = {
@@ -640,16 +639,16 @@ sap.ui.define([
 
         // Show a message to indicate the document has been unlocked
         MessageToast.show("Document unlocked");
-        
-        this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
-        this.getView().byId("idInvLineItemTable").setMode("None");  // Disable table actions
-        this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation", false);
-        this.getView().byId("idNPOInvGLAccountLineTable").setMode("None");  // Disable table actions
+
+        // this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
+        this.getView().byId("idInvLineItemTable").setSelectionMode("None");  // Disable table actions
+        // this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation", false);
+        this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("None");  // Disable table actions
         return data;
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
-        console.log("FAILED TO REMOVE LOCK", err);  // Log the error
+        console.log("FAILED TO REMOVE LOCK", XMLHttpRequest);  // Log the error
 
         // Show a message indicating failure to unlock
         MessageToast.show("Unable to unlock Document");
@@ -675,12 +674,12 @@ sap.ui.define([
         oDetailDetailModel.setProperty("/props/lineItemTable/editMode", true);
 
         MessageToast.show("Document locked");
-          
-        this.getView().byId("idInvLineItemTable").setMode("MultiSelect");
-        this.rebindTable(this.oEditableTemplate, "Edit", true);
-        this.getView().byId("idNPOInvGLAccountLineTable").setMode("MultiSelect");
-        this.rebindTable(this.oEditableTemplateGLAccountNPo, "Edit", false);
-        
+
+        this.getView().byId("idInvLineItemTable").setSelectionMode("MultiToggle");
+        // this.rebindTable(this.oEditableTemplate, "Edit", true);
+        this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("MultiToggle");
+        // this.rebindTable(this.oEditableTemplateGLAccountNPo, "Edit", false);
+
         return data;
       };
 
@@ -695,19 +694,19 @@ sap.ui.define([
       return this.executeRequest(sURL, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
     },
 
-    onEditInvLineItems: function (oEvent) {
-      // this.aProductCollection = deepExtend([], this.oModel.getProperty("/DocxLines"));
-      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
-      oDetailDetailModel.setProperty("/props/lineItemTable/editMode", oEvent.getParameter("pressed"));
+    // onEditInvLineItems: function (oEvent) {
+    //   // this.aProductCollection = deepExtend([], this.oModel.getProperty("/DocxLines"));
+    //   var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+    //   oDetailDetailModel.setProperty("/props/lineItemTable/editMode", oEvent.getParameter("pressed"));
 
-      if (oEvent.getParameter("pressed")) {
-        this.getView().byId("idInvLineItemTable").setMode("MultiSelect");
-        this.rebindTable(this.oEditableTemplate, "Edit", true);
-      } else {
-        this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
-        this.getView().byId("idInvLineItemTable").setMode("None");
-      }
-    },
+    //   if (oEvent.getParameter("pressed")) {
+    //     this.getView().byId("idInvLineItemTable").setMode("MultiSelect");
+    //     this.rebindTable(this.oEditableTemplate, "Edit", true);
+    //   } else {
+    //     this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
+    //     this.getView().byId("idInvLineItemTable").setMode("None");
+    //   }
+    // },
 
     onAddPORow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
@@ -754,6 +753,7 @@ sap.ui.define([
 
     onDeleteSelectedPORows: function () {
       this._onDeleteSelectedRows("idInvLineItemTable", "/DocxLines");
+      this.onSelectionPOChange();
     },
 
     onSelectionPOChange: function () {
@@ -764,21 +764,20 @@ sap.ui.define([
       this._enableDeleteButton("idNPOInvGLAccountLineTable", "deleteRowFromGLAccountLineTable");
     },
 
-    _enableDeleteButton : function (sTableId, sDeleteButtonId) {
+    _enableDeleteButton: function (sTableId, sDeleteButtonId) {
       var oTable = this.getView().byId(sTableId),
-        aItems = oTable.getSelectedItems(),
-        bEnableDeleteButton = aItems.length > 0;
-        this.getView().byId(sDeleteButtonId).setEnabled(bEnableDeleteButton);
+        aIndices = oTable.getSelectedIndices(),
+        bEnableDeleteButton = aIndices.length > 0;
+      this.getView().byId(sDeleteButtonId).setEnabled(bEnableDeleteButton);
     },
 
     _onDeleteSelectedRows: function (sTableId, sPropertyLine) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
         oTable = this.getView().byId(sTableId),
-        selectedContexts = oTable.getSelectedContexts();
-
-      var aBindingContext = oTable.getItems().map(function (oItem) {
-        return oItem.getBindingContext("detailDetailModel");
-      });
+        aSelectedIndices = oTable.getSelectedIndices(),
+        selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex)),
+        oBinding = oTable.getBinding("rows"),
+        aBindingContext = oBinding.getContexts(0, oBinding.getLength());
 
       let a = new Set(aBindingContext);
       let b = new Set(selectedContexts);
@@ -786,17 +785,17 @@ sap.ui.define([
 
       var aDiff = [...diff];
 
-      var values = aDiff.map(function (ctx) {
+      var values = aDiff.map((ctx, index) => {
+        ctx.getObject().InvoiceLineItem = index + 1;
         return ctx.getObject();
       });
 
       oDetailDetailModel.setProperty(sPropertyLine, values);
-      oTable.removeSelections(true);
-      this.onSelectionGLAccountChange();
     },
 
     onDeleteSelectedGLAccountRows: function () {
       this._onDeleteSelectedRows("idNPOInvGLAccountLineTable", "/NonPoDocxLines");
+      this.onSelectionGLAccountChange();
     },
 
 
@@ -2945,17 +2944,20 @@ sap.ui.define([
     _onRouteMatched: function (oEvent) {
       // Define the model for the current page
       this.defineModelForCurrentPage();
+      // Get package ID from the event or fallback to a default value
+      this._packageId = oEvent.getParameter("arguments").packageId || this._packageId || "0";
+      // Get data from backend and bind them to the controls
+      this._getData();
+      // Start auto-lock refresh logic for the UI
+      this.startAutoLockRefresh();
+    },
 
+    _getData: function () {
       // Get the detail model and reset the UI state
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.resetUIState();
-
       // Set the page as busy
       this.getView().byId('DDPage').setBusy(true);
-
-      // Get package ID from the event or fallback to a default value
-      this._packageId = oEvent.getParameter("arguments").packageId || this._packageId || "0";
-
       // Fetch data based on the package ID and handle further actions
       this.fetchData(this._packageId)
         .then(this.readSavedData.bind(this)) // Fetch saved data from the backend
@@ -2981,9 +2983,6 @@ sap.ui.define([
 
       // Bind payment terms to the UI 
       this.bindPaymentTerms();
-
-      // Start auto-lock refresh logic for the UI
-      this.startAutoLockRefresh();
     },
 
     // Function to fetch data for the provided package ID
@@ -3039,14 +3038,16 @@ sap.ui.define([
           var aLineItems = []; // Array to store PO line items
           var aLineItems2 = []; // Array to store Non-PO line items
 
-        // Store attachments (if any)
-        oDetailDetailModel.setProperty("/Filelist", oBody.allegati);
-        this.getView().setModel(new JSONModel(record.Invoice), "currentInvoice");
-        
-        // Process data differently for PO mode and Non-PO mode
-        if (bPOMode) {
-          let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
-          let aLineDetailRefNumberAlreadyProcessed = [];
+          // Store invoice with body inside
+          this.getView().setModel(new JSONModel(record.Invoice), "currentInvoice");
+
+          // Store attachments (if any)
+          oDetailDetailModel.setProperty("/Filelist", oBody.allegati);
+
+          // Process data differently for PO mode and Non-PO mode
+          if (bPOMode) {
+            let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
+            let aLineDetailRefNumberAlreadyProcessed = [];
 
             // Check if there are multiple POs
             bMultiplePO = aPurchaseOrderData.length > 1;
@@ -3217,7 +3218,7 @@ sap.ui.define([
 
           return (record);
         } catch (error) {
-          console.log(error);      
+          console.log(error);
           MessageBox.error("Something failed with the invoice. Please contact your administrator for support");
         }
       };
@@ -3393,7 +3394,7 @@ sap.ui.define([
                     this._fullReload();
                     var bus = this.getOwnerComponent().getEventBus();
                     bus.publish("reload");
-                    this.handleCancelGEdit();
+                    this._confirmCancelEdit();
                   }.bind(this),
                   error: function (err) {
                     console.log("Switch Invoice Type Error: ", err);
@@ -3434,7 +3435,7 @@ sap.ui.define([
                     this._fullReload();
                     var bus = this.getOwnerComponent().getEventBus();
                     bus.publish("reload");
-                    this.handleCancelGEdit();
+                    this._confirmCancelEdit();
                   }.bind(this),
                   error: function (err) {
                     console.log("Switch Invoice Type Error: ", err);
@@ -4321,7 +4322,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock
-        this.handleCancelGEdit();
+        this._confirmCancelEdit();
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -4335,7 +4336,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock even in case of failure
-        this.handleCancelGEdit();
+        this._confirmCancelEdit();
       };
 
       // Execute AJAX request
@@ -4414,7 +4415,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock
-        this.handleCancelGEdit();
+        this._confirmCancelEdit();
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -4428,7 +4429,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock even in case of failure
-        this.handleCancelGEdit();
+        this._confirmCancelEdit();
       };
 
       // Execute AJAX request
@@ -4690,7 +4691,7 @@ sap.ui.define([
                     //}
 
                     // fire cancel press so that lock is released
-                    that.handleCancelGEdit();
+                    that._confirmCancelEdit();
 
                     if (invoice) {
                       that.loadHeaderFromDB(this._packageId);
@@ -4769,7 +4770,7 @@ sap.ui.define([
             }
 
             // fire cancel press so that lock is released
-            this.handleCancelGEdit();
+            this._confirmCancelEdit();
 
           }.bind(this));
 
@@ -5057,7 +5058,7 @@ sap.ui.define([
                     }
 
                     // fire cancel press so that lock is released
-                    that.handleCancelGEdit();
+                    that._confirmCancelEdit();
 
                     if (invoice) {
                       that.loadHeaderFromDB(this._packageId);
@@ -5128,7 +5129,7 @@ sap.ui.define([
             }
 
             // fire cancel press so that lock is released
-            this.handleCancelGEdit();
+            this._confirmCancelEdit();
 
           }.bind(this));
 
