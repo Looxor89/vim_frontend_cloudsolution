@@ -22,7 +22,7 @@ sap.ui.define([
          */
         onInit: function () {
             // read msg from i18n model
-            oBundle = this.getView().getModel("i18n").getResourceBundle();
+            oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             //set manifest base URL
             baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
             this.oRouter = this.getOwnerComponent().getRouter();
