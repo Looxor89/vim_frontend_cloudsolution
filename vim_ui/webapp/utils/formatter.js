@@ -276,6 +276,10 @@ sap.ui.define([
 
     allowAssetTable: function (bPOMode, bNONPOModeGLaccount) {
       return !bPOMode && !bNONPOModeGLaccount;
+    },
+
+    getI18nTextWithCount: function (sText, iCount) {
+      return sText.replace("{0}", iCount);
     }
   };
 });

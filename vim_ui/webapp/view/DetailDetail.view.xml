@@ -7,35 +7,34 @@
 
                 <f:heading>
                     <m:FlexBox wrap="Wrap" fitContainer="true" alignItems="Center">
-                        <m:Title text="Document Extraction​​​​" wrapping="true" class="sapUiTinyMarginEnd" />
+                        <m:Title text="{i18n>DocumentExtraction}​" wrapping="true" class="sapUiTinyMarginEnd" />
                     </m:FlexBox>
                 </f:heading>
                 <f:expandedContent>
-                    <m:Label text="Locked By: {detailDetailModel>/lock/LOCKEDBY}" visible="{path: 'detailDetailModel>/lock/LOCKEDBY', formatter: '.formatter.formatLock'}" />
+                    <m:Label text="{i18n>DocumentExtraction}: {detailDetailModel>/lock/LOCKEDBY}" visible="{path: 'detailDetailModel>/lock/LOCKEDBY', formatter: '.formatter.formatLock'}" />
                 </f:expandedContent>
                 <f:snappedContent>
-                    <m:Label text="Locked By: {detailDetailModel>/lock/LOCKEDBY}" visible="{path: 'detailDetailModel>/lock/LOCKEDBY', formatter: '.formatter.formatLock'}" />
+                    <m:Label text="{i18n>DocumentExtraction}: {detailDetailModel>/lock/LOCKEDBY}" visible="{path: 'detailDetailModel>/lock/LOCKEDBY', formatter: '.formatter.formatLock'}" />
                 </f:snappedContent>
 
                 <f:navigationActions>
-                    <m:Button type="Emphasized" text="Edit Document" icon="sap-icon://edit" press="handleGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/admin'], formatter: '.formatter.detailDetailEdit' }" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/save'], formatter: '.formatter.allowActions' }" />
-                    <m:Button type="Emphasized" text="Cancel Edit" icon="sap-icon://edit-outside" press="handleCancelGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS' , 'props>/action/admin'] , formatter: '.formatter.detailDetailEditCancel' }" />
-                    <!-- INIZIO: CAP elementi aggiunti in attesa di capire cosa fare con la Detail view -->
-                    <m:Button text="Assign" icon="sap-icon://activity-individual" press="onForwardPressHandler" 
+                    <m:Button type="Emphasized" text="{i18n>EditDocumentButton}" icon="sap-icon://edit" press="handleGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/admin'], formatter: '.formatter.detailDetailEdit' }" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/save'], formatter: '.formatter.allowActions' }" />
+                    <m:Button type="Emphasized" text="{i18n>CancelEditButton}" icon="sap-icon://edit-outside" press="handleCancelGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS' , 'props>/action/admin'] , formatter: '.formatter.detailDetailEditCancel' }" />
+                    <m:Button text="{i18n>AssignButton}" icon="sap-icon://activity-individual" press="onForwardPressHandler" 
                         visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/assign'], formatter: '.formatter.allowActions' }"
                         >
                         <m:layoutData>
                             <m:OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
-                    <m:Button text="Forward" icon="sap-icon://forward" press="onForwardPressHandler" 
+                    <m:Button text="{i18n>ForwardButton}" icon="sap-icon://forward" press="onForwardPressHandler" 
                         visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/forward'], formatter: '.formatter.allowActions' }"
                         >
                         <m:layoutData>
                             <m:OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
-                    <m:Button text="Reject" icon="sap-icon://employee-rejections" press="onRejectPress" 
+                    <m:Button text="{i18n>RejectButton}" icon="sap-icon://employee-rejections" press="onRejectPress" 
                         type="Reject"
                         visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/reject'], formatter: '.formatter.allowActions' }"
                         >
@@ -48,9 +47,6 @@
                             <m:OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
-                    <!-- FINE: CAP elementi aggiunti in attesa di capire cosa fare con la Detail view -->
-                    <!-- <m:OverflowToolbarButton type="Transparent" icon="sap-icon://full-screen" press="handleFullScreen" id="enterFullScreenBtn" tooltip="Enter Full Screen Mode" visible="{= ${/actionButtonsInfo/midColumn/fullScreen} !== null }" />
-                    <m:OverflowToolbarButton type="Transparent" icon="sap-icon://exit-full-screen" press="handleExitFullScreen" id="exitFullScreenBtn" tooltip="Exit Full Screen Mode" visible="{= ${/actionButtonsInfo/midColumn/exitFullScreen} !== null }" /> CAP commento temporaneo -->
                     <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline" press="onCancelPress" tooltip="Close column" visible="{= ${/actionButtonsInfo/endColumn/closeColumn} !== null }" />
                     <m:OverflowToolbarButton id="messagePopoverBtn" visible="true" icon="sap-icon://message-popup" type="Emphasized" text="{=${msg>/aMsg}.length}" press=".handleMessagePopoverPress" ariaHasPopup="Dialog" />
 
@@ -62,9 +58,7 @@
         <f:header>
             <f:DynamicPageHeader pinnable="false">
                 <l:Grid>
-                    <!-- <m:ObjectAttribute title="Extraction Status" text="{appmodel>/detail/header/DOX_STATUS}" /> -->
                     <m:ObjectAttribute title="Document Status" text="{path: 'detailDetailModel>/detail/header/DOC_STATUS', formatter: '.formatter.statusText'}" />
-                    <!-- <m:ObjectAttribute title="Invoice Document Type" text="{detailDetailModel>/detail/header/DOCUMENTTYPE}" /> -->
                     <m:ObjectAttribute title="Type/Category" text="{detailDetailModel>/detail/header/DOCCATEGORY}" />
                     <m:ObjectAttribute title="Assigned To" text="{detailDetailModel>/detail/header/ASSIGNEDTO}" />
                     <m:ObjectAttribute title="Changed By" text="{detailDetailModel>/detail/header/LASTCHANGEDBY}" />
@@ -77,187 +71,74 @@
             <m:IconTabBar id="iconTabBar" applyContentPadding="false" class="sapUiNoContentPadding" expandable="false">
                 <m:items>
 
-                    <m:IconTabFilter text="Main Document">
+                    <m:IconTabFilter text="{i18n>MainDocument}">
                         <l:VerticalLayout class="sapUiNoContentPadding" width="100%" enabled="{detailDetailModel>/props/gEditMode}">
                             <l:BlockLayout id="BlockLayout" background="Light">
                                 <l:BlockLayoutRow>
                                     <l:BlockLayoutCell>
-                                        <!-- CAP refactory: Inizio <l:HorizontalLayout>
-                                            <m:Title text="Confidence Levels: " level="H1" class="sapUiSmallMargin" />
-                                            <m:ObjectStatus class="sapUiSmallMargin" text="0% - 50%" inverted="true" state="Error" />
-                                            <m:ObjectStatus class="sapUiSmallMargin" text="51% - 80%" inverted="true" state="Indication03" />
-                                            <m:ObjectStatus class="sapUiSmallMargin" text="81% - 100%" inverted="true" state="Success" />
-                                        </l:HorizontalLayout> CAP refactory: Fine -->
 
                                         <form:SimpleForm id="invoiceHeaderSimpleForm" editable="true" layout="ResponsiveGridLayout" columnsM="2" columnsL="3" columnsXL="3">
                                             <form:content>
 
-                                                <core:Title text="General information" />
-                                                <!-- <m:Label text="Purchase Order" visible="{= !${detailDetailModel>/props/bMultiplePO}}"/>
-                                                <m:Input id="idPurchaseOrder" value="{detailDetailModel>/header/purchaseOrderNumber}"
-                                                    visible="{= !${detailDetailModel>/props/bMultiplePO}}"
-                                                    change=".onPOInputChange" 
-                                                    maxLength="10"/> -->
-                                                <!-- <m:Input id="idPurchaseOrder" 
-                                                    value="{appmodel>/detailDetail/header/purchaseOrderNumber/value}" 
-                                                    change=".onPOInputChange" /> -->
+                                                <core:Title text="{i18n>Generalinformation}" />
 
-                                                <!-- <m:Label text="Sender Name" visible="{= !${appmodel>/props/POMode}}" />
-                                                <m:Input id="idSenderName" value="{appmodel>/detailDetail/header/senderName/value}" tooltip="{ path: 'appmodel>/detailDetail/header/senderName', formatter: '.formatter.genTooltip' }" visible="{= !${appmodel>/props/POMode}}" /> CAP refactory -->
+                                                <m:Label text="{i18n>CompanyCode}" visible="{= !${detailDetailModel>/props/POMode}}" required="true" />
 
-                                                <!-- <m:Label text="Vendor Number" visible="{= !${appmodel>/props/POMode}}" required="true" />
-                                                <m:Input id="idVendorNumber" value="{appmodel>/detail/edited/Vendor}" 
-                                                    showValueHelp="true" submit=".onVendorChange" valueHelpRequest=".onVendorVH" 
-                                                    visible="{= !${appmodel>/props/POMode}}" maxLength="10"/>
-
-                                                <m:Label text="Receiver Name" visible="{= !${appmodel>/props/POMode}}" />
-                                                <m:Input id="idReceiverName" value="{appmodel>/detailDetail/header/receiverName/value}" tooltip="{ path: 'appmodel>/detailDetail/header/receiverName', formatter: '.formatter.genTooltip' }" visible="{= !${appmodel>/props/POMode}}" /> CAP refactory  -->
-
-                                                <m:Label text="Company Code" visible="{= !${detailDetailModel>/props/POMode}}" required="true" />
-                                                <!-- CAP refactory submit event is useless <m:Input id="idCompanyCode" value="{appmodel>/detail/edited/CompCode}" 
-                                                    showValueHelp="true" submit=".onCompCodeChange" 
-                                                    valueHelpRequest=".onCompCodeVH" visible="{= !${appmodel>/props/POMode}}" 
-                                                    maxLength="4"/> -->
-                                                
-                                                <!-- <m:Input id="idCompanyCode" value="{appmodel>/detail/edited/CompCode}" 
-                                                    showValueHelp="true"
-                                                    valueHelpRequest=".onCompCodeVH" visible="{= !${appmodel>/props/POMode}}" 
-                                                    maxLength="4"/>
-
-                                                <m:Label text="Company Code" visible="{= ${appmodel>/props/POMode}}"/>
-                                                <m:Text id="idCompanyCodeTxt" text="" visible="{= ${appmodel>/props/POMode}}" />CAP refactory  -->
-
-                                                <m:Label text="Invoice receipt date" required="true" />
+                                                <m:Label text="{i18n>InvoiceReceiptDate}" required="true" />
                                                 <m:DatePicker id="idDocDate" value="{detailDetailModel>/header/documentDate}" placeholder="MM/DD/YYYY" valueFormat="yyyy-dd-MM" displayFormat="MM/dd/yyyy" />
                                                 
-                                                <m:Label text="Invoice date" required="true" />
+                                                <m:Label text="{i18n>Invoicedate}" required="true" />
                                                 <m:DatePicker id="idInvDate" value="{detailDetailModel>/header/documentDate}" placeholder="MM/DD/YYYY" valueFormat="yyyy-dd-MM" displayFormat="MM/dd/yyyy" />
 
-                                                <m:Label text="Baseline date" required="true" />
+                                                <m:Label text="{i18n>BaselineDate}" required="true" />
                                                 <m:DatePicker id="idBaselineDate" value="{detailDetailModel>/documentDate/value}" placeholder="DD/MM/YYYY" valueFormat="dd-MM-yyyy" displayFormat="dd/MM/yyyy" />
 
-                                                <!-- <m:Label text="Invoice Number" required="true" />
-                                                <m:Input id="idVendorInvoice" value="{appmodel>/detailDetail/header/documentNumber/value}" 
-                                                    tooltip="{ path: 'appmodel>/detailDetail/header/documentNumber', formatter: '.formatter.genTooltip' }" 
-                                                    maxLength="16"/>CAP refactory  -->
-
-                                                <m:Label text="Invoicing party - Vendor code" required="true" />
+                                                <m:Label text="{i18n>InvoicingPartyVendorCode}" required="true" />
                                                 <m:Input id="idInvoicingPartyVendorCode" value="{detailDetailModel>/header/invoicingPartyVendorCode}"/>
 
-                                                <!-- <m:Label text="Business area" required="true" />
-                                                <m:Input id="idBusinessArea" value="{detailDetailModel>/header/businessArea}"/> -->
-
-                                                <m:Label text="Assignment" required="true" />
+                                                <m:Label text="{i18n>Assignment}" required="true" />
                                                 <m:Input id="idAssignment" value="{detailDetailModel>/header/assignment}" maxLength="18"/>
 
-                                                <!-- <m:Label text="Due Date" visible="{= ${appmodel>/props/POMode}}" />
-                                                <m:DatePicker id="idDueDate" placeholder="YYYY-DD-MM" valueFormat="yyyy-dd-MM" displayFormat="yyyy-dd-MM" change="handleDateChange" visible="{= ${appmodel>/props/POMode}}" /> -->
-                                                <m:Label text="Postging date" visible="false" />
+                                                <m:Label text="{i18n>PostgingDate}" visible="false" />
                                                 <m:DatePicker id="idDueDate" placeholder="YYYY-DD-MM" valueFormat="yyyy-dd-MM" displayFormat="yyyy-dd-MM" change="handleDateChange" visible="false" value="{detailDetailModel>/header/postingDate}"/>
 
-                                                <m:Label text="Reference" required="true" />
+                                                <m:Label text="{i18n>Reference}" required="true" />
                                                 <m:Input id="idReference" value="{detailDetailModel>/header/reference}"/>
                                                 
-                                                <m:Label text="Currency" required="true" />
+                                                <m:Label text="{i18n>Currency}" required="true" />
                                                 <m:Input id="idCurrency" value="{detailDetailModel>/header/currency}" 
                                                     showValueHelp="true" valueHelpRequest=".onVHCurrency" 
                                                     maxLength="3"/>
 
-                                                <m:Label text="Text" />
+                                                <m:Label text="{i18n>Text}" />
                                                 <m:Input id="idFreeTxt" value="{detailDetailModel>/header/headerText}" maxLength="50"/>
 
-                                                <!-- <m:Label text="Credit Memo" />
-                                                <m:CheckBox id="idInvInd" select=".onCredMemoToggle"/>CAP refactory  -->
-
-                                                <core:Title text="Amounts" />
-                                                <m:Label text="Gross Amount" required="true" />
+                                                <core:Title text="{i18n>Amounts}" />
+                                                <m:Label text="{i18n>GrossAmount}" required="true" />
                                                 <m:Input id="idGrossAmt" 
                                                     value="{detailDetailModel>/header/grossAmount}" 
                                                     type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" 
                                                     placeholder="0.00"
                                                     liveChange="calcTotals"
                                                     />
-
-                                                <!-- <m:Label text="Discount Amount" visible="{= ${appmodel>/props/POMode}}" />
-                                                <m:Input id="idDiscountAmt" value="" type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" placeholder="0.00" visible="{= ${appmodel>/props/POMode}}" /> -->
-                                                <!-- NOT REQUIRED -->
-                                                <!-- <m:Label text="Discount Amount" visible="false" />
-                                                <m:Input id="idDiscountAmt" type="Number" 
-                                                    value="{
-                                                    type: 'sap.ui.model.odata.type.Decimal',
-                                                    formatOptions: {
-                                                        minFractionDigits: 1,
-                                                        maxFractionDigits: 3
-                                                    },
-                                                    constraints: {
-                                                        precision: 23,
-                                                        scale: 4
-                                                    }}"                                                     
-                                                    description="{appmodel>/detailDetail/header/currencyCode/value}" 
-                                                    placeholder="0.00" visible="false" />CAP refactory  -->
-                                                <!-- Net amount visible=false -->
-                                                <!-- <m:Label text="Net Amount" /> CAP refactory
-                                                <m:Input id="idNetAmt"
-                                                value="{ path:'appmodel>/detailDetail/header/netAmount/value',
-                                                    type: 'sap.ui.model.odata.type.Decimal',
-                                                    formatOptions: {
-                                                      minFractionDigits: 1,
-                                                      maxFractionDigits: 3
-                                                    },
-                                                    constraints: {
-                                                      precision: 23,
-                                                      scale: 4
-                                                    }}"
-                                                tooltip="{ path: 'appmodel>/detailDetail/header/netAmount', formatter: '.formatter.genTooltip' }" type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" placeholder="0.00" /> -->
-                                                <m:Label text="Net Amount" />
+                                                <m:Label text="{i18n>NetAmount}" />
                                                 <m:Input id="idNetAmt" 
                                                     value="{detailDetailModel>/header/netAmount}" 
                                                     type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" placeholder="0.00" 
                                                     />
 
-                                                <m:Label text="Payment Terms" />
-                                                <!-- <m:Select id="idPaymentTerms" items="{appmodel>/valuehelps/paymentterms}">
-                                                    <core:Item id="idPaymnttermSel" key="{appmodel>Paymentterms}" text="{appmodel>Paymentterms} - {appmodel>Description}" />
-                                                </m:Select> -->
+                                                <m:Label text="{i18n>PaymentTerms}" />
                                                 <m:Input id="idPaymentTerms" showValueHelp="true" valueHelpRequest=".onPayTermsVH" value="{detailDetailModel>/header/paymentTerms}"/>
                                                 
-                                                <m:Label text="Payment method" />
-                                                <!-- <m:Select id="idPaymentTerms" items="{appmodel>/valuehelps/paymentterms}">
-                                                    <core:Item id="idPaymnttermSel" key="{appmodel>Paymentterms}" text="{appmodel>Paymentterms} - {appmodel>Description}" />
-                                                </m:Select> -->
+                                                <m:Label text="{i18n>PaymentMethod}" />
                                                 <m:Input id="idPaymentMethod" value="{detailDetailModel>/header/paymentMethod}"/>
         
 
-                                                <m:Label text="Invoice Document Type" />
+                                                <m:Label text="{i18n>InvoiceDocumentType}" />
                                                 <m:Input id="idInvDocType" showValueHelp="true" valueHelpRequest=".onInvDocTypeVH" value="{detailDetailModel>/header/documentType}"/>
 
-                                                <!-- <m:Toolbar ariaLabelledBy="idBankTitle" >
-                                                    <m:Title id="idBankTitle" text="Banking Details" />
-                                                </m:Toolbar>
-
-                                                <m:Label text="Partner Bank Type" />CAP refactory  -->
-                                                <!-- <m:ComboBox id="idBankKey" selectionChange="onBankSelect" enabled="{ 
-                                                  parts: [
-                                                  'appmodel>/props/POMode',
-                                                  'appmodel>/detail/edited/Vendor'
-                                                  ],
-                                                  formatter: '.formatter.isVendor'
-                                                }" items="{appmodel>/valuehelps/partbank}">
-                                                    <core:Item key="{appmodel>Bvtyp}" text="{appmodel>Bvtyp}" />
-                                                </m:ComboBox> -->
-                                                <!-- <m:Input id="idBankKey" showValueHelp="true" valueHelpRequest=".onPartnerBankVH" />
-
-                                                <m:Label text="Bank Acc #" />
-                                                <m:Text id="bankntxt" text="{appmodel>/detailDetail/header/Bankn}" />CAP refactory  -->
-                                                <!-- TODO -->
-                                                <!-- <m:Label text="Routing #" />
-                                                <m:Text id="routingtxt" text="{appmodel>/detailDetail/header/Bankl}" />
-                                               
-                                                <m:Label text="IBAN #" />
-                                                <m:Text id="ibantxt" text="{appmodel>/detailDetail/header/IBAN}" />CAP refactory  -->
-
-                                                <core:Title text="Tax" />
-                                                <m:Label text="Tax Amount" />
+                                                <core:Title text="{i18n>Tax}" />
+                                                <m:Label text="{i18n>TaxAmount}" />
                                                 <m:Input id="idHTaxAmt" 
                                                     value="{
                                                     path: 'detailDetailModel>/header/taxAmount',
@@ -272,25 +153,12 @@
                                                     }}"
                                                     liveChange="calcTotals"
                                                     type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" 
-                                                    placeholder="0.00" enabled="true" />
+                                                    placeholder="0.00" enabled="true" />                                                  
 
-                                                <!-- <m:Label text="Withholding Exemption Amount" />
-                                                <m:Input id="idTaxExemptAmt" value="{
-                                                    type: 'sap.ui.model.odata.type.Decimal',
-                                                    formatOptions: {
-                                                    minFractionDigits: 1,
-                                                    maxFractionDigits: 3
-                                                    },
-                                                    constraints: {
-                                                    precision: 23,
-                                                    scale: 4
-                                                    }}" 
-                                                    description="{appmodel>/detailDetail/header/currencyCode/value}"/> CAP refactory -->                                                    
-
-                                                <m:Label text="Withholding tax code" />
+                                                <m:Label text="{i18n>WithholdingTaxCode}" />
                                                 <m:Input id="idWithholdingTaxCode" value="{detailDetailModel>/header/withholdingTaxCode}"/>    
 
-                                               <m:Label text="Tax Code" />
+                                               <m:Label text="{i18n>TaxCode}" />
                                                 <m:Select id="idTaxCode" enabled="{ 
                                                           parts: [
                                                           'detailDetailModel>/props/POMode',
@@ -311,7 +179,7 @@
                                     <l:BlockLayoutCell>
                                      <m:IconTabBar id="iconTabBarBodyInvoice" applyContentPadding="false" class="sapUiNoContentPadding" expandable="false">
                                         <m:items>
-                                            <m:IconTabFilter text="Purchase Order" count="{= ${detailDetailModel>/DocxLines/length}}">
+                                            <m:IconTabFilter text="{i18n>PurchaseOrder}" count="{= ${detailDetailModel>/DocxLines/length}}">
                                                 <Table id="idInvLineItemTable" rows="{
                                                         path: 'detailDetailModel>/DocxLines',
                                                         sorter: {
@@ -322,34 +190,34 @@
                                                         selectionMode="None">
                                                     <extension>
                                                         <m:Toolbar>
-                                                            <m:Title text="Line Items ({= ${detailDetailModel>/DocxLines/length}}) Purchase Order" level="H2" />
+                                                            <m:Title text="{parts: [{path: 'i18n>BodyLineItemsPurchaseOrder'}, {path: 'detailDetailModel>/DocxLines/length'}], 
+                                                                formatter: '.formatter.getI18nTextWithCount'}" level="H2" />
                                                             <m:ToolbarSpacer />
-                                                            <m:Button text="Add" press="onAddPORow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <m:Button id="deleteRowFromPOLineTable" text="Delete" press="onDeleteSelectedPORows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <!-- <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" /> -->
+                                                            <m:Button text="{i18n>AddButton}" press="onAddPORow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button id="deleteRowFromPOLineTable" text="{i18n>DeleteButton}" press="onDeleteSelectedPORows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                         </m:Toolbar>
                                                     </extension>
                                                     <columns>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Doc. Line No." required="true"/>
+                                                            <m:Label text="{i18n>DocLineNo}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>InvoiceLineItem}" type="Number" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" visible="{detailDetailModel>/props/bMultiplePO}">
-                                                            <m:Label text="Purchase Order" required="true"/>
+                                                            <m:Label text="{i18n>PurchaseOrder}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>PONumber}" showValueHelp="true" valueHelpRequest="onMultiplePOVH" change="onMultiPOInputChange" maxLength="10" visible="{detailDetailModel>/props/bMultiplePO}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="PO Line No." required="true"/>
+                                                            <m:Label text="{i18n>POLineNo}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>PONumber} - {detailDetailModel>POLineItem}" showValueHelp="true" valueHelpRequest="onPurchaseOrderVH" maxLength="16" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" > 
-                                                            <m:Label text="Amount" required="true"/>
+                                                            <m:Label text="{i18n>Amount}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>Amount',
@@ -367,7 +235,7 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Qty" required="true"/>
+                                                            <m:Label text="{i18n>Quantity}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>Quantity',
@@ -385,7 +253,7 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Order Unit" required="true"/>
+                                                            <m:Label text="{i18n>OrderUnit}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>OrderUnit',
@@ -403,73 +271,73 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Text text="Description" />
+                                                            <m:Text text="{i18n>Description}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Description}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Tax Code" required="true"/>
+                                                            <m:Label text="{i18n>TaxCode}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Business area" required="true"/>
+                                                            <m:Label text="{i18n>BusinessArea}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>BusinessArea}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Cost center" required="true"/>
+                                                            <m:Label text="{i18n>CostCenter}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>CostCenter}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="WBS Element" required="true"/>
+                                                            <m:Label text="{i18n>WBSElement}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>WBSElement}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Order" required="true"/>
+                                                            <m:Label text="{i18n>Order}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Order}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Supplier" required="true"/>
+                                                            <m:Label text="{i18n>Supplier}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Supplier}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Material" required="true"/>
+                                                            <m:Label text="{i18n>Material}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Material}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Valuation type" required="true"/>
+                                                            <m:Label text="{i18n>ValuationType}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>ValuationType}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Material group" required="true"/>
+                                                            <m:Label text="{i18n>MaterialGroup}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>MaterialGroup}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Plant" required="true"/>
+                                                            <m:Label text="{i18n>Plant}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Plant}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="Valuation area" required="true"/>
+                                                            <m:Label text="{i18n>ValuationArea}" required="true"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>ValuationArea}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
@@ -478,7 +346,7 @@
                                                     </columns>
                                                 </Table>
                                             </m:IconTabFilter>
-                                            <m:IconTabFilter text="G/L Account" count="{= ${detailDetailModel>/NonPoDocxLines/length}}">
+                                            <m:IconTabFilter text="{i18n>GLAccount}" count="{= ${detailDetailModel>/NonPoDocxLines/length}}">
                                                 <Table id="idNPOInvGLAccountLineTable" rows="{
                                                         path: 'detailDetailModel>/NonPoDocxLines'
                                                     }" class="sapUiNoMargin"
@@ -486,37 +354,28 @@
                                                         selectionMode="None">
                                                     <extension>
                                                         <m:Toolbar>
-                                                            <m:Title text="Line Items ({= ${detailDetailModel>/NonPoDocxLines/length}}) G/L Account" level="H2" />
+                                                            <m:Title text="{parts: [{path: 'i18n>BodyLineItemsGLAccount'}, {path: 'detailDetailModel>/NonPoDocxLines/length'}], 
+                                                                    formatter: '.formatter.getI18nTextWithCount'}" level="H2" />
                                                             <m:ToolbarSpacer />
-                                                            <m:Button text="Add" press="onAddGLAccountRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <m:Button id="deleteRowFromGLAccountLineTable" text="Delete" press="onDeleteSelectedGLAccountRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            <!-- <m:ToggleButton icon="sap-icon://edit" tooltip="Edit" press="onEditInvLineItems" visible="false" /> -->
+                                                            <m:Button text="{i18n>AddButton}" press="onAddGLAccountRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button id="deleteRowFromGLAccountLineTable" text="{i18n>DeleteButton}" press="onDeleteSelectedGLAccountRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
                                                         </m:Toolbar>
                                                     </extension>
                                                     <columns>
                                                         <Column width="8rem">
-                                                            <m:Label text="Doc. Line No." />
+                                                            <m:Label text="{i18n>DocLineNo}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>InvoiceLineItem}" type="Number" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
-                                                        <!-- <m:Column minScreenWidth="Tablet" demandPopin="true">
-                                                            <m:Text text="D/C" />
-                                                        </m:Column> -->
-                                                        <!-- <m:Column>
-                                                            <m:Text text="Description" />
-                                                        </m:Column> -->
-                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Company Code" />
-                                                        </m:Column> -->
                                                         <Column width="8rem">
-                                                            <m:Label text="G/L Account" />
+                                                            <m:Label text="{i18n>GLAccount}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>GLAcc}" showValueHelp="true" valueHelpRequest="onGLAcctVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
-                                                            <m:Label text="Amount" />
+                                                            <m:Label text="{i18n>Amount}" />
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>Amount',
@@ -533,52 +392,37 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
-                                                            <m:Label text="Tax Code" />
+                                                            <m:Label text="{i18n>TaxCode}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
-                                                            <m:Label text="Assignment" />
+                                                            <m:Label text="{i18n>Assignment}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Assignment}" showValueHelp="true" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="20rem">
-                                                            <m:Label text="Text" />
+                                                            <m:Label text="{i18n>Text}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Text}" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
-                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Business area" />
-                                                        </m:Column> -->
-                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Tax Amount" />
-                                                        </m:Column> -->
-                                                        <!-- <m:Column>
-                                                            <m:Text text="Quantity" /> -->
-                                                        <!-- </m:Column> -->
                                                         <Column width="8rem">
-                                                            <m:Label text="Cost Center" />
+                                                            <m:Label text="{i18n>CostCenter}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>CostCen}" showValueHelp="true" valueHelpRequest="onCostCenterVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
-                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Order" />
-                                                        </m:Column> -->
-                                                        <!-- <m:Column minScreenWidth="Desktop" demandPopin="true">
-                                                            <m:Text text="Sales order" />
-                                                        </m:Column> -->
                                                         <Column width="8rem">
-                                                            <m:Label text="Profit Center" />
+                                                            <m:Label text="{i18n>ProfitCenter}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>ProfitCen}" showValueHelp="true" valueHelpRequest="onProfitCenterVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
-                                                            <m:Label text="WBS Element" />
+                                                            <m:Label text="{i18n>WBSElement}" />
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>WBSElem}" showValueHelp="true" valueHelpRequest="onWBSElementVH" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
                                                             </template>
@@ -595,16 +439,16 @@
                         </l:VerticalLayout>
                     </m:IconTabFilter>
 
-                    <m:IconTabFilter text="Additional Information">
+                    <m:IconTabFilter text="{i18n>AdditionalInformation}">
                         <l:VerticalLayout class="sapUiNoContentPadding" width="100%">
                             <l:BlockLayout background="Light">
                                 <l:BlockLayoutRow>
                                     <l:BlockLayoutCell class="sapUiContentPadding" visible="{props>/action/comment}">
                                         <m:VBox>
-                                            <m:Title text="Notes"></m:Title>
+                                            <m:Title text="{i18n>Notes}"></m:Title>
                                             <m:TextArea id="idNotesTxtArea" rows="8" width="100%" />
-                                            <m:Button text="Post Note" press=".onAddNotes" width="100%" />
-                                            <m:Button text="Clear" press=".onClearNotes" width="100%" />
+                                            <m:Button text="{i18n>PostNoteButton}" press=".onAddNotes" width="100%" />
+                                            <m:Button text="{i18n>ClearButton}" press=".onClearNotes" width="100%" />
                                         </m:VBox>
 
                                     </l:BlockLayoutCell>
@@ -625,7 +469,7 @@
                                         <m:Table id="idFileList" items="{detailDetailModel>/Filelist}" class="sapUiNoMargin">
                                             <m:headerToolbar>
                                                 <m:Toolbar>
-                                                    <m:Title text="Files " level="H2" />
+                                                    <m:Title text="{i18n>Files}" level="H2" />
                                                     <m:ToolbarSpacer />
 
                                                     <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="txt,jpg,png,doc,docx,xls,xlsx,pdf,ppt,pptx,zip" placeholder="Choose a file for Upload..." visible="{detailDetailModel>/props/FileEditMode}" />
@@ -637,34 +481,18 @@
                                             </m:headerToolbar>
                                             <m:columns>
                                                 <m:Column>
-                                                    <m:Text text="File" />
+                                                    <m:Text text="{i18n>File}" />
                                                 </m:Column>
                                                 <m:Column>
-                                                    <m:Text text="Document Type" />
+                                                    <m:Text text="{i18n>DocumentType}" />
                                                 </m:Column>
-                                                <!-- <m:Column>
-                                                    <m:Text text="Category" /> CAP refactory
-                                                </m:Column> -->
-                                                <!-- <m:Column>
-                                                    <m:Text text="Extraction Status" /> CAP refactory
-                                                </m:Column> -->
-                                                <!-- <m:Column>
-                                                        <m:Text text="Job Id" />
-                                                    </m:Column> -->
-                                                <!-- <m:Column>
-                                                    <m:Text text="Primary Document" /> CAP refactory
-                                                </m:Column> -->
 
                                             </m:columns>
                                             <m:items>
                                                 <m:ColumnListItem vAlign="Middle">
                                                     <m:cells>
-                                                        <!-- <m:Link text="{appmodel>nomeAttachment}" href="{path: 'appmodel>ObjectStoreRef', formatter: '.formatter.formatLink'}" /> CAP refactory  -->
                                                         <m:ObjectIdentifier title="{detailDetailModel>nomeAttachment}" titleActive="true" titlePress="onDownloadAttachment" />
                                                         <m:Text text="{detailDetailModel>formatoAttachment}" />
-                                                        <!-- <m:Text text="{appmodel>DocCategory}" /> CAP refactory -->
-                                                        <!-- <m:Text text="{appmodel>DoxStatus}" /> CAP refactory -->
-                                                        <!-- <m:RadioButton selected="{= ${appmodel>IsMain}}" enabled="{appmodel>/props/FileEditMode}" visible="{= ${appmodel>DoxStatus} ? true : false }" select=".onFileListMainSelect" groupName="FileList" /> CAP refactory -->
                                                     </m:cells>
                                                 </m:ColumnListItem>
                                             </m:items>
@@ -680,16 +508,9 @@
         <f:footer>
             <m:OverflowToolbar visible="{detailDetailModel>/props/gEditMode}">
                 <m:ToolbarSpacer />
-                <!-- <m:Button type="Reject" text="Reject" press="onRejectPress" icon="sap-icon://employee-rejections" 
-                    visible="{ parts:['appmodel>/detail/header/DOCSTATUS', 'props>/action/reject'], formatter: '.formatter.allowActions' }"
-                    />
-                <m:Button type="Default" text="Forward" press="onForwardPress" icon="sap-icon://forward" 
-                    visible="{ parts:['appmodel>/detail/header/DOCSTATUS', 'props>/action/forward'], formatter: '.formatter.allowActions' }"
-                    /> CAP refactory -->
-                <m:Button type="Emphasized" text="Save" icon="sap-icon://save" visible="{props>/action/save}" press=".onSavePress" />
-                <m:Button type="Accept" text="Submit" icon="sap-icon://accept" visible="{props>/action/savesap}" press=".onSubmitPress" />
+                <m:Button type="Emphasized" text="{i18n>SaveButton}" icon="sap-icon://save" visible="{props>/action/save}" press=".onSavePress" />
+                <m:Button type="Accept" text="{i18n>SubmitButton}" icon="sap-icon://accept" visible="{props>/action/savesap}" press=".onSubmitPress" />
             </m:OverflowToolbar>
         </f:footer>
     </f:DynamicPage>
-
 </mvc:View>

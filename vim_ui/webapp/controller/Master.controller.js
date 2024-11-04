@@ -11,6 +11,7 @@ sap.ui.define([
     "use strict";
     //manifest base URL
     var baseManifestUrl;
+    var oBundle;
 
     return BaseController.extend("vim_ui.controller.Master", {
         formatter: formatter,
@@ -20,6 +21,8 @@ sap.ui.define([
          * Set up router and attach the route pattern matcher.
          */
         onInit: function () {
+            // read msg from i18n model
+            oBundle = this.getView().getModel("i18n").getResourceBundle();
             //set manifest base URL
             baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
             this.oRouter = this.getOwnerComponent().getRouter();
@@ -139,7 +142,8 @@ sap.ui.define([
             var sPackageId = this.getView().getModel("masterModel").getProperty(this.oCtx + "/PACKAGEID");
 
             if (!sPackageId) {
-                MessageToast.show("ERROR - Document cannot be unlocked");
+                let sMsg = oBundle.getText("DocumentCannotBeUnlocked");
+                MessageToast.show(sMsg);
                 return;
             }
 
@@ -159,11 +163,13 @@ sap.ui.define([
                 dataType: 'json',
                 data: JSON.stringify(body),
                 success: function (data) {
-                    MessageToast.show("Document has been unlocked");
+                    let sMsg = oBundle.getText("DocumentUnlocked");
+                    MessageToast.show(sMsg);
                 },
                 error: function (err) {
+                    let sMsg = oBundle.getText("UnableToUnlock");
                     console.log("FAILED TO REMOVE LOCK", err);
-                    MessageToast.show("Unable to unlock Document");
+                    MessageToast.show(sMsg);
                 }
             });
         },
@@ -268,8 +274,9 @@ sap.ui.define([
                     };
                 }
             });
-
-            MessageBox.warning("Do you really want to submit selected invoices?", {
+            
+            let sMsg = oBundle.getText("MassiveSubmitMessageBox");
+            MessageBox.warning(sMsg, {
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                 onClose: function (sAction) {
                   if (sAction === MessageBox.Action.YES) {
@@ -279,16 +286,19 @@ sap.ui.define([
                         sap.ui.core.BusyIndicator.hide();
                         var aErrorInvoicesPackageIds = oData.value[0].ErrorInvoicesPackageIds;
                         if (aErrorInvoicesPackageIds.length > 0) {
-                            MessageBox.error("Some submit failed. Please adjust invoices from their details page.");
+                            let sMsg = oBundle.getText("MassiveSubmitFailed");
+                            MessageBox.error(sMsg);
                             that._highlightErrorRows(aErrorInvoicesPackageIds);
                         } else {
-                            MessageBox.success("Submit succeded");
+                            let sMsg = oBundle.getText("MassiveSubmitSucceded");
+                            MessageBox.success(sMsg);
                         }
                     };
 
                     const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
                         sap.ui.core.BusyIndicator.hide();
-                        MessageBox.error("Backend request failed. Please try again later.");
+                        let sMsg = oBundle.getText("BackendRequestFailed");
+                        MessageBox.error(sMsg);
                         aSelectedItems = aSelectedItems.map((oItem) => {
                             return oItem.PackageId;
                         });

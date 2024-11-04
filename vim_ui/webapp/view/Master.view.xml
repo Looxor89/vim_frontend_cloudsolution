@@ -17,7 +17,7 @@
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
-                    <Title text="Extracted Documents" textAlign="Center" />
+                    <Title text="{i18n>DynamicPageTitle}" textAlign="Center" />
                 </f:heading>
                 <f:actions>
                     <!-- Add any actions like buttons if needed -->
@@ -34,7 +34,7 @@
                         <fb:filterGroupItems>
 
                             <!-- Document Status Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="B" label="Document Status" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="B" label="{i18n>DocumentStatus}" visibleInFilterBar="true">
                                 <fb:control>
                                     <MultiComboBox id="idSelectDocStatus" items="{path: 'prmodel>/filterProps/DocumentStatus'}">
                                         <core:Item key="{prmodel>id}" text="{prmodel>status}" />
@@ -43,7 +43,7 @@
                             </fb:FilterGroupItem>
 
                             <!-- Extraction Status Filter (currently hidden) -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="C" label="Extraction Status" visible="false" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="C" label="{i18n>ExtractionStatus}" visible="false" visibleInFilterBar="true">
                                 <fb:control>
                                     <Select id="idSelectExtractionStatus" forceSelection="false" items="{prmodel>/filterProps/ExtractionStatus}">
                                         <core:Item key="{prmodel>id}" text="{prmodel>status}" />
@@ -52,21 +52,21 @@
                             </fb:FilterGroupItem>
 
                             <!-- Sent By Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="Vendor name" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="{i18n>VendorName}" visibleInFilterBar="true">
                                 <fb:control>
                                     <Input id="idSentByInp" />
                                 </fb:control>
                             </fb:FilterGroupItem>
 
                             <!-- Assigned To Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="Assigned To" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="{i18n>AssignedTo}" visibleInFilterBar="true">
                                 <fb:control>
                                     <Input id="idAssignedToInp" />
                                 </fb:control>
                             </fb:FilterGroupItem>
 
                             <!-- Document Category Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="Document Category" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="{i18n>DocumentCategory}" visibleInFilterBar="true">
                                 <fb:control>
                                     <Select id="idSelectDocumentCategory" forceSelection="false" items="{prmodel>/filterProps/DocumentCategory}">
                                         <core:Item key="{prmodel>id}" text="{prmodel>status}" />
@@ -75,7 +75,7 @@
                             </fb:FilterGroupItem>
 
                             <!-- Received Between Filter (Date Range) -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="Received Between" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="{i18n>ReceivedBetween}" visibleInFilterBar="true">
                                 <fb:control>
                                     <DateRangeSelection id="idSentOn" displayFormat="long" />
                                 </fb:control>
@@ -108,49 +108,49 @@
                 <headerToolbar>
                     <OverflowToolbar >
                         <ToolbarSpacer/>
-                        <Button id="quickMassiveActionButton" icon="sap-icon://edit" text="Quick Massive Edit" enabled="false" press="onQuickMassiveEditPress" tooltip="Massive action"/>
+                        <Button id="quickMassiveActionButton" icon="sap-icon://edit" text="{i18n>QuickMassiveEdit}" enabled="false" press="onQuickMassiveEditPress" tooltip="{i18n>MassiveActionTooltip}"/>
                     </OverflowToolbar>
                 </headerToolbar>
 
                 <columns>
                     <!-- Company Code Column -->
                     <Column hAlign="Initial" width="10%">
-                        <Text text="Company Code" />
+                        <Text text="{i18n>CompanyCode}" />
                     </Column>
 
                     <!-- Document Status Column -->
                     <Column hAlign="Initial" width="12%">
-                        <Text text="Document Status" />
+                        <Text text="{i18n>DocumentStatusColumn}" />
                     </Column>
 
                     <!-- ReceivedOn Column -->
                     <Column hAlign="Initial" width="16%">
-                        <Text text="Received on" />
+                        <Text text="{i18n>ReceivedOn}" />
                     </Column>
 
                     <!-- Vendor name Column -->
                     <Column hAlign="Initial" width="15%">
-                        <Text text="Vendor name" />
+                        <Text text="{i18n>VendorNameColumn}" />
                     </Column>
 
                     <!-- Assigned To Column -->
                     <Column hAlign="Initial" width="15%">
-                        <Text text="Assigned To" />
+                        <Text text="{i18n>AssignedToColumn}" />
                     </Column>
 
                     <!-- Category Column -->
                     <Column hAlign="Initial" width="10%">
-                        <Text text="Category" />
+                        <Text text="{i18n>Category}" />
                     </Column>
 
                     <!-- Last Changed Column -->
                     <Column hAlign="Initial" width="17%">
-                        <Text text="Last Changed" />
+                        <Text text="{i18n>LastChanged}" />
                     </Column>
 
                     <!-- Action Column -->
                     <Column hAlign="Initial" width="5%">
-                        <Text text="Action" />
+                        <Text text="{i18n>Action}" />
                     </Column>
                 </columns>
 
@@ -190,7 +190,7 @@
                             />
 
                             <!-- Edit Button -->
-                            <Button tooltip="Edit" icon="sap-icon://edit" press="onQuickEditPress" type="Transparent" />
+                            <Button tooltip="{i18n>EditButtonTooltip}" icon="sap-icon://edit" press="onQuickEditPress" type="Transparent" />
                         </cells>
                     </ColumnListItem>
                 </items>
@@ -202,7 +202,7 @@
         <f:footer>
             <OverflowToolbar >
                 <ToolbarSpacer />
-                <Button type="Accept" text="Submit" press="onSubmitPress"/>
+                <Button type="Accept" text="{i18n>SubmitButton}" press="onSubmitPress"/>
             </OverflowToolbar>
         </f:footer>
 

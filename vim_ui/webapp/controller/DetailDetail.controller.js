@@ -21,11 +21,14 @@ sap.ui.define([
   var sResponsivePaddingClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer";
   //manifest base URL
   var baseManifestUrl;
+  var oBundle;
 
   return BaseController.extend("vim_ui.controller.DetailDetail", {
     formatter: formatter,
     _sTestVar: "test",
     onInit: function () {
+      // read msg from i18n model
+      oBundle = this.getView().getModel("i18n").getResourceBundle();
       //set manifest base URL
       baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
       // Create a MessagePopover for showing messages and notifications
@@ -559,7 +562,7 @@ sap.ui.define([
       const oSuccessFunction = (data) => {
         sap.ui.core.BusyIndicator.hide(); // Hide any busy indicator after success
         this.getView().byId("idNotesTxtArea").setValue(""); // Clear the text area
-        MessageToast.show("Successfully posted the note"); // Show success message
+        MessageToast.show(oBundle.getText("SuccessfullyPostedNote")); // Show success message
         this.fetchNotes(this._packageId); // Refresh the notes after adding a new one
         return data;
       };
@@ -568,7 +571,7 @@ sap.ui.define([
         this.getView().byId("idNotesTxtArea").setValue(""); // Clear the text area
         console.log('Error occurred while posting the note: ', errorThrown); // Log the error
         sap.ui.core.BusyIndicator.hide(); // Hide any busy indicator after error
-        MessageToast.show("Error occurred while posting the note"); // Show error message
+        MessageToast.show(oBundle.getText("ErrorPostingNote")); // Show error message
       };
 
       return this.executeRequest(sUrl, 'POST', JSON.stringify(obj), oSuccessFunction, oErrorFunction);
@@ -604,7 +607,7 @@ sap.ui.define([
     // Handler to cancel the "edit" mode and unlock the document
     handleCancelGEdit: function () {
       var that = this;
-      MessageBox.warning("Do you really want to cancel edit? Every unsaved edit will be lost.", {
+      MessageBox.warning(oBundle.getText("AlertCancelEdit"), {
         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
         emphasizedAction: MessageBox.Action.NO,
         onClose: function (sAction) {
@@ -638,7 +641,7 @@ sap.ui.define([
         oDetailDetailModel.setProperty("/props/lineItemTable/editMode", false);
 
         // Show a message to indicate the document has been unlocked
-        MessageToast.show("Document unlocked");
+        MessageToast.show(oBundle.getText("DocumentUnlocked"));
 
         // this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
         this.getView().byId("idInvLineItemTable").setSelectionMode("None");  // Disable table actions
@@ -651,7 +654,7 @@ sap.ui.define([
         console.log("FAILED TO REMOVE LOCK", XMLHttpRequest);  // Log the error
 
         // Show a message indicating failure to unlock
-        MessageToast.show("Unable to unlock Document");
+        MessageToast.show(oBundle.getText("UnableToUnlock"));
       };
 
       return this.executeRequest(URL, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
@@ -673,7 +676,7 @@ sap.ui.define([
         oDetailDetailModel.setProperty("/props/gEditMode", true);
         oDetailDetailModel.setProperty("/props/lineItemTable/editMode", true);
 
-        MessageToast.show("Document locked");
+        MessageToast.show(oBundle.getText("DocumentLocked"));
 
         this.getView().byId("idInvLineItemTable").setSelectionMode("MultiToggle");
         // this.rebindTable(this.oEditableTemplate, "Edit", true);
@@ -685,7 +688,7 @@ sap.ui.define([
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
         console.log("FAILED TO SET LOCK", errorThrown);
-        MessageBox.error("Unable to lock document ", {
+        MessageBox.error(oBundle.getText("UnableToLockDocument"), {
           details: errorThrown,
           styleClass: sResponsivePaddingClasses
         });
@@ -1428,7 +1431,7 @@ sap.ui.define([
       var sPO = oEvent.getParameter("value");
       var sPath = oEvent.getSource().getBindingContext("appmodel").getPath();
       if (sPO.length < 10) {
-        MessageBox.error("Purchase order can't be less than 10!");
+        MessageBox.error(oBundle.getText("PurchaseOrderCannotBeLessThan", ["10"]));
         this.appmodel.setProperty(sPath + "/PONumber", "");
         this.appmodel.setProperty(sPath + "/POLineItem", "");
       } else {
@@ -1573,7 +1576,7 @@ sap.ui.define([
       var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
 
       if (!sBukrs || sBukrs.length <= 0) {
-        MessageToast.show("Select a company code.");
+        MessageToast.show(oBundle.getText("SelectCompanyCode"));
         return;
       }
 
@@ -1678,7 +1681,7 @@ sap.ui.define([
         .catch(function (err) {
           console.log("Errored:", err);
           this.appmodel.refresh();
-          MessageToast.show("Error in loading recommended G/L Account")
+          MessageToast.show(oBundle.getText("ErrorLoadingRecommendedGLAccount"));
         }.bind(this))
     },
 
@@ -1754,7 +1757,7 @@ sap.ui.define([
       var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
 
       if (!sBukrs || sBukrs.length <= 0) {
-        MessageToast.show("Select a company code.");
+        MessageToast.show(oBundle.getText("SelectCompanyCode"));
         return;
       }
 
@@ -3219,7 +3222,7 @@ sap.ui.define([
           return (record);
         } catch (error) {
           console.log(error);
-          MessageBox.error("Something failed with the invoice. Please contact your administrator for support");
+          MessageBox.error(oBundle.getText("ErrorLoadingInvoiceData"));
         }
       };
 
@@ -3368,14 +3371,15 @@ sap.ui.define([
 
       // If removing PO number completely
       if (!sValue || sValue.trim().length <= 0) {
-        var msg = "Are you sure you want to convert document to NON-PO invoice type?";
+        var msg = oBundle.getText("SwitchInvoiceTypeAlertToNonPo"),
+        textButton = oBundle.getText("SwitchInvoiceTypeButton");
 
         if (this.appmodel.getProperty("/props/POMode")) {
           MessageBox.warning(msg, {
-            actions: ["Switch Invoice Type", MessageBox.Action.CLOSE],
-            emphasizedAction: "Switch Invoice Type",
+            actions: [textButton, MessageBox.Action.CLOSE],
+            emphasizedAction: textButton,
             onClose: function (sAction) {
-              if (sAction === "Switch Invoice Type") {
+              if (sAction === textButton) {
                 $.ajax({
                   url: url,
                   method: "POST",
@@ -3389,7 +3393,7 @@ sap.ui.define([
                   async: false,
                   success: function (data) {
                     console.log("Switch Invoice Type: ", data);
-                    MessageToast.show("Switching Invoice Type", data);
+                    MessageToast.show(oBundle.getText("SwitchingInvoiceType"), data);
                     // this.fetchFileList(this._packageId);
                     this._fullReload();
                     var bus = this.getOwnerComponent().getEventBus();
@@ -3398,7 +3402,7 @@ sap.ui.define([
                   }.bind(this),
                   error: function (err) {
                     console.log("Switch Invoice Type Error: ", err);
-                    MessageToast.show("Error switching", err);
+                    MessageToast.show(oBundle.getText("ErrorSwitching"), err);
                   }.bind(this)
                 });
               } else {
@@ -3408,14 +3412,14 @@ sap.ui.define([
           });
         }
       } else {
-        var msg = "Are you sure you want to convert document to PO invoice type?";
+        var msg = oBundle.getText("SwitchInvoiceTypeAlertToPo");
         // either user is switching from NON PO to PO
         if (!this.appmodel.getProperty("/props/POMode")) {
           MessageBox.warning(msg, {
-            actions: ["Switch Invoice Type", MessageBox.Action.CLOSE],
-            emphasizedAction: "Switch Invoice Type",
+            actions: [textButton, MessageBox.Action.CLOSE],
+            emphasizedAction: textButton,
             onClose: function (sAction) {
-              if (sAction === "Switch Invoice Type") {
+              if (sAction === textButton) {
                 this.setPOMode(sValue);
                 this.setPONumberForAllLines(sValue);
                 $.ajax({
@@ -3431,7 +3435,7 @@ sap.ui.define([
                   async: false,
                   success: function (data) {
                     console.log("Switch Invoice Type: ", data);
-                    MessageToast.show("Switching Invoice Type", data);
+                    MessageToast.show(oBundle.getText("SwitchingInvoiceType"), data);
                     this._fullReload();
                     var bus = this.getOwnerComponent().getEventBus();
                     bus.publish("reload");
@@ -3439,7 +3443,7 @@ sap.ui.define([
                   }.bind(this),
                   error: function (err) {
                     console.log("Switch Invoice Type Error: ", err);
-                    MessageToast.show("Error switching", err);
+                    MessageToast.show(oBundle.getText("ErrorSwitching"), err);
                   }.bind(this)
                 });
               } else {
@@ -3478,20 +3482,20 @@ sap.ui.define([
       }
 
       if (oEvent.getParameter('selected')) {
-        var msg = "You are currently editing the document! Are you sure you want to set attachment " + fileName + " as the Primary Document?\n" +
-          "Please save your changes before you confirm.";
+        var msg = oBundle.getText("SwitchPrimaryDocumentAlert",[fileName]);
         if (!this.appmodel.getProperty('/props/gEditMode')) {
-          msg = "Are you sure you want to set attachment " + fileName + " as the Primary Document?";
+          msg = oBundle.getText("SwitchPrimaryDocumentConfirmAlert", [fileName]);
         }
 
         var url = baseManifestUrl + "/odata/setMainJob";
+        var textButton = oBundle.getText("SwitchPrimaryDocumentButton");
 
         MessageBox.warning(msg, {
-          actions: ["Switch Primary", MessageBox.Action.CLOSE],
-          emphasizedAction: "Switch Primary",
+          actions: [textButton, MessageBox.Action.CLOSE],
+          emphasizedAction: textButton,
           onClose: function (sAction) {
 
-            if (sAction === "Switch Primary") {
+            if (sAction === textButton) {
               $.ajax({
                 url: url,
                 method: "POST",
@@ -3506,7 +3510,7 @@ sap.ui.define([
                 success: function (data) {
 
                   console.log("Switch Main Job Response: ", data);
-                  MessageToast.show("Switching Primary Document", data);
+                  MessageToast.show(oBundle.getText("SwitchingPrimaryDocument"), data);
                   // this.fetchFileList(this._packageId);
                   this._fullReload();
                   var bus = this.getOwnerComponent().getEventBus();
@@ -3515,7 +3519,7 @@ sap.ui.define([
                 error: function (err) {
 
                   console.log("Switch Main Job Error: ", err);
-                  MessageToast.show("Error switching", err);
+                  MessageToast.show(oBundle.getText("ErrorSwitching"), err);
                   this.fetchFileList(this._packageId);
                 }.bind(this)
               });
@@ -3588,7 +3592,7 @@ sap.ui.define([
           console.log(data);  // Log the successful response
           table.setBusy(false);
           // Show success message to the user
-          MessageBox.success("Attachment uploaded with success", {
+          MessageBox.success(oBundle.getText("AttachmentUploadedSuccessfully"), {
             actions: [MessageBox.Action.CLOSE],
             title: "Success",
             details: data,  // Provide details of the response
@@ -3605,7 +3609,7 @@ sap.ui.define([
 
           table.setBusy(false);
           // Show error message to the user
-          MessageBox.error("An unexpected error occurred in the backend system.\nPlease try again later.", {
+          MessageBox.error(oBundle.getText("UnexpectedErrorOccured"), {
             title: "Error",
             details: errorThrown,  // Provide error details
             styleClass: sResponsivePaddingClasses
@@ -3619,7 +3623,7 @@ sap.ui.define([
             this.executeRequest(sUrl, 'POST', JSON.stringify(oBody), oSuccessFunction, oErrorFunction);
           }.bind(this), function (error) {
             table.setBusy(false);
-            MessageToast.show("File upload error");
+            MessageToast.show(oBundle.getText("FileUploadError"));
           }).then(function () {
             oFileUploader.clear();
           }.bind(this));
@@ -3848,7 +3852,7 @@ sap.ui.define([
       var po_viewTaxCode = oV.byId("idTaxCode");
       var poTaxCode = po_viewTaxCode.getSelectedKey();
       if (poTaxCode.length <= 0) {
-        msg = "Tax Code is required";
+        msg = oBundle.getText("TaxCodeRequired");
         po_viewTaxCode.setShowSecondaryValues(true)
         po_viewTaxCode.setValueState("Error");
         po_viewTaxCode.setValueStateText(msg);
@@ -3867,7 +3871,7 @@ sap.ui.define([
         var V_PONum = C_PONum.getValue();
 
         if (V_PONum.trim().length <= 0) {
-          msg = "PO number is required";
+          msg = oBundle.getText("PONumberRequired");
           C_PONum.setShowValueStateMessage(true);
           C_PONum.setValueState("Error");
           C_PONum.setValueStateText(msg);
@@ -3879,7 +3883,7 @@ sap.ui.define([
         }
 
         if (V_PONum.trim().length > 10 || V_PONum.trim().length < 10) {
-          msg = "PO number should be of 10 characters";
+          msg = oBundle.getText("PONumberDifferentFrom_Characters", ["10"]);
           C_PONum.setShowValueStateMessage(true);
           C_PONum.setValueState("Error");
           C_PONum.setValueStateText(msg);
@@ -3895,7 +3899,7 @@ sap.ui.define([
       var V_DocDt = C_DocDt.getDateValue();
 
       if (!V_DocDt) {
-        msg = "Document Date is invalid";
+        msg = oBundle.getText("IvalidDocumentDate");
         C_DocDt.setValueState("Error");
         C_DocDt.setValueStateText(msg);
         aErr.push({
@@ -3923,7 +3927,7 @@ sap.ui.define([
       var V_InvNum = C_InvNum.getValue();
 
       if (!V_InvNum || V_InvNum.trim().length <= 0) {
-        msg = "Invoice Number is required";
+        msg = oBundle.getText("InvoiceNumberRequired");
         C_InvNum.setValueState("Error");
         C_InvNum.setValueStateText(msg);
         aErr.push({
@@ -3938,7 +3942,7 @@ sap.ui.define([
       var V_Curr = C_Curr.getValue();
 
       if (V_Curr.trim().length <= 0) {
-        msg = "Currency is required";
+        msg = oBundle.getText("CurrencyRequired");
         C_Curr.setShowValueStateMessage(true);
         C_Curr.setValueState("Error");
         C_Curr.setValueStateText(msg);
@@ -3950,7 +3954,7 @@ sap.ui.define([
       }
 
       if (V_Curr.trim().length > 3 || V_Curr.trim().length < 3) {
-        msg = "Currency should be of 3 characters";
+        msg = oBundle.getText("CurrencyDifferentFrom_Characters", ["3"]);
         C_Curr.setShowValueStateMessage(true);
         C_Curr.setValueState("Error");
         C_Curr.setValueStateText(msg);
@@ -3966,7 +3970,7 @@ sap.ui.define([
       var V_GrossAmt = C_GrossAmt.getValue();
 
       if (!V_GrossAmt || V_GrossAmt.trim().length <= 0) {
-        msg = "Gross Amount is required";
+        msgoBundle.getText("GrossAmountRequired");
         C_GrossAmt.setValueState("Error");
         C_GrossAmt.setValueStateText(msg);
         aErr.push({
@@ -4002,7 +4006,7 @@ sap.ui.define([
       // lines check
       if (!lines || lines.length <= 0) {
         isError = true;
-        msg = "Invoice does not have any line items";
+        msg = oBundle.getText("NoLinesForInvoice");
         aErr.push({
           msg: msg
         });
@@ -4011,14 +4015,14 @@ sap.ui.define([
       for (var i = 0; i < lines.length; i++) {
         if (lines[i].TaxCode == null) {
           isError = true;
-          msg = "Please Select Tax Code from Line items ";
+          msg = oBundle.getText("PleaseSelectTaxCodeFromLineItems");
           aErr.push({
             msg: msg
           });
         }
         if (bMultiplePO && (lines[i].PONumber == null || lines[i].PONumber == "")) {
           isError = true;
-          msg = "Please Enter Purchase Order from Line items ";
+          msg = oBundle.getText("PleaseEnterPurchaseOrderFromLineItems");
           aErr.push({
             msg: msg
           });
@@ -4038,7 +4042,7 @@ sap.ui.define([
       var V_VenNum = C_VenNum.getValue();
 
       if (!V_VenNum || V_VenNum.trim().length <= 0) {
-        msg = "Vendor Number is required";
+        msg = oBundle.getText("VendorNumberRequired");
         C_VenNum.setValueState("Error");
         C_VenNum.setValueStateText(msg);
         aErr.push({
@@ -4053,7 +4057,7 @@ sap.ui.define([
       var V_CCNum = C_CCNum.getValue();
 
       if (!V_CCNum || V_CCNum.trim().length <= 0) {
-        msg = "Company Code is required";
+        msg = oBundle.getText("CompanyCodeRequired");
         C_CCNum.setValueState("Error");
         C_CCNum.setValueStateText(msg);
         aErr.push({
@@ -4071,7 +4075,7 @@ sap.ui.define([
       //To check if selected vendor have Partner Bank set up in SAP, if yes, this feild should be kept manadatory
 
       if (!V_PartBnk || V_PartBnk.trim().length <= 0) {
-        msg = "Partner Bank is required";
+        msg = oBundle.getText("PartnerBankRequired");
         C_PartBnk.setValueState("Error");
         C_PartBnk.setValueStateText(msg);
         aErr.push({
@@ -4088,7 +4092,7 @@ sap.ui.define([
       var V_DocDt = C_DocDt.getDateValue();
 
       if (!V_DocDt) {
-        msg = "Document Date is invalid";
+        msg = oBundle.getText("InvalidDocumentDate");
         C_DocDt.setValueState("Error");
         C_DocDt.setValueStateText(msg);
         aErr.push({
@@ -4103,7 +4107,7 @@ sap.ui.define([
       var V_InvNum = C_InvNum.getValue();
 
       if (!V_InvNum || V_InvNum.trim().length <= 0) {
-        msg = "Invoice Number is required";
+        msg = oBundle.getText("InvoiceNumberRequired");
         C_InvNum.setValueState("Error");
         C_InvNum.setValueStateText(msg);
         aErr.push({
@@ -4118,7 +4122,7 @@ sap.ui.define([
       var V_Curr = C_Curr.getValue();
 
       if (V_Curr.trim().length <= 0) {
-        msg = "Currency is required";
+        msg = oBundle.getText("CurrencyRrequired");
         C_Curr.setShowValueStateMessage(true);
         C_Curr.setValueState("Error");
         C_Curr.setValueStateText(msg);
@@ -4130,7 +4134,7 @@ sap.ui.define([
       }
 
       if (V_Curr.trim().length > 3 || V_Curr.trim().length < 3) {
-        msg = "Currency should be of 3 characters";
+        msg = oBundle.getText("CurrencyDifferentFrom_Characters", ["3"]);
         C_Curr.setShowValueStateMessage(true);
         C_Curr.setValueState("Error");
         C_Curr.setValueStateText(msg);
@@ -4146,7 +4150,7 @@ sap.ui.define([
       var V_GrossAmt = C_GrossAmt.getValue();
 
       if (!V_GrossAmt || V_GrossAmt.trim().length <= 0) {
-        msg = "Gross Amount is required";
+        msg = oBundle.getText("GrossAmountRequired");
         C_GrossAmt.setValueState("Error");
         C_GrossAmt.setValueStateText(msg);
         aErr.push({
@@ -4315,7 +4319,7 @@ sap.ui.define([
       const oSuccessFunction = (data) => {
         console.log(data);  // Log the successful response
         // Show success message to the user
-        MessageBox.success("Successfully saved record", {
+        MessageBox.success(oBundle.getText("SuccessfullySavedRecord"), {
           title: "Success",
           details: data,  // Provide details of the response
           styleClass: sResponsivePaddingClasses
@@ -4329,7 +4333,7 @@ sap.ui.define([
         console.log(errorThrown);  // Log the error
 
         // Show error message to the user
-        MessageBox.error("An unexpected error occurred in the backend system.\nPlease try again later.", {
+        MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
           title: "Error",
           details: errorThrown,  // Provide error details
           styleClass: sResponsivePaddingClasses
@@ -4408,7 +4412,7 @@ sap.ui.define([
       const oSuccessFunction = (data) => {
         console.log(data);  // Log the successful response
         // Show success message to the user
-        MessageBox.success("Successfully saved record", {
+        MessageBox.success(oBundle.getText("SuccessfullySavedRecord"), {
           title: "Success",
           details: data,  // Provide details of the response
           styleClass: sResponsivePaddingClasses
@@ -4422,7 +4426,7 @@ sap.ui.define([
         console.log(errorThrown);  // Log the error
 
         // Show error message to the user
-        MessageBox.error("An unexpected error occurred in the backend system.\nPlease try again later.", {
+        MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
           title: "Error",
           details: errorThrown,  // Provide error details
           styleClass: sResponsivePaddingClasses
@@ -4647,16 +4651,14 @@ sap.ui.define([
                     var soap_res = resHdr2Ret;
                     var bCreated = resHdr2Ret[0].Type === "S" ? true : false;
                     if (resHdr2Ret[0].Type === "S") {
-                      MessageBox.success("Successfully Created Incoive Document no "
-                        + resHdr2Ret[0].Invoicedocnumber + " For Fiscal year: " + resHdr2Ret[0].Fiscalyear, {
+                      MessageBox.success(oBundle.getText("SuccessfullyCreatedInvoiceDocumentNo", [resHdr2Ret[0].Invoicedocnumber, resHdr2Ret[0].Fiscalyear]), {
                         title: "Success",
                         details: soap_res,
                         styleClass: sResponsivePaddingClasses
                       });
                       that.asyncInvoiceStatusUpdate(resHdr2Ret[0].Invoicedocnumber);
                     } else if (resHdr2Ret[0].Type === "") {
-                      MessageBox.success("Successfully Created Incoive Document no: "
-                        + resHdr2Ret[0].Invoicedocnumber + " for Fiscal year: " + resHdr2Ret[0].Fiscalyear, {
+                      MessageBox.success(oBundle.getText("SuccessfullyCreatedInvoiceDocumentNo", [resHdr2Ret[0].Invoicedocnumber, resHdr2Ret[0].Fiscalyear]), {
                         title: "Success",
                         details: soap_res,
                         styleClass: sResponsivePaddingClasses
@@ -4756,13 +4758,13 @@ sap.ui.define([
               }.bind(this), 100);
 
             } else if (err.status === 500) {
-              MessageBox.error("SAP Odata failure", {
+              MessageBox.error(oBundle.getText("SAPRequestFailed"), {
                 title: "Error",
                 details: soap_res,
                 styleClass: sResponsivePaddingClasses
               });
             } else {
-              MessageBox.error("Error creating Invoice Document in SAP", {
+              MessageBox.error(oBundle.getText("ErrorCreatingInvoiceDocument"), {
                 title: "Error",
                 details: soap_res,
                 styleClass: sResponsivePaddingClasses
@@ -5115,13 +5117,13 @@ sap.ui.define([
                 this.oMP.openBy(oButton);
               }.bind(this), 100);
             } else if (err.status === 500) {
-              MessageBox.error("SAP Odata failure", {
+              MessageBox.error(oBundle.getText("SAPRequestFailed"), {
                 title: "Error",
                 details: soap_res,
                 styleClass: sResponsivePaddingClasses
               });
             } else {
-              MessageBox.error("Error creating Invoice Document in SAP", {
+              MessageBox.error(oBundle.getText("ErrorCreatingInvoiceDocument"), {
                 title: "Error",
                 details: soap_res,
                 styleClass: sResponsivePaddingClasses
