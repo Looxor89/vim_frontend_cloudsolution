@@ -79,7 +79,8 @@ sap.ui.define([
 
             const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
                 sap.ui.core.BusyIndicator.hide();
-                MessageToast.show("Error loading data: " + textStatus);
+                let sMsg = oBundle.getText("ErrorLoadingData", [textStatus]);
+                MessageToast.show(sMsg);
                 console.log(errorThrown);
             };
 
