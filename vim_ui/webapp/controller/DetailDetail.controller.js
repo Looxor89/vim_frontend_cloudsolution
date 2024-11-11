@@ -714,7 +714,11 @@ sap.ui.define([
     onAddPORow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
         aDocxLines = oDetailDetailModel.getProperty("/DocxLines");
+        // Retrieve the current invoice data from the model
+      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
       aDocxLines.push({
+        "ID": null,
+        "body_Id": oCurrentInvoice.body[0].ID,
         "InvoiceLineItem": "",
         "PONumber": null,
         "POLineItem": null,
@@ -740,7 +744,11 @@ sap.ui.define([
     onAddGLAccountRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
         aNonPoDocxLines = oDetailDetailModel.getProperty("/NonPoDocxLines");
+        // Retrieve the current invoice data from the model
+      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
       aNonPoDocxLines.push({
+        "ID": null,
+        "body_Id": oCurrentInvoice.body[0].ID,
         "InvoiceLineItem": "",
         "GLAcc": "",
         "Amount": "",
@@ -3063,6 +3071,8 @@ sap.ui.define([
             // Helper function to create a PO line item
             function createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder) {
               return {
+                "ID": oLineDetail.ID,
+                "body_Id": oLineDetail.body_Id,
                 "InvoiceLineItem": index + 1,
                 "Description": oLineDetail.descrizione || null,
                 "Amount": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
@@ -3142,6 +3152,8 @@ sap.ui.define([
               //   "AssetValueDate": null
               // };
               return {
+                "ID": oLineDetail.ID,
+                "body_Id": oLineDetail.body_Id,
                 "InvoiceLineItem": index + 1,
                 "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
                 "GLAcc": null,
@@ -4215,7 +4227,7 @@ sap.ui.define([
 
     },
 
-    savePayloadBuilder: function (mode, oV) {
+    savePayloadBuilderOld: function (mode, oV) {
       var res;
       if (mode === "PO") {
         res = {
@@ -4300,13 +4312,206 @@ sap.ui.define([
       return res;
     },
 
+    _getControlValue: function (oControl) {
+      if (oControl instanceof sap.m.Input || oControl instanceof sap.m.Select) {
+        return oControl.getValue();
+      } else if (oControl instanceof sap.m.Switch) {
+        return oControl.getState();
+      } else if (oControl instanceof sap.m.CheckBox) {
+        return oControl.getSelected();
+      } else {
+        throw new Error("Unsupported control type");
+      }
+    },
+
+    _onChangeEventHandler: function (oEvent, sProperty) {
+      var oControl = oEvent.getSource(),
+      sPath = oControl.getBindingContext("detailDetailModel").getPath()+sProperty,
+      sValue = this._getControlValue(oControl);
+      this.getView().getModel("detailDetailModel").setProperty(sPath, sValue);
+    },
+
+    onAmountChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Amount");
+    },
+
+    onQuantityChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Quantity");
+    },
+
+    onDescriptionChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Description");
+    },
+
+    onOrderUnitChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/OrderUnit");
+    },
+
+    onTaxCodeChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/TaxCode");
+    },
+
+    onBusinessAreaChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/BusinessArea");
+    },
+
+    onCostCenterChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CostCenter");
+    },
+
+    onWBSElementChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/WBSElement");
+    },
+
+    onOrderChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Order");
+    },
+
+    onSupplierChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Supplier");
+    },
+
+    onMaterialChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Material");
+    },
+
+    onValuationTypeChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ValuationType");
+    },
+
+    onMaterialGroupChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/MaterialGroup");
+    },
+
+    onPlantChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Plant");
+    },
+
+    onValuationAreaChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ValuationArea");
+    },
+
+    onGLAccountChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/GLAccount");
+    },
+
+    onAssignmentAreaChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/AssignmentArea");
+    },
+
+    onTextChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Text");
+    },
+
+    onProfitCenterChange: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ProfitCenter");
+    },
+
+    savePayloadBuilder: function () {
+      // Retrieve the current invoice data from the model
+      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      var bPOMode = oDetailDetailModel.getProperty("/props/POMode");
+      oBody = oCurrentInvoice.body[0],
+      aDatiBeniServizi_DettaglioLinee = oBody.datiBeniServizi_DettaglioLinee;
+      
+      var aPOLineItems = oDetailDetailModel.getProperty("/DocxLines");
+      aPOLineItems.forEach(oLineItem => {
+        if (oLineItem.ID) {
+          let oOriginalLineItem = aDatiBeniServizi_DettaglioLinee.find((oDettaglioLinea) => oDettaglioLinea.ID === oLineItem.ID);
+          oOriginalLineItem.descrizione = oLineItem.Description;
+          oOriginalLineItem.quantita = oLineItem.quantity;
+          oOriginalLineItem.numeroLinea = oLineItem.POLineItem;
+          oOriginalLineItem.aliquotaIVA = oLineItem.TaxCode.split(" ")[0];
+          oOriginalLineItem.natura = oLineItem.TaxCode.split(" ")[1];
+
+          oBody.datiGenerali_DatiOrdineAcquisto.forEach(oPurchaseOrder => {
+            oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
+              if (oLineNumberRef.riferimentoNumeroLinea === oLineItem.POLineItem) {
+                oPurchaseOrder.idDocumento = oLineItem.PONumber;
+              }
+            });
+          });
+        } else {
+          oBody.datiBeniServizi_DettaglioLinee.push({
+            ID: null,
+            body_Id: oBody.ID,
+            aliquotaIVA: oLineItem.TaxCode.split(" ")[0],
+            altriDatiGestionali: [],
+            codiceArticolo: [],
+            dataFinePeriodo: null,
+            dataInizioPeriodo: null,
+            descrizione: oLineItem.Description,
+            natura: oLineItem.TaxCode.split(" ")[1],
+            numeroLinea: oLineItem.POLineItem,
+            prezzoTotale: null,
+            prezzoUnitario: null,
+            quantita: oLineItem.quantity,
+            riferimentoAmministrazione: null,
+            ritenuta: null,
+            scontoMaggiorazione: [],
+            tipoCessazionePrestazione: null,
+            unitaMisura : null
+          })
+        }
+      });
+
+      var aNonPOLineItems = oDetailDetailModel.getProperty("/NonPoDocxLines");
+      aNonPOLineItems.forEach(oLineItem => {
+        if (oLineItem.ID) {
+          let oOriginalLineItem = aDatiBeniServizi_DettaglioLinee.find((oDettaglioLinea) => oDettaglioLinea.ID === oLineItem.ID);
+          oOriginalLineItem.descrizione = oLineItem.Text;
+          oOriginalLineItem.aliquotaIVA = oLineItem.TaxCode.split(" ")[0];
+          oOriginalLineItem.natura = oLineItem.TaxCode.split(" ")[1];
+        } else {
+          oBody.datiBeniServizi_DettaglioLinee.push({
+            ID: null,
+            body_Id: oBody.ID,
+            aliquotaIVA: oLineItem.TaxCode.split(" ")[0],
+            altriDatiGestionali: [],
+            codiceArticolo: [],
+            dataFinePeriodo: null,
+            dataInizioPeriodo: null,
+            descrizione: oLineItem.Text,
+            natura: oLineItem.TaxCode.split(" ")[1],
+            numeroLinea: null,
+            prezzoTotale: null,
+            prezzoUnitario: null,
+            quantita: null,
+            riferimentoAmministrazione: null,
+            ritenuta: null,
+            scontoMaggiorazione: [],
+            tipoCessazionePrestazione: null,
+            unitaMisura : null
+          })
+        }
+      });
+      
+      if (bPOMode) {
+        oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento = aPOLineItems.length > 0 ? aPOLineItems[0].Amount : null;
+      } else {
+        oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento = aNonPOLineItems.length > 0 ? aNonPOLineItems[0].AmountInDocCurrency : null;
+      }
+
+      oBody.datiGenerali_DatiGeneraliDocumento_Data = oDetailDetailModel.getProperty("/header/documentDate");
+      oBody.datiGenerali_DatiGeneraliDocumento_Numero = oDetailDetailModel.getProperty("/header/reference");
+      oBody.datiGenerali_DatiGeneraliDocumento_Divisa = oDetailDetailModel.getProperty("/header/currency");
+      oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento = oDetailDetailModel.getProperty("/header/documentType");
+      oBody.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese = oDetailDetailModel.getProperty("/header/invoicingPartyVendorCode");
+      oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento = oDetailDetailModel.getProperty("/header/netAmount");
+      oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento = oDetailDetailModel.getProperty("/header/paymentMethod");
+      oBody.datiBeniServizi_DatiRiepilogo[0].imposta = oDetailDetailModel.getProperty("/header/taxAmount");
+      oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] = oDetailDetailModel.getProperty("/header/withholdingTaxCode");
+      this.getView().getModel("currentInvoice").setProperty("/", oCurrentInvoice);
+      
+      return oCurrentInvoice;
+    },
+
     // Handler for the "Save" button press
     onSavePress: function (oEvent) {
       var body = {}; // Initialize request body
       var sUrl = baseManifestUrl + `/odata/save`; // API endpoint for saving data
-
-      // Retrieve the current invoice data from the model
-      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
+      var oCurrentInvoice = this.savePayloadBuilder();
 
       // Build the request payload
       body = {

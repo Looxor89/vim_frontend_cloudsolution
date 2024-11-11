@@ -231,7 +231,7 @@
                                                                         precision: 23,
                                                                         scale: 4
                                                                     }
-                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onAmountChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
@@ -249,7 +249,7 @@
                                                                         precision: 13,
                                                                         scale: 3
                                                                     }
-                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onQuantityChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
@@ -267,79 +267,79 @@
                                                                         precision: 13,
                                                                         scale: 3
                                                                     }
-                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                }" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onOrderUnitChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Text text="{i18n>Description}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Description}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                                <m:Input value="{detailDetailModel>Description}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onDescriptionChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>TaxCode}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onTaxCodeChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>BusinessArea}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>BusinessArea}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>BusinessArea}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onBusinessAreaChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>CostCenter}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>CostCenter}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>CostCenter}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onCostCenterChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>WBSElement}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>WBSElement}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                                <m:Input value="{detailDetailModel>WBSElement}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onWBSElementChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>Order}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Order}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>Order}" maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onOrderChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>Supplier}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Supplier}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>Supplier}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onSupplierChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>Material}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Material}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>Material}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onMaterialChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>ValuationType}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>ValuationType}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>ValuationType}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onValuationTypeChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>MaterialGroup}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>MaterialGroup}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>MaterialGroup}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onMaterialGroupChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>Plant}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Plant}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>Plant}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onPlantChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>ValuationArea}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>ValuationArea}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>ValuationArea}"  maxLength="50" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onValuationAreaChange"/>
                                                             </template>
                                                         </Column>
 
@@ -371,7 +371,7 @@
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>GLAccount}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>GLAcc}" showValueHelp="true" valueHelpRequest="onGLAcctVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>GLAcc}" showValueHelp="true" valueHelpRequest="onGLAcctVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onGLAccountChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
@@ -388,43 +388,43 @@
                                                                     constraints: {
                                                                         precision: 23,
                                                                         scale: 4
-                                                                    }}" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                    }}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onAmountChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>TaxCode}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" maxLength="2" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onTaxCodeChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>Assignment}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Assignment}" showValueHelp="true" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>Assignment}" showValueHelp="true" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onAssignmentChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="20rem">
                                                             <m:Label text="{i18n>Text}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>Text}" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>Text}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onTextChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>CostCenter}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>CostCen}" showValueHelp="true" valueHelpRequest="onCostCenterVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>CostCen}" showValueHelp="true" valueHelpRequest="onCostCenterVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onCostCenterChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>ProfitCenter}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>ProfitCen}" showValueHelp="true" valueHelpRequest="onProfitCenterVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>ProfitCen}" showValueHelp="true" valueHelpRequest="onProfitCenterVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onProfitCenterChange"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>WBSElement}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>WBSElem}" showValueHelp="true" valueHelpRequest="onWBSElementVH" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
+                                                                <m:Input value="{detailDetailModel>WBSElem}" showValueHelp="true" valueHelpRequest="onWBSElementVH" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onWBSElementChange"/>
                                                             </template>
                                                         </Column>
 
