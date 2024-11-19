@@ -280,6 +280,39 @@ sap.ui.define([
 
     getI18nTextWithCount: function (sText, iCount) {
       return sText.replace("{0}", iCount);
+    },
+
+    showTo_SelectedPurchaseOrders_PurchaseOrder: function (sRefDocumentCategoryKey) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory1';
+    },
+
+    showTo_SelectedDeliveryNotes_InboundDeliveryNote : function (sRefDocumentCategoryKey) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory2';
+    },
+
+    showTo_SelectedServiceEntrySheets_ServiceEntrySheet : function (sRefDocumentCategoryKey) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategoryS';
+    },
+
+    fillTo_SelectedPurchaseOrders_PurchaseOrder: function (sRefDocumentCategoryKey, sValue) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory1' ? sValue : null;
+    },
+
+    fillTo_SelectedDeliveryNotes_InboundDeliveryNote : function (sRefDocumentCategoryKey, sValue) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory2' ? sValue : null;
+    },
+
+    fillTo_SelectedServiceEntrySheets_ServiceEntrySheet : function (sRefDocumentCategoryKey, sValue) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategoryS' ? sValue : null;
+    },
+
+    setDatePicker : function (sDate) {
+      if (sDate) {
+        let aDate = sDate.split("-"),
+        sYear = aDate[0], sMonth = aDate[1] - 1, sDay = aDate[2];
+        return new Date(sYear, sMonth, sDay);
+      }
+      return null;
     }
   };
 });

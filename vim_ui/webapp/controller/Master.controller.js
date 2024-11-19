@@ -52,9 +52,21 @@ sap.ui.define([
 
         /**
          * Triggered when the user presses the "Go" button to apply filters and fetch data.
-         * It constructs the query parameters from the input fields and sends an AJAX request to the backend.
+         * Define top and skip parameters for pagination
          */
         onGoPress: function (oEvent) {
+            this._iSkip = 0; // Reset skip counter on new search
+            this._iTop = 2*this.getView().byId("masterTable").getGrowingThreshold();
+            this.getView().getModel("masterModel").setProperty("/list", []);
+            this._loadData();
+        },
+
+
+        /**
+         * Load data with current filters and pagination parameters.
+         * It constructs the query parameters from the input fields and sends an AJAX request to the backend.
+         */
+        _loadData: function () {
             var oView = this.getView();
             var sDocStatus = oView.byId("idSelectDocStatus").getSelectedKeys();
             var sAssignedTo = oView.byId("idAssignedToInp").getValue();
@@ -72,7 +84,9 @@ sap.ui.define([
 
             const oSuccessFunction = (oData) => {
                 console.log("Filtered data:", oData);
-                oMasterModel.setProperty("/list", oData.value[0].result);
+                var aCurrentData = oMasterModel.getProperty("/list");
+                var aNewData = aCurrentData.concat(oData.value[0].result);
+                oMasterModel.setProperty("/list", aNewData);
                 sap.ui.core.BusyIndicator.hide();
                 return oData;
             };
@@ -110,7 +124,21 @@ sap.ui.define([
                 aParams.push("CREATEDAT=" + sCreatedDateFrom.toJSON() + "," + sCreatedDateTo.toJSON());
             }
 
+            aParams.push("$top=" + this._iTop);
+            aParams.push("$skip=" + this._iSkip);
+
             return url + aParams.join("&");
+        },
+
+        /**
+         * Event handler for growing event of the table.
+         * Fetches additional data with pagination.
+         */
+        onTableGrowing: function (oEvent) {
+            if (oEvent.getParameters().reason === 'Growing') {
+                this._iSkip += this._iTop;
+                this._loadData();
+            }
         },
 
         /**
@@ -175,7 +203,7 @@ sap.ui.define([
             });
         },
 
-        
+
         onQuickEditPress: function (oEvent) {
             this.oCtx = oEvent.getSource().getBindingContext('masterModel');
             this._quickEditPress(oEvent);
@@ -188,7 +216,7 @@ sap.ui.define([
         _quickEditPress: function (oEvent) {
             var oControl = oEvent.getSource(),
                 oView = this.getView();
-                
+
             if (!this._oMenuFragment) {
                 Fragment.load({
                     id: oView.getId(),
@@ -218,7 +246,7 @@ sap.ui.define([
             }
         },
 
-        
+
         /**
          * Event handler to handle forward action with parameters from the selected list item.
          */
@@ -245,10 +273,10 @@ sap.ui.define([
 
 
         onSelectionChange: function (oEvent) {
-			var oTable = oEvent.getSource(),
-            aItems = oTable.getSelectedItems(),
-            bShowFooter = aItems.length > 0,
-            bEnableQuickMassiveEdit = aItems.length > 1;
+            var oTable = oEvent.getSource(),
+                aItems = oTable.getSelectedItems(),
+                bShowFooter = aItems.length > 0,
+                bEnableQuickMassiveEdit = aItems.length > 1;
             oTable.getItems().forEach(oItem => {
                 if (aItems.length > 1) {
                     oItem.getAggregation("cells")[7].setEnabled(false);
@@ -263,9 +291,9 @@ sap.ui.define([
 
         onSubmitPress: function () {
             var oTable = this.getView().byId("masterTable"),
-            oMasterModel = this.getView().getModel("masterModel"),
-            aSelectedItems = oTable.getSelectedItems(),
-            that = this;
+                oMasterModel = this.getView().getModel("masterModel"),
+                aSelectedItems = oTable.getSelectedItems(),
+                that = this;
 
             aSelectedItems = aSelectedItems.map((oItem) => {
                 if (oItem.getBindingContext("masterModel").getProperty("DOC_STATUS") == "SUBMITTED") {
@@ -275,51 +303,51 @@ sap.ui.define([
                     };
                 }
             });
-            
+
             let sMsg = oBundle.getText("MassiveSubmitMessageBox");
             MessageBox.warning(sMsg, {
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                 onClose: function (sAction) {
-                  if (sAction === MessageBox.Action.YES) {
-                    sap.ui.core.BusyIndicator.show();
-                    const sUrl ="/odata/massiveSubmit"
-                    const oSuccessFunction = (oData) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        var aErrorInvoicesPackageIds = oData.value[0].ErrorInvoicesPackageIds;
-                        if (aErrorInvoicesPackageIds.length > 0) {
-                            let sMsg = oBundle.getText("MassiveSubmitFailed");
-                            MessageBox.error(sMsg);
-                            that._highlightErrorRows(aErrorInvoicesPackageIds);
-                        } else {
-                            let sMsg = oBundle.getText("MassiveSubmitSucceded");
-                            MessageBox.success(sMsg);
-                        }
-                    };
+                    if (sAction === MessageBox.Action.YES) {
+                        sap.ui.core.BusyIndicator.show();
+                        const sUrl = "/odata/massiveSubmit"
+                        const oSuccessFunction = (oData) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            var aErrorInvoicesPackageIds = oData.value[0].ErrorInvoicesPackageIds;
+                            if (aErrorInvoicesPackageIds.length > 0) {
+                                let sMsg = oBundle.getText("MassiveSubmitFailed");
+                                MessageBox.error(sMsg);
+                                that._highlightErrorRows(aErrorInvoicesPackageIds);
+                            } else {
+                                let sMsg = oBundle.getText("MassiveSubmitSucceded");
+                                MessageBox.success(sMsg);
+                            }
+                        };
 
-                    const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
-                        sap.ui.core.BusyIndicator.hide();
-                        let sMsg = oBundle.getText("BackendRequestFailed");
-                        MessageBox.error(sMsg);
-                        aSelectedItems = aSelectedItems.map((oItem) => {
-                            return oItem.PackageId;
-                        });
-                        that._highlightErrorRows(aSelectedItems);
-                    };
-                    const oBody = {
-                        payload: aSelectedItems
+                        const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+                            sap.ui.core.BusyIndicator.hide();
+                            let sMsg = oBundle.getText("BackendRequestFailed");
+                            MessageBox.error(sMsg);
+                            aSelectedItems = aSelectedItems.map((oItem) => {
+                                return oItem.PackageId;
+                            });
+                            that._highlightErrorRows(aSelectedItems);
+                        };
+                        const oBody = {
+                            payload: aSelectedItems
+                        }
+                        that.executeRequest(sUrl, "POST", JSON.stringify(oBody), oSuccessFunction, oErrorFunction);
                     }
-                    that.executeRequest(sUrl, "POST", JSON.stringify(oBody), oSuccessFunction, oErrorFunction);
-                  } 
                 }
             });
         },
 
-        _highlightErrorRows: function(aErrorPackageIds) {
+        _highlightErrorRows: function (aErrorPackageIds) {
             var oTable = this.byId("masterTable");
             var aItems = oTable.getItems();
 
             // Iterate over table rows and check if PACKAGEID is in the error list
-            aItems.forEach(function(oItem) {
+            aItems.forEach(function (oItem) {
                 var sPackageId = oItem.getBindingContext("masterModel").getProperty("PACKAGEID");
 
                 // If the PACKAGEID is in the error list, set the highlight to 'Error'

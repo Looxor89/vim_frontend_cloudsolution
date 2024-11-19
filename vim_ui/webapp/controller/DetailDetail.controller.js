@@ -22,6 +22,8 @@ sap.ui.define([
   //manifest base URL
   var baseManifestUrl;
   var oBundle;
+  var aRemovedPoLineDetails;
+  var aRemovedGlAccountLineDetails;
 
   return BaseController.extend("vim_ui.controller.DetailDetail", {
     formatter: formatter,
@@ -422,9 +424,12 @@ sap.ui.define([
         "detail": {
           "header": null
         },
+        "currentInvoice": null,
         "header": {
+          "transaction": null,
+          "companyCode": null,
           "documentDate": null,
-          "baselineDate": null,
+          "dueCalculationBaseDate": null,
           "invoiceDate": null,
           "invoicingPartyVendorCode": null,
           "reference": null,
@@ -439,6 +444,30 @@ sap.ui.define([
           "documentType": null,
           "taxAmount": null,
           "taxCode": null,
+          "supplierPostingLineItemText": null,
+          "taxIsCalculatedAutomatically": null,
+          "manualCashDiscount": null,
+          "cashDiscount1Days": null,
+          "cashDiscount1Percent": null,
+          "cashDiscount2Days": null,
+          "cashDiscount2Percent": null,
+          "fixedCashDiscount": null,
+          "netPaymentDays": null,
+          "bpBankAccountInternalId": null,
+          "invoiceReference": null,
+          "invoiceReferenceFiscalYear": null,
+          "houseBank": null,
+          "houseBankAccount": null,
+          "paymentBlockingReason": null,
+          "paymentReason": null,
+          "unplannedDeliveryCost": null,
+          "supplyingCountry": null,
+          "isEuTriangularDate": null,
+          "taxDeterminationDate": null,
+          "taxReportingDate": null,
+          "taxFulfillmentDate": null,
+          "withholdingTaxType": null,
+          "withholdingTaxBaseAmount": null,
           "withholdingTaxCode": null
         },
         "DocxLines": [],
@@ -459,19 +488,18 @@ sap.ui.define([
     resetUIState: function () {
       // this.appmodel.setProperty("/props/POMode", false);
 
-      var ui = this.appmodel.getProperty("/ui/header");
 
       // Clear all fields which are not using data binding
-      this.getView().byId("idFreeTxt").setValue(null);
+      // this.getView().byId("idFreeTxt").setValue(null);
       // this.getView().byId("idCompanyCodeTxt").setText(null); CAP refactory
       // this.getView().byId("idDiscountAmt").setValue(null); CAP refactory
-      this.getView().byId("idInvDocType").setValue(null);
+      // this.getView().byId("idInvDocType").setValue(null);
 
       // payement terms
-      this.getView().byId("idPaymentTerms").setSelectedKey(null);
+      // this.getView().byId("idPaymentTerms").setSelectedKey(null);
 
       // tax code
-      this.getView().byId("idTaxCode").setSelectedKey(null);
+      // this.getView().byId("idTaxCode").setSelectedKey(null);
 
       // bank
       // this.getView().byId("idBankKey").setSelectedKey(null); CAP refactory
@@ -480,9 +508,9 @@ sap.ui.define([
       // this.getView().byId("ibantxt").setText(null); CAP refactory
 
       // tax
-      this.getView().byId("idHTaxAmt").setValue(null);
+      // this.getView().byId("idHTaxAmt").setValue(null);
       // this.getView().byId("idTaxExemptAmt").setValue(null); CAP refactory
-      this.getView().byId("idWithholdingTaxCode").setValue(null);
+      // this.getView().byId("idWithholdingTaxCode").setValue(null);
       // this.getView().byId("idCalcTaxInd").setSelected(false); CAP refactory
 
       // credit memo check
@@ -527,6 +555,8 @@ sap.ui.define([
           key: "InvoiceLineItem"
         }).setKeyboardMode(sKeyboardMode); // Set keyboard navigation mode
       }
+      this.aRemovedPoLineDetails = [];
+      this.aRemovedGlAccountLineDetails = [];
     },
 
     // Function to fetch notes associated with a package ID from the backend
@@ -584,13 +614,13 @@ sap.ui.define([
     fetchFileList: function (packageId) {
       var sURL = baseManifestUrl + `/odata/DOC_PACK?$filter=PackageId eq ${packageId}&$expand=Invoice($expand=body($expand=allegati))`,
         oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        oCurrentInvoice = this.getView().getModel("currentInvoice"),
+        oCurrentInvoiceItalianTrace = this.getView().getModel("currentInvoiceItalianTrace"),
         oTable = this.getView().byId("idFileList");
       oTable.setBusy(true);
 
       const oSuccessFunction = (data) => {
         oDetailDetailModel.setProperty("/Filelist", data.value[0].Invoice.body[0].allegati);
-        oCurrentInvoice.setProperty("/body/0/allegati");
+        oCurrentInvoiceItalianTrace.setProperty("/body/0/allegati");
         oDetailDetailModel.refresh();
         oTable.setBusy(false);
         return data;
@@ -621,7 +651,8 @@ sap.ui.define([
     _confirmCancelEdit: function () {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");  // Get the model for details
       var URL = baseManifestUrl + "/odata/unlock";  // API endpoint to unlock the document
-
+      this.aRemovedPoLineDetails = [];
+      this.aRemovedGlAccountLineDetails = [];
       // Build the request payload
       var body = {
         payload: {
@@ -667,6 +698,8 @@ sap.ui.define([
         }
       };
       var sURL = baseManifestUrl + "/odata/lock";
+      this.aRemovedPoLineDetails = [];
+      this.aRemovedGlAccountLineDetails = [];
 
       const oSuccessFunction = (data) => {
         // if success means lock was set
@@ -713,57 +746,100 @@ sap.ui.define([
 
     onAddPORow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        aDocxLines = oDetailDetailModel.getProperty("/DocxLines");
-        // Retrieve the current invoice data from the model
-      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
-      aDocxLines.push({
-        "ID": null,
-        "body_Id": oCurrentInvoice.body[0].ID,
-        "InvoiceLineItem": "",
-        "PONumber": null,
-        "POLineItem": null,
-        "Amount": 0,
-        "Quantity": 1,
-        "OrderUnit": null,
-        "Description": "",
-        "TaxCode": null,
-        "BusinessArea": null,
-        "CostCenter": null,
-        "WBSElement": null,
-        "Order": null,
-        "Supplier": null,
-        "Material": null,
-        "ValuationType": null,
-        "MaterialGroup": null,
+      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+      sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
+        // Retrieve the PORecords data from the model
+      var aPORecords = oDetailDetailModel.getProperty("/currentInvoice/PORecords");
+      aPORecords.push({
+        "lineDetail_ID": null,
+        "bodyInvoiceItalianTrace_Id": sBodyInvoiceItalianTrace_Id,
+        "bodyPOIntegrationInfo_Id": null,
+        "To_SelectedPurchaseOrders_PurchaseOrder": null,
+        "To_SelectedPurchaseOrders_PurchaseOrderItem": null,
+        "To_SelectedDeliveryNotes_InboundDeliveryNote": null,
+        "To_SelectedServiceEntrySheets_ServiceEntrySheet": null,
+        "To_SelectedServiceEntrySheets_ServiceEntrySheetItem": null,
+        "SupplierInvoiceItem": null,
+        "PurchaseOrder": null,
+        "PurchaseOrderItem": null,
         "Plant": null,
-        "ValuationArea": null
+        "IsSubsequentDebitCredit": null,
+        "TaxCode": null,
+        "DocumentCurrency": null,
+        "SupplierInvoiceItemAmount": null,
+        "PurchaseOrderQuantityUnit": null,
+        "QtyInPurchaseOrderPriceUnit": null,
+        "PurchaseOrderPriceUnit": null,
+        "SupplierInvoiceItemText": null,
+        "IsNotCashDiscountLiable": null,
+        "ServiceEntrySheet": null,
+        "ServiceEntrySheetItem": null,
+        "IsFinallyInvoiced": null,
+        "TaxDeterminationDate": null,
+        "ControllingArea": null,
+        "BusinessArea": null,
+        "ProfitCenter": null,
+        "FunctionalArea": null,
+        "SalesOrder": null,
+        "SalesOrderItem": null,
+        "CommitmentItem": null,
+        "FundsCenter": null,
+        "Fund": null,
+        "GrantID": null,
+        "ProfitabilitySegment": null,
+        "BudgetPeriod": null
       });
-      oDetailDetailModel.setProperty("/DocxLines", aDocxLines);
+      oDetailDetailModel.setProperty("/currentInvoice/PORecords", aPORecords);
     },
 
     onAddGLAccountRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        aNonPoDocxLines = oDetailDetailModel.getProperty("/NonPoDocxLines");
-        // Retrieve the current invoice data from the model
-      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
-      aNonPoDocxLines.push({
-        "ID": null,
-        "body_Id": oCurrentInvoice.body[0].ID,
-        "InvoiceLineItem": "",
-        "GLAcc": "",
-        "Amount": "",
+      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+      sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
+
+        // Retrieve the GLAccountRecords data from the model
+      var aGLAccountRecords = oDetailDetailModel.getProperty("/currentInvoice/GLAccountRecords");
+      aGLAccountRecords.push({
+        "lineDetail_ID": null,
+        "bodyInvoiceItalianTrace_Id": sBodyInvoiceItalianTrace_Id,
+        "bodyGLAccountIntegrationInfo_Id": null,
+        "SupplierInvoiceItem": null,
+        "CompanyCode": null,
+        "GLAccount": null,
+        "DebitCreditCode": null,
+        "DocumentCurrency": null,
+        "SupplierInvoiceItemAmount": null,
         "TaxCode": null,
-        "Assignment": 0,
-        "Text": null,
-        "CostCen": null,
-        "ProfitCen": null,
-        "WBSElem": null
+        "AssignmentReference": null,
+        "SupplierInvoiceItemText": null,
+        "CostCenter": null,
+        "BusinessArea": null,
+        "PartnerBusinessArea": null,
+        "ProfitCenter": null,
+        "FunctionalArea": null,
+        "SalesOrder": null,
+        "SalesOrderItem": null,
+        "CostCtrActivityType": null,
+        "WBSElement": null,
+        "PersonnelNumber": null,
+        "IsNotCashDiscountLiable": null,
+        "InternalOrder": null,
+        "CommitmentItem": null,
+        "Fund": null,
+        "GrantID": null,
+        "QuantityUnit": null,
+        "Quantity": null,
+        "FinancialTransactionType": null,
+        "EarmarkedFundsDocument": null,
+        "EarmarkedFundsDocumentItem": null,
+        "BudgetPeriod": null
       });
-      oDetailDetailModel.setProperty("/NonPoDocxLines", aNonPoDocxLines);
+      oDetailDetailModel.setProperty("/currentInvoice/GLAccountRecords", aGLAccountRecords);
     },
 
     onDeleteSelectedPORows: function () {
-      this._onDeleteSelectedRows("idInvLineItemTable", "/DocxLines");
+      this._handleRemovedLineDetailCache("idInvLineItemTable");
+      this._onDeleteSelectedRows("idInvLineItemTable", "/currentInvoice/PORecords");
       this.onSelectionPOChange();
     },
 
@@ -797,15 +873,49 @@ sap.ui.define([
       var aDiff = [...diff];
 
       var values = aDiff.map((ctx, index) => {
-        ctx.getObject().InvoiceLineItem = index + 1;
+        // ctx.getObject().InvoiceLineItem = index + 1;
         return ctx.getObject();
       });
 
       oDetailDetailModel.setProperty(sPropertyLine, values);
     },
 
+    /**
+     * Store line detail to be removed depening from lineDetail_ID and sTableId.
+     * If lineDetail_ID is null then record is new so it doesn't exist into the DB entities
+     * and there is no need to insert it into the aRemovedLineDetailCache.
+     */
+    _handleRemovedLineDetailCache: function (sTableId) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+        oTable = this.getView().byId(sTableId),
+        aSelectedIndices = oTable.getSelectedIndices(),
+        selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex));
+
+      switch (sTableId) {
+        case "idInvLineItemTable": 
+          this.aRemovedPoLineDetails = selectedContexts.map(oContext => {
+            let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath+"/lineDetail_ID");
+            let sBodyPOIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath+"/bodyPOIntegrationInfo_Id");
+            if (sLineDetail_ID) {
+              return { "lineDetail_ID": sLineDetail_ID, "bodyPOIntegrationInfo_Id": sBodyPOIntegrationInfo_Id};
+            }
+            
+          });
+          break;
+        default: 
+          this.aRemovedGlAccountLineDetails = selectedContexts.map(oContext => {
+            let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath+"/lineDetail_ID");
+            let sBodyGLAccountIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath+"/bodyGLAccountIntegrationInfo_Id");
+            if (sLineDetail_ID) {
+              return { "lineDetail_ID": sLineDetail_ID, "bodyGLAccountIntegrationInfo_Id": sBodyGLAccountIntegrationInfo_Id};
+            }
+          });
+      }
+    },
+
     onDeleteSelectedGLAccountRows: function () {
-      this._onDeleteSelectedRows("idNPOInvGLAccountLineTable", "/NonPoDocxLines");
+      this._handleRemovedLineDetailCache("idNPOInvGLAccountLineTable");
+      this._onDeleteSelectedRows("idNPOInvGLAccountLineTable", "/currentInvoice/GLAccountRecords");
       this.onSelectionGLAccountChange();
     },
 
@@ -3031,171 +3141,255 @@ sap.ui.define([
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
+    /**
+     * Merge oHeaderInvoiceItalianTrace and oHeaderInvoiceIntegrationInfo in one header
+     */
+    _assemblyInvoiceHeaders: function (oHeaderInvoiceItalianTrace, oHeaderInvoiceIntegrationInfo) {
+      return Object.assign({}, oHeaderInvoiceItalianTrace, oHeaderInvoiceIntegrationInfo);
+    },
+
+    /**
+     * Merge every object belonging to datiBeniServizi_DettaglioLinee either to oBodyPOInvoiceIntegrationInfo record or oBodyGLAccountIntegrationInfo record
+     * depending from ID matches
+     */
+    _assemblyInvoiceBodies: function (oBodyInvoiceItalianTrace, oBodyPOInvoiceIntegrationInfo, oBodyGLAccountIntegrationInfo) {
+      oBodyInvoiceItalianTrace.datiBeniServizi_DettaglioLinee = oBodyInvoiceItalianTrace.datiBeniServizi_DettaglioLinee.map(oLineDetail => {
+        // If there are no referements to PO or GL Account line detail then return oLineDetail
+        if (oLineDetail.bodyPOIntegrationInfo_ID === null && oLineDetail.bodyGLAccountIntegrationInfo_ID === null) {
+          return oLineDetail;
+        }
+        
+        oBodyPOInvoiceIntegrationInfo.forEach(oPOItem => {
+          // If LineDetail is PO
+          if (oLineDetail.bodyPOIntegrationInfo_ID === oPOItem.ID) {
+            // renaming ID in order to avoid issues during body merge operation
+            oPOItem.ID_bodyPOInvoiceIntegrationInfo = oPOItem.ID;
+            delete oPOItem.ID;
+            // removing useless key
+            delete oBodyPOInvoiceIntegrationInfo.navigation_to;
+            return Object.assign({}, oLineDetail, oPOItem);
+          }
+        })
+        
+        oBodyGLAccountIntegrationInfo.forEach(oGLAccountItem => {
+          // If LineDetail is GL Account
+          if (oLineDetail.bodyGLAccountIntegrationInfo_ID === oGLAccountItem.ID) {
+            // renaming ID in order to avoid issues during body merge operation
+            oBodyGLAccountIntegrationInfo.ID_bodyGLAccountIntegrationInfo = oBodyGLAccountIntegrationInfo.ID;
+            delete oBodyGLAccountIntegrationInfo.ID;
+            // removing useless key
+            delete oBodyGLAccountIntegrationInfo.navigation_to;
+            return Object.assign({}, oLineDetail, oGLAccountItem);
+          }
+        })
+      });
+      return oBodyInvoiceItalianTrace;
+    },
+
     // Function to read saved data from the backend for the current package
     readSavedData: function () {
-      var aURL = baseManifestUrl + "/odata/DOC_PACK?$expand=Invoice($expand=body($expand=datiGenerali_DatiGeneraliDocumento_DatiRitenuta,datiGenerali_DatiGeneraliDocumento_DatiCassaPrevidenziale,datiGenerali_DatiGeneraliDocumento_ScontoMaggiorazione,datiGenerali_DatiOrdineAcquisto($expand=riferimentoNumeroLinea),datiBeniServizi_DettaglioLinee($expand=codiceArticolo,scontoMaggiorazione,altriDatiGestionali),datiBeniServizi_DatiRiepilogo,datiPagamento($expand=dettaglioPagamento),allegati,datiGenerali_DatiDDT($expand=riferimentoNumeroLinea)))&$filter=PackageId eq " + this.I_PACKAGEID;
+      // var aURL = baseManifestUrl + "/odata/DOC_PACK?$expand=InvoiceIntegrationInfo($expand=bodyPOIntegrationInfo,bodyGLAccountIntegrationInfo),InvoiceItalianTrace($expand=body($expand=datiGenerali_DatiGeneraliDocumento_DatiRitenuta,datiGenerali_DatiGeneraliDocumento_DatiCassaPrevidenziale,datiGenerali_DatiGeneraliDocumento_ScontoMaggiorazione,datiGenerali_DatiGeneraliDocumento_Causale,datiGenerali_DatiOrdineAcquisto($expand=riferimentoNumeroLinea),datiBeniServizi_DettaglioLinee($expand=codiceArticolo,scontoMaggiorazione,altriDatiGestionali),datiBeniServizi_DatiRiepilogo,datiPagamento($expand=dettaglioPagamento),allegati,datiGenerali_DatiDDT($expand=riferimentoNumeroLinea)))&$filter=PackageId eq " + this.I_PACKAGEID;
+      var aURL = baseManifestUrl + "/odata/getInvoice()?PackageId=" + this.I_PACKAGEID;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
         try {
-          var record = data.value[0]; // Get the main record
-          var oBody = record.Invoice.body[0]; // Extract the body of the invoice
-          var aLineDetails = oBody.datiBeniServizi_DettaglioLinee; // Get line details
-          var oHeader = record.Invoice; // Header info of the invoice
-          var bPOMode = oDetailDetailModel.getProperty("/props/POMode"); // Check if in PO mode
-          var bMultiplePO = false; // Flag for multiple POs
-          var sPOnumber = null; // PO number
-          var oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
-          var aLineItems = []; // Array to store PO line items
-          var aLineItems2 = []; // Array to store Non-PO line items
+          var record = data.value[0].result, // Get the main record
+            // oBodyInvoiceItalianTrace = record.InvoiceItalianTrace.body[0], // Extract the body of the InvoiceItalianTrace
+            // oBodyPOInvoiceIntegrationInfo = record.InvoiceIntegrationInfo ? record.InvoiceIntegrationInfo.bodyPOIntegrationInfo : null, // Extract the bodyPOIntegrationInfo of the InvoiceIntegrationInfo
+            // oBodyGLAccountIntegrationInfo = record.InvoiceIntegrationInfo ? record.InvoiceIntegrationInfo.bodyGLAccountIntegrationInfo : null, // Extract the bodyGLAccountIntegrationInfo of the InvoiceIntegrationInfo
+            // oBody = this._assemblyInvoiceBodies(oBodyInvoiceItalianTrace, oBodyPOInvoiceIntegrationInfo, oBodyGLAccountIntegrationInfo),
+            // aLineDetails = oBody.datiBeniServizi_DettaglioLinee, // Get line details
+            // oHeaderInvoiceItalianTrace = record.InvoiceItalianTrace, // Header info of the InvoiceItalianTrace
+            // oHeaderInvoiceIntegrationInfo = record.InvoiceIntegrationInfo, // Header info of the InvoiceIntegrationInfo
+            // oHeader = this._assemblyInvoiceHeaders(oHeaderInvoiceItalianTrace, oHeaderInvoiceIntegrationInfo),
+            bPOMode = oDetailDetailModel.getProperty("/props/POMode"), // Check if in PO mode
+            bMultiplePO = false, // Flag for multiple POs
+            sPOnumber = null, // PO number
+            oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
+            // aLineItems = [], // Array to store PO line items
+            // aLineItems2 = []; // Array to store Non-PO line items
 
-          // Store invoice with body inside
-          this.getView().setModel(new JSONModel(record.Invoice), "currentInvoice");
+          // Store InvoiceItalianTrace with body inside
+          // this.getView().setModel(new JSONModel(record.InvoiceItalianTrace), "currentInvoiceItalianTrace");
+          // Store InvoiceIntegrationInfo with body inside
+          // this.getView().setModel(new JSONModel(record.InvoiceIntegrationInfo), "currentInvoiceIntegrationInfo");
 
           // Store attachments (if any)
-          oDetailDetailModel.setProperty("/Filelist", oBody.allegati);
+          oDetailDetailModel.setProperty("/Filelist", record.Allegati);
+          delete record.Allegati;
+
+          oDetailDetailModel.setProperty("/currentInvoice", record);
+          
 
           // Process data differently for PO mode and Non-PO mode
-          if (bPOMode) {
-            let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
-            let aLineDetailRefNumberAlreadyProcessed = [];
+          // if (bPOMode) {
+          //   let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
+          //   let aLineDetailRefNumberAlreadyProcessed = [];
 
-            // Check if there are multiple POs
-            bMultiplePO = aPurchaseOrderData.length > 1;
+          //   // Check if there are multiple POs
+          //   bMultiplePO = aPurchaseOrderData.length > 1;
 
-            // If invoice contains just one purchase order
-            if (!bMultiplePO) {
-              sPOnumber = aPurchaseOrderData[0].idDocumento; // Get PO number
-            }
+          //   // If invoice contains just one purchase order
+          //   if (!bMultiplePO) {
+          //     sPOnumber = aPurchaseOrderData[0].idDocumento; // Get PO number
+          //   }
 
-            // Helper function to create a PO line item
-            function createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder) {
-              return {
-                "ID": oLineDetail.ID,
-                "body_Id": oLineDetail.body_Id,
-                "InvoiceLineItem": index + 1,
-                "Description": oLineDetail.descrizione || null,
-                "Amount": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
-                "Quantity": oLineDetail.quantita || 1,
-                "PONumber": oPurchaseOrder.idDocumento || null,
-                "POLineItem": oLineDetail.numeroLinea || null,
-                "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
-                "BusinessArea": null,
-                "CostCenter": null,
-                "WbsElem": null,
-                "Order": null,
-                "OrderUnit": null,
-                "Supplier": null,
-                "Material": null,
-                "ValuationType": null,
-                "MaterialGroup": null,
-                "Plant": null,
-                "ValuationArea": null
-              };
-            }
+          //   // Helper function to create a PO line item
+          //   function createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder) {
+          //     return {
+          //       "ID": oLineDetail.ID,
+          //       "body_Id": oLineDetail.body_Id,
+          //       "InvoiceLineItem": index + 1,
+          //       "Description": oLineDetail.descrizione || null,
+          //       "Amount": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
+          //       "Quantity": oLineDetail.quantita || 1,
+          //       "PONumber": oPurchaseOrder.idDocumento || null,
+          //       "POLineItem": oLineDetail.numeroLinea || null,
+          //       "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
+          //       "BusinessArea": null,
+          //       "CostCenter": null,
+          //       "WbsElem": null,
+          //       "Order": null,
+          //       "OrderUnit": null,
+          //       "Supplier": null,
+          //       "Material": null,
+          //       "ValuationType": null,
+          //       "MaterialGroup": null,
+          //       "Plant": null,
+          //       "ValuationArea": null
+          //     };
+          //   }
 
-            // Process line items based on PO references
-            aPurchaseOrderData.forEach(oPurchaseOrder => {
-              if (oPurchaseOrder.riferimentoNumeroLinea.length > 0) {
-                oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
-                  let nRefLineNumber = oLineNumberRef.riferimentoNumeroLinea;
-                  aLineDetailRefNumberAlreadyProcessed.push(nRefLineNumber);
-                  aLineDetails.forEach((oLineDetail, index) => {
-                    if (nRefLineNumber == oLineDetail.numeroLinea) {
-                      aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder));
-                    }
-                  });
-                });
-              }
-            });
+          //   // Process line items based on PO references
+          //   aPurchaseOrderData.forEach(oPurchaseOrder => {
+          //     if (oPurchaseOrder.riferimentoNumeroLinea.length > 0) {
+          //       oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
+          //         let nRefLineNumber = oLineNumberRef.riferimentoNumeroLinea;
+          //         aLineDetailRefNumberAlreadyProcessed.push(nRefLineNumber);
+          //         aLineDetails.forEach((oLineDetail, index) => {
+          //           if (nRefLineNumber == oLineDetail.numeroLinea) {
+          //             aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder));
+          //           }
+          //         });
+          //       });
+          //     }
+          //   });
 
-            // Add remaining line items
-            let afilteredLineDetails = aLineDetails.filter(item => !aLineDetailRefNumberAlreadyProcessed.includes(item.numeroLinea));
-            afilteredLineDetails.forEach((oLineDetail, index) => {
-              aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, {}));
-            });
+          //   // Add remaining line items
+          //   let afilteredLineDetails = aLineDetails.filter(item => !aLineDetailRefNumberAlreadyProcessed.includes(item.numeroLinea));
+          //   afilteredLineDetails.forEach((oLineDetail, index) => {
+          //     aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, {}));
+          //   });
 
-          } else {
-            // Helper function to create a Non-PO line item
-            function createLineItemForNONPOInvoices(index, oLineDetail) {
-              // return {
-              //   "InvoiceLineItem": index + 1,
-              //   "Description": null,
-              //   "CompanyCode": null,
-              //   "Amount": null,
-              //   "Currency": null,
-              //   "Quantity": 1,
-              //   "UoM": null,
-              //   "TaxCode": null,
-              //   "TaxAmount": null,
-              //   "UoM": null,
-              //   "Bukrs": null,
-              //   "GLAcc": null,
-              //   "AmountInDocCurrency": null,
-              //   "Assignment": null,
-              //   "Text": null,
-              //   "WBSElem": null,
-              //   "ProfitCen": null,
-              //   "TaxName": null,
-              //   "BusinessArea": null,
-              //   "CostCenter": null,
-              //   "WbsElem": null,
-              //   "Order": null,
-              //   "SalesOrder": null,
-              //   "Supplier": null,
-              //   "Material": null,
-              //   "ValuationType": null,
-              //   "MaterialGroup": null,
-              //   "Plant": null,
-              //   "ValuationArea": null,
-              //   "AssetSecondaryNumber": null,
-              //   "AssetValueDate": null
-              // };
-              return {
-                "ID": oLineDetail.ID,
-                "body_Id": oLineDetail.body_Id,
-                "InvoiceLineItem": index + 1,
-                "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
-                "GLAcc": null,
-                "AmountInDocCurrency": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
-                "Assignment": null,
-                "Text": oLineDetail.descrizione || null,
-                "WBSElem": null,
-                "ProfitCen": null,
-                "CostCenter": null
-              };
-            }
+          // } else {
+          //   // Helper function to create a Non-PO line item
+          //   function createLineItemForNONPOInvoices(index, oLineDetail) {
+          //     // return {
+          //     //   "InvoiceLineItem": index + 1,
+          //     //   "Description": null,
+          //     //   "CompanyCode": null,
+          //     //   "Amount": null,
+          //     //   "Currency": null,
+          //     //   "Quantity": 1,
+          //     //   "UoM": null,
+          //     //   "TaxCode": null,
+          //     //   "TaxAmount": null,
+          //     //   "UoM": null,
+          //     //   "Bukrs": null,
+          //     //   "GLAcc": null,
+          //     //   "AmountInDocCurrency": null,
+          //     //   "Assignment": null,
+          //     //   "Text": null,
+          //     //   "WBSElem": null,
+          //     //   "ProfitCen": null,
+          //     //   "TaxName": null,
+          //     //   "BusinessArea": null,
+          //     //   "CostCenter": null,
+          //     //   "WbsElem": null,
+          //     //   "Order": null,
+          //     //   "SalesOrder": null,
+          //     //   "Supplier": null,
+          //     //   "Material": null,
+          //     //   "ValuationType": null,
+          //     //   "MaterialGroup": null,
+          //     //   "Plant": null,
+          //     //   "ValuationArea": null,
+          //     //   "AssetSecondaryNumber": null,
+          //     //   "AssetValueDate": null
+          //     // };
+          //     return {
+          //       "ID": oLineDetail.ID,
+          //       "body_Id": oLineDetail.body_Id,
+          //       "InvoiceLineItem": index + 1,
+          //       "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
+          //       "GLAcc": null,
+          //       "AmountInDocCurrency": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
+          //       "Assignment": null,
+          //       "Text": oLineDetail.descrizione || null,
+          //       "WBSElem": null,
+          //       "ProfitCen": null,
+          //       "CostCenter": null
+          //     };
+          //   }
 
-            // Process Non-PO line items
-            aLineDetails.forEach((oLineDetail, index) => {
-              aLineItems2.push(createLineItemForNONPOInvoices(index, oLineDetail));
-            });
-          }
+          //   // Process Non-PO line items
+          //   aLineDetails.forEach((oLineDetail, index) => {
+          //     aLineItems2.push(createLineItemForNONPOInvoices(index, oLineDetail));
+          //   });
+          // }
 
           // Update the model with the line items for PO and Non-PO invoices
-          oDetailDetailModel.setProperty("/DocxLines", aLineItems);
-          oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", aLineItems);
-          oDetailDetailModel.setProperty("/NonPoDocxLines", aLineItems2);
+          // oDetailDetailModel.setProperty("/DocxLines", aLineItems);
+          oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", record.PORecords);
+          // oDetailDetailModel.setProperty("/NonPoDocxLines", aLineItems2);
 
           // Set header information like dates, amounts, and tax info
           // General data
-          let dInvoiceReceiptDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
-            dInvoiceDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
-            sReference = oBody.datiGenerali_DatiGeneraliDocumento_Numero,
-            sCurrency = oBody.datiGenerali_DatiGeneraliDocumento_Divisa,
-            sDocumentType = oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento,
-            sInvoicingPartyVendorCode = oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese + " " + oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdCodice,
-            // Amounts
-            sAmount = oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento,
-            sPaymentMethod = oBody.datiPagamento[0].dettaglioPagamento[0] ? oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento : null,
-            // Banking Details
-            // Tax
-            sTaxAmount = oBody.datiBeniServizi_DatiRiepilogo[0] ? oBody.datiBeniServizi_DatiRiepilogo[0].imposta : null,
-            sTaxCode = oBody.datiBeniServizi_DettaglioLinee[0].aliquotaIVA + " " + oBody.datiBeniServizi_DettaglioLinee[0].natura,
-            sWithholdingTaxCode = oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] ? oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0].tipoRitenuta : null,
-            // Unplanned Freight
-            // Goods and services data
-            sBusinessArea;
+          // let sTransaction = "", 
+          //   sCompanyCode = "",
+          //   sText = "",
+          //   sTaxIsCalculatedAutomatically = "",
+          //   dInvoiceReceiptDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
+          //   dInvoiceDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
+          //   sReference = oBody.datiGenerali_DatiGeneraliDocumento_Numero,
+          //   sCurrency = oBody.datiGenerali_DatiGeneraliDocumento_Divisa,
+          //   sDocumentType = oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento,
+          //   sInvoicingPartyVendorCode = oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese + " " + oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdCodice,
+          //   // Amounts
+          //   sAmount = oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento,
+          //   // Payment
+          //   sManualCashDiscount = "",
+          //   sCashDiscount1Days = "",
+          //   sCashDiscount1Percent = "",
+          //   sCashDiscount2Days = "",
+          //   sCashDiscount2Percent = "",
+          //   sFixedCashDiscount = "",
+          //   sNetPaymentDays = "",
+          //   sBpBankAccountInternalId = "",
+          //   sInvoiceReference = "",
+          //   sInvoiceReferenceFiscalYear = "",
+          //   sHouseBank = "",
+          //   sHouseBankAccount = "",
+          //   sPaymentBlockingReason = "",
+          //   sPaymentReason = "",
+          //   sUnplannedDeliveryCost = "",
+          //   sSupplyingCountry = "",
+          //   sIsEuTriangularDate = "",
+          //   sTaxDeterminationDate = "",
+          //   sTaxReportingDate = "",
+          //   sTaxFulfillmentDate = "",
+          //   sWithholdingTaxType = "",
+          //   sWithholdingTaxBaseAmount = "",
+          //   sPaymentMethod = oBody.datiPagamento[0].dettaglioPagamento[0] ? oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento : null,
+          //   // Banking Details
+          //   // Tax
+          //   sTaxAmount = oBody.datiBeniServizi_DatiRiepilogo[0] ? oBody.datiBeniServizi_DatiRiepilogo[0].imposta : null,
+          //   sTaxCode = oBody.datiBeniServizi_DettaglioLinee[0].aliquotaIVA + " " + oBody.datiBeniServizi_DettaglioLinee[0].natura,
+          //   sWithholdingTaxCode = oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] ? oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0].tipoRitenuta : null,
+          //   // Unplanned Freight
+          //   // Goods and services data
+          //   sBusinessArea;
 
           oDetailDetailModel.setProperty("/props/bMultiplePO", bMultiplePO);
           if (bMultiplePO) {
@@ -3205,23 +3399,49 @@ sap.ui.define([
             this.setPOMode(sPOnumber);
           }
 
-          oDetailDetailModel.setProperty("/header/documentDate", dInvoiceReceiptDate);
-          // oDetailDetailModel.setProperty("/header/baselineDate", dBaselineDate);
-          oDetailDetailModel.setProperty("/header/invoiceDate", dInvoiceDate);
-          oDetailDetailModel.setProperty("/header/invoicingPartyVendorCode", sInvoicingPartyVendorCode);
-          oDetailDetailModel.setProperty("/header/reference", sReference);
-          // oDetailDetailModel.setProperty("/header/headerText", sHeaderText);
-          oDetailDetailModel.setProperty("/header/businessArea", sBusinessArea);
-          // oDetailDetailModel.setProperty("/header/assignment", sAssignment);
+          // oDetailDetailModel.setProperty("/header/transaction", sTransaction);
+          // oDetailDetailModel.setProperty("/header/companyCode", sCompanyCode);
+          // oDetailDetailModel.setProperty("/header/text", sText);
+          // oDetailDetailModel.setProperty("/header/taxIsCalculatedAutomatically", sTaxIsCalculatedAutomatically);
+          // oDetailDetailModel.setProperty("/header/manualCashDiscount", sManualCashDiscount);
+          // oDetailDetailModel.setProperty("/header/cashDiscount1Days", sCashDiscount1Days);
+          // oDetailDetailModel.setProperty("/header/cashDiscount1Percent", sCashDiscount1Percent);
+          // oDetailDetailModel.setProperty("/header/cashDiscount2Days", sCashDiscount2Days);
+          // oDetailDetailModel.setProperty("/header/cashDiscount2Percent", sCashDiscount2Percent);
+          // oDetailDetailModel.setProperty("/header/fixedCashDiscount", sFixedCashDiscount);
+          // oDetailDetailModel.setProperty("/header/documentDate", dInvoiceReceiptDate);
+          // // oDetailDetailModel.setProperty("/header/baselineDate", dBaselineDate);
+          // oDetailDetailModel.setProperty("/header/invoiceDate", dInvoiceDate);
+          // oDetailDetailModel.setProperty("/header/invoicingPartyVendorCode", sInvoicingPartyVendorCode);
+          // oDetailDetailModel.setProperty("/header/reference", sReference);
+          // // oDetailDetailModel.setProperty("/header/headerText", sHeaderText);
+          // oDetailDetailModel.setProperty("/header/businessArea", sBusinessArea);
+          // // oDetailDetailModel.setProperty("/header/assignment", sAssignment);
           // oDetailDetailModel.setProperty("/header/postingDate", dPostingDate);
-          oDetailDetailModel.setProperty("/header/currency", sCurrency);
-          oDetailDetailModel.setProperty("/header/netAmount", sAmount);
-          // oDetailDetailModel.setProperty("/header/paymentTerms", sPaymentTerms);
-          oDetailDetailModel.setProperty("/header/paymentMethod", sPaymentMethod);
-          oDetailDetailModel.setProperty("/header/documentType", sDocumentType);
-          oDetailDetailModel.setProperty("/header/taxAmount", sTaxAmount);
-          oDetailDetailModel.setProperty("/header/taxCode", sTaxCode);
-          oDetailDetailModel.setProperty("/header/withholdingTaxCode", sWithholdingTaxCode);
+          // oDetailDetailModel.setProperty("/header/currency", sCurrency);
+          // oDetailDetailModel.setProperty("/header/netAmount", sAmount);
+          // // oDetailDetailModel.setProperty("/header/paymentTerms", sPaymentTerms);
+          // oDetailDetailModel.setProperty("/header/paymentMethod", sPaymentMethod);
+          // oDetailDetailModel.setProperty("/header/netPaymentDays", sNetPaymentDays);
+          // oDetailDetailModel.setProperty("/header/bpBankAccountInternalId", sBpBankAccountInternalId);
+          // oDetailDetailModel.setProperty("/header/invoiceReference", sInvoiceReference);
+          // oDetailDetailModel.setProperty("/header/invoiceReferenceFiscalYear", sInvoiceReferenceFiscalYear);
+          // oDetailDetailModel.setProperty("/header/houseBank", sHouseBank);
+          // oDetailDetailModel.setProperty("/header/houseBankAccount", sHouseBankAccount);
+          // oDetailDetailModel.setProperty("/header/paymentReason", sPaymentReason);
+          // oDetailDetailModel.setProperty("/header/paymentBlockingReason", sPaymentBlockingReason);
+          // oDetailDetailModel.setProperty("/header/unplannedDeliveryCost", sUnplannedDeliveryCost);
+          // oDetailDetailModel.setProperty("/header/supplyingCountry", sSupplyingCountry);
+          // oDetailDetailModel.setProperty("/header/isEuTriangularDate", sIsEuTriangularDate);
+          // oDetailDetailModel.setProperty("/header/taxDeterminationDate", sTaxDeterminationDate);
+          // oDetailDetailModel.setProperty("/header/taxReportingDate", sTaxReportingDate);
+          // oDetailDetailModel.setProperty("/header/taxFulfillmentDate", sTaxFulfillmentDate);
+          // oDetailDetailModel.setProperty("/header/withholdingTaxType", sWithholdingTaxType);
+          // oDetailDetailModel.setProperty("/header/withholdingTaxBaseAmount", sWithholdingTaxBaseAmount);
+          // oDetailDetailModel.setProperty("/header/documentType", sDocumentType);
+          // oDetailDetailModel.setProperty("/header/taxAmount", sTaxAmount);
+          // oDetailDetailModel.setProperty("/header/taxCode", sTaxCode);
+          // oDetailDetailModel.setProperty("/header/withholdingTaxCode", sWithholdingTaxCode);
 
           // if (!oDetailDetailModel.getProperty("/props/POMode")) {
           //   if (oDetailDetailModel.getProperty("/props/NONPOModeGLaccount")) {
@@ -3230,6 +3450,23 @@ sap.ui.define([
           //     this.getView().byId("idLineItemsType").setSelectedKey("idAssetItem");
           //   }
           // }
+          let sTransactionKey = record.Transaction;
+          if (sTransactionKey) {
+            let oSelectTransaction = this.getView().byId("idTransaction"),
+            oItem = oSelectTransaction.getItemByKey(sTransactionKey);
+            oSelectTransaction.setSelectedItem(oItem);
+          }
+
+          if (bPOMode) {
+            let sRefDocumentCategoryKey = record.RefDocumentCategory;
+            if (sRefDocumentCategoryKey) {
+              let oSelectRefDocumentCategory = this.getView().byId("idRefDocCategory"),
+              oItem = oSelectRefDocumentCategory.getItemByKey(sRefDocumentCategoryKey);
+              oSelectRefDocumentCategory.setSelectedItem(oItem);
+              this._removeAllRefDocumentCategoryValues(sRefDocumentCategoryKey);
+            }
+          }
+
 
           return (record);
         } catch (error) {
@@ -3553,7 +3790,7 @@ sap.ui.define([
 
       if (aFiles && aFiles.length) {
         var oFile = aFiles[0],  // Get the first file
-          sBodyId = this.getView().getModel("currentInvoice").getProperty("/body")[0].ID,
+          sBodyId = this.getView().getModel("currentInvoiceItalianTrace").getProperty("/body")[0].ID,
           sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/detail/header/COMPANYCODE"),
           sFiscalYear = this.getView().getModel("detailDetailModel").getProperty("/detail/header/FISCALYEAR"),
           sName = oFile.name,
@@ -4312,8 +4549,15 @@ sap.ui.define([
       return res;
     },
 
+    onChangeTransaction: function (oEvent) {
+      var sKey = oEvent.getParameters().selectedItem.getKey(),
+      oSelect = oEvent.getSource(),
+      sPath = oSelect.getBindingContext("detailDetailModel").getPath()+"/Transaction";
+      this.getView().getModel("detailDetailModel").setProperty(sPath, sKey);
+    },
+
     _getControlValue: function (oControl) {
-      if (oControl instanceof sap.m.Input || oControl instanceof sap.m.Select) {
+      if (oControl instanceof sap.m.Input || oControl instanceof sap.m.Select || oControl instanceof sap.m.DatePicker) {
         return oControl.getValue();
       } else if (oControl instanceof sap.m.Switch) {
         return oControl.getState();
@@ -4326,198 +4570,377 @@ sap.ui.define([
 
     _onChangeEventHandler: function (oEvent, sProperty) {
       var oControl = oEvent.getSource(),
-      sPath = oControl.getBindingContext("detailDetailModel").getPath()+sProperty,
+      bControlBelongingToHeader = oControl.getBindingContext("detailDetailModel") === undefined,
+      sPath = bControlBelongingToHeader ? "/currentInvoice"+sProperty : oControl.getBindingContext("detailDetailModel").getPath()+sProperty,
       sValue = this._getControlValue(oControl);
       this.getView().getModel("detailDetailModel").setProperty(sPath, sValue);
     },
 
-    onAmountChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Amount");
+    onChangeCompanyCode : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CompanyCode");
     },
 
-    onQuantityChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Quantity");
+    onChangeDocumentDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/DocumentDate");
     },
 
-    onDescriptionChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Description");
+    onChangeInvoiceReceiptDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/InvoiceReceiptDate");
     },
 
-    onOrderUnitChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/OrderUnit");
+    onChangePostingDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PostingDate");
     },
 
-    onTaxCodeChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/TaxCode");
+    onChangeInvoicingParty : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/InvoicingParty");
     },
 
-    onBusinessAreaChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/BusinessArea");
+    onChangeCurrency : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Currency");
     },
 
-    onCostCenterChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/CostCenter");
+    onChangeSupplierInvoiceIDByInvcgParty : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SupplierInvoiceIDByInvcgParty");
     },
 
-    onWBSElementChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/WBSElement");
+    onChangeInvoiceGrossAmount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/InvoiceGrossAmount");
     },
 
-    onOrderChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Order");
+    onChangeSupplierPostingLineItemText: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SupplierPostingLineItemText");
     },
 
-    onSupplierChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Supplier");
+    onChangeTaxIsCalculatedAutomatically: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/TaxIsCalculatedAutomatically");
     },
 
-    onMaterialChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Material");
+    onChangeDueCalculationBaseDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/DueCalculationBaseDate");
     },
 
-    onValuationTypeChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/ValuationType");
+    onChangeManualCashDiscount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ManualCashDiscount");
     },
 
-    onMaterialGroupChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/MaterialGroup");
+    onChangePaymentTerms: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PaymentTerms");
     },
 
-    onPlantChange: function (oEvent) {
+    onChangeCashDiscount1Days: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CashDiscount1Days");
+    },
+
+    onChangeCashDiscount1Percent: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CashDiscount1Percent");
+    },
+
+    onChangeCashDiscount2Days: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CashDiscount2Days");
+    },
+
+    onChangeCashDiscount2Percent: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CashDiscount2Percent");
+    },
+
+    onChangeFixedCashDiscount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/FixedCashDiscount");
+    },
+
+    onChangeNetPaymentDays: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/NetPaymentDays");
+    },
+
+    onChangeBPBankAccountInternalID: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/BPBankAccountInternalID");
+    },
+
+    onChangePaymentMethod: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PaymentMethod");
+    },
+
+    onChangeReference: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/InvoiceReference");
+    },
+
+    onChangeInvoiceReferenceFiscalYear: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/InvoiceReferenceFiscalYear");
+    },
+
+    onChangeHouseBank: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/HouseBank");
+    },
+
+    onChangeHouseBankAccount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/HouseBankAccount");
+    },
+
+    onChangePaymentBlockingReason: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PaymentBlockingReason");
+    },
+
+    onChangePaymentReason: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PaymentReason");
+    },
+
+    onChangeUnplannedDeliveryCost: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/UnplannedDeliveryCost");
+    },
+
+    onChangeFreeTxt: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/DocumentHeaderText");
+    },
+
+    onChangeInvDocType: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/AccountingDocumentType");
+    },
+
+    onChangeSupplyingCountry: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SupplyingCountry");
+    },
+
+    onChangeAssignment: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/AssignmentReference");
+    },
+
+    onChangeIsEUTriangularDeal: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/IsEUTriangularDeal");
+    },
+
+    onChangeTaxDeterminationDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/TaxDeterminationDate");
+    },
+
+    onChangeTaxReportingDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/TaxReportingDate");
+    },
+
+    onChangeTaxFulfillmentDate : function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/TaxFulfillmentDate");
+    },
+
+    onChangeWithholdingTaxType: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/WithholdingTaxType");
+    },
+
+    onChangeWithholdingTaxCode: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/WithholdingTaxCode");
+    },
+
+    onChangeWithholdingTaxBaseAmount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/WithholdingTaxBaseAmount");
+    },
+
+    _removeAllRefDocumentCategoryValues: function (sKey) {
+      switch (sKey) {
+        case "keyRefDocCategory1":
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes_InboundDeliveryNote", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          break;
+        case "keyRefDocCategory2":
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrder", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrderItem", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          break;
+        case "keyRefDocCategoryS":
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          break;
+        default:
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrder", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrderItem", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes_InboundDeliveryNote", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+      }
+    },
+
+    onChangeRefDocCategory: function (oEvent) {
+      var sKey =  oEvent.getParameters().selectedItem.getKey();
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/RefDocumentCategory", sKey);
+      this._removeAllRefDocumentCategoryValues(sKey);
+    },
+
+    onChangeTo_SelectedPurchaseOrders_PurchaseOrder: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/To_SelectedPurchaseOrders_PurchaseOrder");
+    },
+
+    onChangeTo_SelectedPurchaseOrders_PurchaseOrderItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/To_SelectedPurchaseOrders_PurchaseOrderItem");
+    },
+
+    onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/To_SelectedDeliveryNotes_InboundDeliveryNote");
+    },
+
+    onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/To_SelectedServiceEntrySheets_ServiceEntrySheet");
+    },
+
+    onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/To_SelectedServiceEntrySheets_ServiceEntrySheetItem");
+    },
+
+    onChangePurchaseOrder: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PurchaseOrder");
+    },
+
+    onChangePurchaseOrderItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PurchaseOrderItem");
+    },
+
+    onChangePlant: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/Plant");
     },
 
-    onValuationAreaChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/ValuationArea");
+    onChangeTaxCode: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/TaxCode");
     },
 
-    onGLAccountChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/GLAccount");
+    onChangeSupplierInvoiceItemAmount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SupplierInvoiceItemAmount");
     },
 
-    onAssignmentAreaChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/AssignmentArea");
+    onChangePurchaseOrderQuantityUnit: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PurchaseOrderQuantityUnit");
     },
 
-    onTextChange: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/Text");
+    onChangeQuantityInPurchaseOrderUnit: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/QuantityInPurchaseOrderUnit");
     },
 
-    onProfitCenterChange: function (oEvent) {
+    onChangeSupplierInvoiceItemText: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SupplierInvoiceItemText");
+    },
+
+    onChangeIsNotCashDiscountLiable: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/IsNotCashDiscountLiable");
+    },
+
+    onChangeServiceEntrySheet: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ServiceEntrySheet");
+    },
+
+    onChangeServiceEntrySheetItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ServiceEntrySheetItem");
+    },
+
+    onChangeIsFinallyInvoiced: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/IsFinallyInvoiced");
+    },
+
+    onChangeCostCenter: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CostCenter");
+    },
+
+    onChangeBusinessArea: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/BusinessArea");
+    },
+
+    onChangeProfitCenter: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/ProfitCenter");
     },
 
-    savePayloadBuilder: function () {
-      // Retrieve the current invoice data from the model
-      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
-      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
-      var bPOMode = oDetailDetailModel.getProperty("/props/POMode");
-      oBody = oCurrentInvoice.body[0],
-      aDatiBeniServizi_DettaglioLinee = oBody.datiBeniServizi_DettaglioLinee;
-      
-      var aPOLineItems = oDetailDetailModel.getProperty("/DocxLines");
-      aPOLineItems.forEach(oLineItem => {
-        if (oLineItem.ID) {
-          let oOriginalLineItem = aDatiBeniServizi_DettaglioLinee.find((oDettaglioLinea) => oDettaglioLinea.ID === oLineItem.ID);
-          oOriginalLineItem.descrizione = oLineItem.Description;
-          oOriginalLineItem.quantita = oLineItem.quantity;
-          oOriginalLineItem.numeroLinea = oLineItem.POLineItem;
-          oOriginalLineItem.aliquotaIVA = oLineItem.TaxCode.split(" ")[0];
-          oOriginalLineItem.natura = oLineItem.TaxCode.split(" ")[1];
+    onChangeFunctionalArea: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/FunctionalArea");
+    },
 
-          oBody.datiGenerali_DatiOrdineAcquisto.forEach(oPurchaseOrder => {
-            oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
-              if (oLineNumberRef.riferimentoNumeroLinea === oLineItem.POLineItem) {
-                oPurchaseOrder.idDocumento = oLineItem.PONumber;
-              }
-            });
-          });
-        } else {
-          oBody.datiBeniServizi_DettaglioLinee.push({
-            ID: null,
-            body_Id: oBody.ID,
-            aliquotaIVA: oLineItem.TaxCode.split(" ")[0],
-            altriDatiGestionali: [],
-            codiceArticolo: [],
-            dataFinePeriodo: null,
-            dataInizioPeriodo: null,
-            descrizione: oLineItem.Description,
-            natura: oLineItem.TaxCode.split(" ")[1],
-            numeroLinea: oLineItem.POLineItem,
-            prezzoTotale: null,
-            prezzoUnitario: null,
-            quantita: oLineItem.quantity,
-            riferimentoAmministrazione: null,
-            ritenuta: null,
-            scontoMaggiorazione: [],
-            tipoCessazionePrestazione: null,
-            unitaMisura : null
-          })
-        }
-      });
+    onChangeWBSElement: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/WBSElement");
+    },
 
-      var aNonPOLineItems = oDetailDetailModel.getProperty("/NonPoDocxLines");
-      aNonPOLineItems.forEach(oLineItem => {
-        if (oLineItem.ID) {
-          let oOriginalLineItem = aDatiBeniServizi_DettaglioLinee.find((oDettaglioLinea) => oDettaglioLinea.ID === oLineItem.ID);
-          oOriginalLineItem.descrizione = oLineItem.Text;
-          oOriginalLineItem.aliquotaIVA = oLineItem.TaxCode.split(" ")[0];
-          oOriginalLineItem.natura = oLineItem.TaxCode.split(" ")[1];
-        } else {
-          oBody.datiBeniServizi_DettaglioLinee.push({
-            ID: null,
-            body_Id: oBody.ID,
-            aliquotaIVA: oLineItem.TaxCode.split(" ")[0],
-            altriDatiGestionali: [],
-            codiceArticolo: [],
-            dataFinePeriodo: null,
-            dataInizioPeriodo: null,
-            descrizione: oLineItem.Text,
-            natura: oLineItem.TaxCode.split(" ")[1],
-            numeroLinea: null,
-            prezzoTotale: null,
-            prezzoUnitario: null,
-            quantita: null,
-            riferimentoAmministrazione: null,
-            ritenuta: null,
-            scontoMaggiorazione: [],
-            tipoCessazionePrestazione: null,
-            unitaMisura : null
-          })
-        }
-      });
-      
-      if (bPOMode) {
-        oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento = aPOLineItems.length > 0 ? aPOLineItems[0].Amount : null;
-      } else {
-        oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento = aNonPOLineItems.length > 0 ? aNonPOLineItems[0].AmountInDocCurrency : null;
-      }
+    onChangeSalesOrder: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SalesOrder");
+    },
 
-      oBody.datiGenerali_DatiGeneraliDocumento_Data = oDetailDetailModel.getProperty("/header/documentDate");
-      oBody.datiGenerali_DatiGeneraliDocumento_Numero = oDetailDetailModel.getProperty("/header/reference");
-      oBody.datiGenerali_DatiGeneraliDocumento_Divisa = oDetailDetailModel.getProperty("/header/currency");
-      oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento = oDetailDetailModel.getProperty("/header/documentType");
-      oBody.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese = oDetailDetailModel.getProperty("/header/invoicingPartyVendorCode");
-      oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento = oDetailDetailModel.getProperty("/header/netAmount");
-      oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento = oDetailDetailModel.getProperty("/header/paymentMethod");
-      oBody.datiBeniServizi_DatiRiepilogo[0].imposta = oDetailDetailModel.getProperty("/header/taxAmount");
-      oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] = oDetailDetailModel.getProperty("/header/withholdingTaxCode");
-      this.getView().getModel("currentInvoice").setProperty("/", oCurrentInvoice);
-      
-      return oCurrentInvoice;
+    onChangeSalesOrderItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/SalesOrderItem");
+    },
+
+    onChangeInternalOrder: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/InternalOrder");
+    },
+
+    onChangeCommitmentItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CommitmentItem");
+    },
+
+    onChangeFundsCenter: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/FundsCenter");
+    },
+
+    onChangeFund: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Fund");
+    },
+
+    onChangeGrantID: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/GrantID");
+    },
+
+    onChangeProfitabilitySegment: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/ProfitabilitySegment");
+    },
+
+    onChangeBudgetPeriod: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/BudgetPeriod");
+    },
+
+    onChangeGLAccount: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/GLAccount");
+    },
+
+    onChangeDebitCreditCode: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/DebitCreditCode");
+    },
+
+    onChangePartnerBusinessArea: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PartnerBusinessArea");
+    },
+
+    onChangeCostCtrActivityType: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/CostCtrActivityType");
+    },
+
+    onChangePersonnelNumber: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/PersonnelNumber");
+    },
+
+    onChangeQuantityUnit: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/QuantityUnit");
+    },
+
+    onChangeQuantity: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/Quantity");
+    },
+
+    onChangeFinancialTransactionType: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/FinancialTransactionType");
+    },
+
+    onChangeEarmarkedFundsDocument: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/EarmarkedFundsDocument");
+    },
+
+    onChangeEarmarkedFundsDocumentItem: function (oEvent) {
+      this._onChangeEventHandler(oEvent, "/EarmarkedFundsDocumentItem");
     },
 
     // Handler for the "Save" button press
     onSavePress: function (oEvent) {
       var body = {}; // Initialize request body
       var sUrl = baseManifestUrl + `/odata/save`; // API endpoint for saving data
-      var oCurrentInvoice = this.savePayloadBuilder();
+      var oCurrentInvoice = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice");
 
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
-          Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
+          Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          RemovedPoLineDetails: this.aRemovedPoLineDetails,
+          RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
         }
       };
 
@@ -4535,12 +4958,12 @@ sap.ui.define([
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
-        console.log(errorThrown);  // Log the error
+        console.log(JSON.parse(XMLHttpRequest.responseText).error.message);  // Log the error
 
         // Show error message to the user
         MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
           title: "Error",
-          details: errorThrown,  // Provide error details
+          details: JSON.parse(XMLHttpRequest.responseText).error.message,  // Provide error details
           styleClass: sResponsivePaddingClasses
         });
 
@@ -4604,13 +5027,13 @@ sap.ui.define([
       var sUrl = this.getView().getModel("detailDetailModel").getProperty("/props/POMode") ? baseManifestUrl + `/odata/submitPO` : baseManifestUrl + `/odata/submitGLAccount`; // API endpoint for saving data
 
       // Retrieve the current invoice data from the model
-      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
+      var oCurrentInvoiceItalianTrace = this.getView().getModel("currentInvoiceItalianTrace").getProperty("/");
 
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
-          Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
+          Invoice: JSON.stringify(oCurrentInvoiceItalianTrace)  // Convert invoice data to JSON string
         }
       };
 

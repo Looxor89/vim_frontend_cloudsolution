@@ -98,7 +98,11 @@
                     path: 'masterModel>/list',
                     sorter: { path: 'LASTCHANGEDON', descending: true }
                 }"
+                growing="true"
+                growingScrollToLoad="true"
+                growingThreshold="50"
                 mode="MultiSelect"
+                updateFinished="onTableGrowing"
                 selectionChange="onSelectionChange"
                 alternateRowColors="true"
                 class="sapFDynamicPageAlignContent sapUiLargeMarginBottom"

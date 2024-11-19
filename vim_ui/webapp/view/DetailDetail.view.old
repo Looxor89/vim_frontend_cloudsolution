@@ -152,7 +152,7 @@
 
                                                 <!-- <m:Label text="Due Date" visible="{= ${appmodel>/props/POMode}}" />
                                                 <m:DatePicker id="idDueDate" placeholder="YYYY-DD-MM" valueFormat="yyyy-dd-MM" displayFormat="yyyy-dd-MM" change="handleDateChange" visible="{= ${appmodel>/props/POMode}}" /> -->
-                                                <m:Label text="Postging date" visible="false" />
+                                                <m:Label text="Posting date" visible="false" />
                                                 <m:DatePicker id="idDueDate" placeholder="YYYY-DD-MM" valueFormat="yyyy-dd-MM" displayFormat="yyyy-dd-MM" change="handleDateChange" visible="false" />
 
                                                 <m:Label text="Reference" required="true" />
