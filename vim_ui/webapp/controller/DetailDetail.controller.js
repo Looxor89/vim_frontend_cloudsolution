@@ -22,6 +22,7 @@ sap.ui.define([
   //manifest base URL
   var baseManifestUrl;
   var oBundle;
+  var aRemovedSupplierInvoiceWhldgTaxRecords;
   var aRemovedPoLineDetails;
   var aRemovedGlAccountLineDetails;
 
@@ -522,6 +523,8 @@ sap.ui.define([
       oTable.setSelectionMode("None");
       var oTable = this.getView().byId("idNPOInvGLAccountLineTable");
       oTable.setSelectionMode("None");
+      var oTable = this.getView().byId("idSupplierInvoiceWhldgTaxTable");
+      oTable.setSelectionMode("None");
       // Select first body IconTabFilter
       var oTabBarBodyInvoice = this.byId("iconTabBarBodyInvoice");
       oTabBarBodyInvoice.setSelectedKey(oTabBarBodyInvoice.getItems()[0].sId);
@@ -555,6 +558,7 @@ sap.ui.define([
           key: "InvoiceLineItem"
         }).setKeyboardMode(sKeyboardMode); // Set keyboard navigation mode
       }
+      this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
     },
@@ -651,6 +655,7 @@ sap.ui.define([
     _confirmCancelEdit: function () {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");  // Get the model for details
       var URL = baseManifestUrl + "/odata/unlock";  // API endpoint to unlock the document
+      this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
       // Build the request payload
@@ -678,6 +683,7 @@ sap.ui.define([
         this.getView().byId("idInvLineItemTable").setSelectionMode("None");  // Disable table actions
         // this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation", false);
         this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("None");  // Disable table actions
+        this.getView().byId("idSupplierInvoiceWhldgTaxTable").setSelectionMode("None");  // Disable table actions
         return data;
       };
 
@@ -698,6 +704,7 @@ sap.ui.define([
         }
       };
       var sURL = baseManifestUrl + "/odata/lock";
+      this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
 
@@ -714,6 +721,7 @@ sap.ui.define([
         this.getView().byId("idInvLineItemTable").setSelectionMode("MultiToggle");
         // this.rebindTable(this.oEditableTemplate, "Edit", true);
         this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("MultiToggle");
+        this.getView().byId("idSupplierInvoiceWhldgTaxTable").setSelectionMode("MultiToggle");
         // this.rebindTable(this.oEditableTemplateGLAccountNPo, "Edit", false);
 
         return data;
@@ -743,6 +751,23 @@ sap.ui.define([
     //     this.getView().byId("idInvLineItemTable").setMode("None");
     //   }
     // },
+
+    onAddSupplierInvoiceWhldgTaxRow: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        // Retrieve the PORecords data from the model
+      var aTo_SupplierInvoiceWhldgTax = oDetailDetailModel.getProperty("/currentInvoice/To_SupplierInvoiceWhldgTax");
+      aTo_SupplierInvoiceWhldgTax.push({
+        "supplierInvoiceWhldgTax_Id": null,
+        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
+        "WithholdingTaxType": null,
+        "WithholdingTaxCode": null,
+        "WithholdingTaxBaseAmount": null,
+        "WhldgTaxBaseIsEnteredManually": null
+      });
+      oDetailDetailModel.setProperty("/currentInvoice/To_SupplierInvoiceWhldgTax", aTo_SupplierInvoiceWhldgTax);
+    },
 
     onAddPORow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
@@ -843,6 +868,10 @@ sap.ui.define([
       this.onSelectionPOChange();
     },
 
+    onSelectionSupplierInvoiceWhldgTaxChange: function () {
+      this._enableDeleteButton("idSupplierInvoiceWhldgTaxTable", "deleteSupplierInvoiceWhldgTaxTable");
+    },
+
     onSelectionPOChange: function () {
       this._enableDeleteButton("idInvLineItemTable", "deleteRowFromPOLineTable");
     },
@@ -902,12 +931,20 @@ sap.ui.define([
             
           });
           break;
-        default: 
+        case "idNPOInvGLAccountLineTable": 
           this.aRemovedGlAccountLineDetails = selectedContexts.map(oContext => {
             let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath+"/lineDetail_ID");
             let sBodyGLAccountIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath+"/bodyGLAccountIntegrationInfo_Id");
             if (sLineDetail_ID) {
               return { "lineDetail_ID": sLineDetail_ID, "bodyGLAccountIntegrationInfo_Id": sBodyGLAccountIntegrationInfo_Id};
+            }
+          });
+          break;
+        default: 
+          this.aRemovedSupplierInvoiceWhldgTaxRecords = selectedContexts.map(oContext => {
+            let sSupplierInvoiceWhldgTax_Id = oDetailDetailModel.getProperty(oContext.sPath+"/supplierInvoiceWhldgTax_Id");
+            if (sSupplierInvoiceWhldgTax_Id) {
+              return { "supplierInvoiceWhldgTax_Id": sSupplierInvoiceWhldgTax_Id};
             }
           });
       }
@@ -917,6 +954,14 @@ sap.ui.define([
       this._handleRemovedLineDetailCache("idNPOInvGLAccountLineTable");
       this._onDeleteSelectedRows("idNPOInvGLAccountLineTable", "/currentInvoice/GLAccountRecords");
       this.onSelectionGLAccountChange();
+    },
+
+    
+
+    onDeleteSelectedSupplierInvoiceWhldgTaxRows: function () {
+      this._handleRemovedLineDetailCache("idSupplierInvoiceWhldgTaxTable");
+      this._onDeleteSelectedRows("idSupplierInvoiceWhldgTaxTable", "/currentInvoice/To_SupplierInvoiceWhldgTax");
+      this.onSelectionSupplierInvoiceWhldgTaxChange();
     },
 
 
@@ -4573,6 +4618,9 @@ sap.ui.define([
       bControlBelongingToHeader = oControl.getBindingContext("detailDetailModel") === undefined,
       sPath = bControlBelongingToHeader ? "/currentInvoice"+sProperty : oControl.getBindingContext("detailDetailModel").getPath()+sProperty,
       sValue = this._getControlValue(oControl);
+      if (sValue === "") {
+        sValue = null;
+      }
       this.getView().getModel("detailDetailModel").setProperty(sPath, sValue);
     },
 
@@ -4939,6 +4987,7 @@ sap.ui.define([
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords,
           RemovedPoLineDetails: this.aRemovedPoLineDetails,
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
         }
@@ -5024,16 +5073,16 @@ sap.ui.define([
 
     onSubmitPress: function (oEvent) {
       var body = {}; // Initialize request body
-      var sUrl = this.getView().getModel("detailDetailModel").getProperty("/props/POMode") ? baseManifestUrl + `/odata/submitPO` : baseManifestUrl + `/odata/submitGLAccount`; // API endpoint for saving data
+      var sUrl = baseManifestUrl + `/odata/submit`;// API endpoint for saving data
 
       // Retrieve the current invoice data from the model
-      var oCurrentInvoiceItalianTrace = this.getView().getModel("currentInvoiceItalianTrace").getProperty("/");
+      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
 
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
-          Invoice: JSON.stringify(oCurrentInvoiceItalianTrace)  // Convert invoice data to JSON string
+          Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
         }
       };
 

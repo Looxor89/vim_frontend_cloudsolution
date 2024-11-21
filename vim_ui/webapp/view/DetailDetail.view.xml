@@ -85,7 +85,7 @@
                                             <core:Item key="keyTransaction4" text="{i18n>SubsequentCredit}" />
                                         </m:Select>
 
-                                        <form:SimpleForm id="invoiceHeaderSimpleForm" editable="true" layout="ResponsiveGridLayout" columnsM="2" columnsL="3" columnsXL="3">
+                                        <form:SimpleForm id="invoiceHeaderSimpleForm" editable="true" layout="ResponsiveGridLayout" columnsM="2" columnsL="2" columnsXL="3">
                                             <form:content>
 
                                                 <core:Title text="{i18n>BasicData}" />
@@ -303,26 +303,52 @@
                                                 
                                                 <core:Title text="{i18n>WithholdingTax}" />
 
-                                                <m:Label text="{i18n>WithholdingTaxType}" required="true" />
-                                                <m:Input id="idWithholdingTaxType" value="{detailDetailModel>/currentInvoice/WithholdingTaxType}" change=".onChangeWithholdingTaxType" maxLength="2"/>
-
-                                                <m:Label text="{i18n>WithholdingTaxCode}" />
-                                                <m:Input id="idWithholdingTaxCode" value="{detailDetailModel>/currentInvoice/WithholdingTaxCode}" change=".onChangeWithholdingTaxCode" maxLength="2"/>
-
-                                                <m:Label text="{i18n>WithholdingTaxBaseAmount}" required="true" />
-                                                <m:Input id="idWithholdingTaxBaseAmount" value="{
-                                                    'path': 'detailDetailModel>/currentInvoice/WithholdingTaxBaseAmount',
-                                                    type: 'sap.ui.model.odata.type.Decimal',
-                                                    formatOptions: {
-                                                        minFractionDigits: 0,
-                                                        maxFractionDigits: 3,
-                                                        groupingEnabled: false
-                                                    },
-                                                    constraints: {
-                                                        precision: 16,
-                                                        scale: 3
-                                                    }
-                                                }" change=".onChangeWithholdingTaxBaseAmount"/>
+                                                <Table id="idSupplierInvoiceWhldgTaxTable" rows="{
+                                                        path: 'detailDetailModel>/currentInvoice/To_SupplierInvoiceWhldgTax'
+                                                    }" class="sapUiNoMargin"
+                                                        visibleRowCount="5"
+                                                        rowSelectionChange="onSelectionSupplierInvoiceWhldgTaxChange"
+                                                        selectionMode="None">
+                                                    <extension>
+                                                        <m:Toolbar>
+                                                            <m:ToolbarSpacer />
+                                                            <m:Button text="{i18n>AddButton}" press="onAddSupplierInvoiceWhldgTaxRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                            <m:Button id="deleteSupplierInvoiceWhldgTaxTable" text="{i18n>DeleteButton}" press="onDeleteSelectedSupplierInvoiceWhldgTaxRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
+                                                        </m:Toolbar>
+                                                    </extension>
+                                                    <columns>
+                                                        <Column >
+                                                            <m:Label text="{i18n>WithholdingTaxType}" required="true" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>WithholdingTaxType}" change=".onChangeWithholdingTaxType" maxLength="2"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column >
+                                                            <m:Label text="{i18n>WithholdingTaxCode}" />
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>WithholdingTaxCode}" change=".onChangeWithholdingTaxCode" maxLength="2"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column >
+                                                            <m:Label text="{i18n>WithholdingTaxBaseAmount}" required="true" />
+                                                            <template>
+                                                                <m:Input value="{
+                                                                    'path': 'detailDetailModel>WithholdingTaxBaseAmount',
+                                                                    type: 'sap.ui.model.odata.type.Decimal',
+                                                                    formatOptions: {
+                                                                        minFractionDigits: 0,
+                                                                        maxFractionDigits: 3,
+                                                                        groupingEnabled: false
+                                                                    },
+                                                                    constraints: {
+                                                                        precision: 16,
+                                                                        scale: 3
+                                                                    }
+                                                                }" change=".onChangeWithholdingTaxBaseAmount"/>
+                                                            </template>
+                                                        </Column>
+                                                     </columns>
+                                                </Table>
 
                                             </form:content>
                                         </form:SimpleForm>
