@@ -623,8 +623,8 @@ sap.ui.define([
       oTable.setBusy(true);
 
       const oSuccessFunction = (data) => {
-        oDetailDetailModel.setProperty("/Filelist", data.value[0].Invoice.body[0].allegati);
-        oCurrentInvoiceItalianTrace.setProperty("/body/0/allegati");
+        oDetailDetailModel.setProperty("/currentInvoice/Allegati", data.value[0].Invoice.body[0].allegati);
+        // oCurrentInvoiceItalianTrace.setProperty("/body/0/allegati");
         oDetailDetailModel.refresh();
         oTable.setBusy(false);
         return data;
@@ -779,11 +779,6 @@ sap.ui.define([
         "lineDetail_ID": null,
         "bodyInvoiceItalianTrace_Id": sBodyInvoiceItalianTrace_Id,
         "bodyPOIntegrationInfo_Id": null,
-        "To_SelectedPurchaseOrders_PurchaseOrder": null,
-        "To_SelectedPurchaseOrders_PurchaseOrderItem": null,
-        "To_SelectedDeliveryNotes_InboundDeliveryNote": null,
-        "To_SelectedServiceEntrySheets_ServiceEntrySheet": null,
-        "To_SelectedServiceEntrySheets_ServiceEntrySheetItem": null,
         "SupplierInvoiceItem": null,
         "PurchaseOrder": null,
         "PurchaseOrderItem": null,
@@ -793,6 +788,7 @@ sap.ui.define([
         "DocumentCurrency": null,
         "SupplierInvoiceItemAmount": null,
         "PurchaseOrderQuantityUnit": null,
+        "QuantityInPurchaseOrderUnit": null,
         "QtyInPurchaseOrderPriceUnit": null,
         "PurchaseOrderPriceUnit": null,
         "SupplierInvoiceItemText": null,
@@ -3261,8 +3257,8 @@ sap.ui.define([
           // this.getView().setModel(new JSONModel(record.InvoiceIntegrationInfo), "currentInvoiceIntegrationInfo");
 
           // Store attachments (if any)
-          oDetailDetailModel.setProperty("/Filelist", record.Allegati);
-          delete record.Allegati;
+          // oDetailDetailModel.setProperty("/Filelist", record.Allegati);
+          // delete record.Allegati;
 
           oDetailDetailModel.setProperty("/currentInvoice", record);
           
@@ -4976,8 +4972,23 @@ sap.ui.define([
       this._onChangeEventHandler(oEvent, "/EarmarkedFundsDocumentItem");
     },
 
+    
+
+    onSavePress: function () {
+      var that = this;
+      MessageBox.warning(oBundle.getText("AlertSave"), {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if (sAction === MessageBox.Action.YES) {
+            that._confirmSave().then(result => that._getData());
+          }
+        }
+      });
+    },
+
     // Handler for the "Save" button press
-    onSavePress: function (oEvent) {
+    _confirmSave: function (oEvent) {
       var body = {}; // Initialize request body
       var sUrl = baseManifestUrl + `/odata/save`; // API endpoint for saving data
       var oCurrentInvoice = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice");
@@ -5003,7 +5014,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock
-        this._confirmCancelEdit();
+        return this._confirmCancelEdit();
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -5017,7 +5028,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock even in case of failure
-        this._confirmCancelEdit();
+        return this._confirmCancelEdit();
       };
 
       // Execute AJAX request
@@ -5071,18 +5082,34 @@ sap.ui.define([
       return componentPath + "/docservice/";
     },
 
-    onSubmitPress: function (oEvent) {
+    onSubmitPress: function () {
+      var that = this;
+      MessageBox.warning(oBundle.getText("AlertSubmit"), {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if (sAction === MessageBox.Action.YES) {
+            that._confirmSubmit();
+          }
+        }
+      });
+    },
+
+    _confirmSubmit: function (oEvent) {
       var body = {}; // Initialize request body
       var sUrl = baseManifestUrl + `/odata/submit`;// API endpoint for saving data
 
       // Retrieve the current invoice data from the model
-      var oCurrentInvoice = this.getView().getModel("currentInvoice").getProperty("/");
+      var oCurrentInvoice = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice");
 
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
-          Invoice: JSON.stringify(oCurrentInvoice)  // Convert invoice data to JSON string
+          Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords,
+          RemovedPoLineDetails: this.aRemovedPoLineDetails,
+          RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
         }
       };
 
@@ -5096,7 +5123,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock
-        this._confirmCancelEdit();
+        return this._confirmCancelEdit();
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -5105,12 +5132,12 @@ sap.ui.define([
         // Show error message to the user
         MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
           title: "Error",
-          details: errorThrown,  // Provide error details
+          details: JSON.parse(XMLHttpRequest.responseText).error.message,  // Provide error details
           styleClass: sResponsivePaddingClasses
         });
 
         // Call the cancel handler to release the lock even in case of failure
-        this._confirmCancelEdit();
+        return this._confirmCancelEdit();
       };
 
       // Execute AJAX request

@@ -117,7 +117,7 @@
                                                     maxLength="5"/>
 
                                                 <m:Label text="{i18n>SupplierInvoiceIDByInvcgParty}" required="true" />
-                                                <m:Input id="idSupplierInvoiceIDByInvcgParty" value="{detailDetailModel>/currentInvoice/SupplierInvoiceIDByInvcgParty}" change=".onChangeSupplierInvoiceIDByInvcgParty" maxLength="2"/>
+                                                <m:Input id="idSupplierInvoiceIDByInvcgParty" value="{detailDetailModel>/currentInvoice/SupplierInvoiceIDByInvcgParty}" change=".onChangeSupplierInvoiceIDByInvcgParty" maxLength="16"/>
                                                 
                                                 <m:Label text="{i18n>GrossAmount}" required="true" />
                                                 <m:Input id="idGrossAmt" 
@@ -461,7 +461,7 @@
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>Quantity}" required="true"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>PurchaseOrderQuantityUnit}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrderQuantityUnit" maxLength="3"/>
+                                                                <m:Input value="{detailDetailModel>QuantityInPurchaseOrderUnit}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeQuantityInPurchaseOrderUnit" maxLength="3"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
@@ -719,7 +719,7 @@
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>WBSElement}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>WBSElem}" showValueHelp="true" valueHelpRequest="onWBSElementVH" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeWBSElement"/>
+                                                                <m:Input value="{detailDetailModel>WBSElement}" showValueHelp="true" valueHelpRequest="onWBSElementVH" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeWBSElement"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
@@ -845,7 +845,7 @@
                                 </l:BlockLayoutRow>
                                 <l:BlockLayoutRow>
                                     <l:BlockLayoutCell>
-                                        <m:Table id="idFileList" items="{detailDetailModel>/Filelist}" class="sapUiNoMargin">
+                                        <m:Table id="idFileList" items="{detailDetailModel>/currentInvoice/Allegati}" class="sapUiNoMargin">
                                             <m:headerToolbar>
                                                 <m:Toolbar>
                                                     <m:Title text="{i18n>Files}" level="H2" />
