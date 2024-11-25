@@ -294,16 +294,24 @@ sap.ui.define([
       return sRefDocumentCategoryKey === 'keyRefDocCategoryS';
     },
 
-    fillTo_SelectedPurchaseOrders_PurchaseOrder: function (sRefDocumentCategoryKey, sValue) {
-      return sRefDocumentCategoryKey === 'keyRefDocCategory1' ? sValue : null;
+    fillTo_SelectedPurchaseOrders_PurchaseOrder: function (sRefDocumentCategoryKey, aValues) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory1' && aValues.length > 0 ? aValues[0].PurchaseOrder : null;
     },
 
-    fillTo_SelectedDeliveryNotes_InboundDeliveryNote : function (sRefDocumentCategoryKey, sValue) {
-      return sRefDocumentCategoryKey === 'keyRefDocCategory2' ? sValue : null;
+    fillTo_SelectedPurchaseOrders_PurchaseOrderItem: function (sRefDocumentCategoryKey, aValues) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory1' && aValues.length > 0 ? aValues[0].PurchaseOrderItem : null;
     },
 
-    fillTo_SelectedServiceEntrySheets_ServiceEntrySheet : function (sRefDocumentCategoryKey, sValue) {
-      return sRefDocumentCategoryKey === 'keyRefDocCategoryS' ? sValue : null;
+    fillTo_SelectedDeliveryNotes_InboundDeliveryNote : function (sRefDocumentCategoryKey, aValues) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategory2' && aValues.length > 0 ? aValues[0].InboundDeliveryNote : null;
+    },
+
+    fillTo_SelectedServiceEntrySheets_ServiceEntrySheet : function (sRefDocumentCategoryKey, aValues) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategoryS' && aValues.length > 0 ? aValues[0].ServiceEntrySheet : null;
+    },
+
+    fillTo_SelectedServiceEntrySheets_ServiceEntrySheetItem : function (sRefDocumentCategoryKey, aValues) {
+      return sRefDocumentCategoryKey === 'keyRefDocCategoryS' && aValues.length > 0 ? aValues[0].ServiceEntrySheetItem : null;
     },
 
     setDatePicker : function (sDate) {

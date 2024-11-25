@@ -25,6 +25,9 @@ sap.ui.define([
   var aRemovedSupplierInvoiceWhldgTaxRecords;
   var aRemovedPoLineDetails;
   var aRemovedGlAccountLineDetails;
+  var aRemovedSelectedPurchaseOrdersRecords;
+  var aRemovedSelectedDeliveryNotesRecords;
+  var aRemovedSelectedServiceEntrySheetsRecords;
 
   return BaseController.extend("vim_ui.controller.DetailDetail", {
     formatter: formatter,
@@ -519,6 +522,12 @@ sap.ui.define([
       // this.getView().byId("idShippingAmount").setValue(null); CAP refactory
 
       // Bind read only template
+      var oTable = this.getView().byId("idTo_SelectedPurchaseOrdersTable");
+      oTable.setSelectionMode("None");
+      var oTable = this.getView().byId("idTo_SelectedDeliveryNotesTable");
+      oTable.setSelectionMode("None");
+      var oTable = this.getView().byId("idTo_SelectedServiceEntrySheetsTable");
+      oTable.setSelectionMode("None");
       var oTable = this.getView().byId("idInvLineItemTable");
       oTable.setSelectionMode("None");
       var oTable = this.getView().byId("idNPOInvGLAccountLineTable");
@@ -561,6 +570,9 @@ sap.ui.define([
       this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
+      this.aRemovedSelectedPurchaseOrdersRecords = [];
+      this.aRemovedSelectedDeliveryNotesRecords = [];
+      this.aRemovedSelectedServiceEntrySheetsRecords = [];
     },
 
     // Function to fetch notes associated with a package ID from the backend
@@ -658,6 +670,9 @@ sap.ui.define([
       this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
+      this.aRemovedSelectedPurchaseOrdersRecords = [];
+      this.aRemovedSelectedDeliveryNotesRecords = [];
+      this.aRemovedSelectedServiceEntrySheetsRecords = [];
       // Build the request payload
       var body = {
         payload: {
@@ -681,6 +696,9 @@ sap.ui.define([
 
         // this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
         this.getView().byId("idInvLineItemTable").setSelectionMode("None");  // Disable table actions
+        this.getView().byId("idTo_SelectedPurchaseOrdersTable").setSelectionMode("None");
+        this.getView().byId("idTo_SelectedDeliveryNotesTable").setSelectionMode("None");
+        this.getView().byId("idTo_SelectedServiceEntrySheetsTable").setSelectionMode("None");
         // this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation", false);
         this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("None");  // Disable table actions
         this.getView().byId("idSupplierInvoiceWhldgTaxTable").setSelectionMode("None");  // Disable table actions
@@ -707,6 +725,9 @@ sap.ui.define([
       this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
+      this.aRemovedSelectedPurchaseOrdersRecords = [];
+      this.aRemovedSelectedDeliveryNotesRecords = [];
+      this.aRemovedSelectedServiceEntrySheetsRecords = [];
 
       const oSuccessFunction = (data) => {
         // if success means lock was set
@@ -719,6 +740,9 @@ sap.ui.define([
         MessageToast.show(oBundle.getText("DocumentLocked"));
 
         this.getView().byId("idInvLineItemTable").setSelectionMode("MultiToggle");
+        this.getView().byId("idTo_SelectedPurchaseOrdersTable").setSelectionMode("MultiToggle");
+        this.getView().byId("idTo_SelectedDeliveryNotesTable").setSelectionMode("MultiToggle");
+        this.getView().byId("idTo_SelectedServiceEntrySheetsTable").setSelectionMode("MultiToggle");
         // this.rebindTable(this.oEditableTemplate, "Edit", true);
         this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("MultiToggle");
         this.getView().byId("idSupplierInvoiceWhldgTaxTable").setSelectionMode("MultiToggle");
@@ -751,6 +775,50 @@ sap.ui.define([
     //     this.getView().byId("idInvLineItemTable").setMode("None");
     //   }
     // },
+
+    onAddTo_SelectedPurchaseOrdersRow: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        // Retrieve the PORecords data from the model
+      var aTo_SelectedPurchaseOrders = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedPurchaseOrders");
+      aTo_SelectedPurchaseOrders.push({
+        "selectedPurchaseOrders_Id": null,
+        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
+        "PurchaseOrder": null,
+        "PurchaseOrderItem": null
+      });
+      oDetailDetailModel.setProperty("/currentInvoice/To_SelectedPurchaseOrders", aTo_SelectedPurchaseOrders);
+    },
+
+    onAddTo_SelectedDeliveryNotesRow: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        // Retrieve the PORecords data from the model
+      var aTo_SelectedDeliveryNotes = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedDeliveryNotes");
+      aTo_SelectedDeliveryNotes.push({
+        "selectedDeliveryNotes_Id": null,
+        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
+        "InboundDeliveryNote": null
+      });
+      oDetailDetailModel.setProperty("/currentInvoice/To_SelectedDeliveryNotes", aTo_SelectedDeliveryNotes);
+    },
+
+    onAddTo_SelectedServiceEntrySheetsRow: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
+      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        // Retrieve the PORecords data from the model
+      var aTo_SelectedServiceEntrySheets = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedServiceEntrySheets");
+      aTo_SelectedServiceEntrySheets.push({
+        "selectedServiceEntrySheets_Id": null,
+        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
+        "ServiceEntrySheet": null,
+        "ServiceEntrySheetItem": null
+      });
+      oDetailDetailModel.setProperty("/currentInvoice/To_SelectedServiceEntrySheets", aTo_SelectedServiceEntrySheets);
+    },
 
     onAddSupplierInvoiceWhldgTaxRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
@@ -864,6 +932,21 @@ sap.ui.define([
       this.onSelectionPOChange();
     },
 
+    onSelectionTo_SelectedPurchaseOrdersChange: function () {
+      this._enableDeleteButton("idTo_SelectedPurchaseOrdersTable", "deleteTo_SelectedPurchaseOrdersTable");
+    },
+
+
+    onSelectionTo_SelectedDeliveryNotesChange: function () {
+      this._enableDeleteButton("idTo_SelectedDeliveryNotesTable", "deleteTo_SelectedDeliveryNotesTable");
+    },
+
+
+    onSelectionTo_SelectedServiceEntrySheetsChange: function () {
+      this._enableDeleteButton("idTo_SelectedServiceEntrySheetsTable", "deleteTo_SelectedServiceEntrySheetsTable");
+    },
+
+
     onSelectionSupplierInvoiceWhldgTaxChange: function () {
       this._enableDeleteButton("idSupplierInvoiceWhldgTaxTable", "deleteSupplierInvoiceWhldgTaxTable");
     },
@@ -936,6 +1019,30 @@ sap.ui.define([
             }
           });
           break;
+        case "idTo_SelectedPurchaseOrdersTable": 
+          this.aRemovedSelectedPurchaseOrdersRecords = selectedContexts.map(oContext => {
+            let sSelectedPurchaseOrders_Id = oDetailDetailModel.getProperty(oContext.sPath+"/selectedPurchaseOrders_Id");
+            if (sSelectedPurchaseOrders_Id) {
+              return { "selectedPurchaseOrders_Id": sSelectedPurchaseOrders_Id};
+            }
+          });
+          break;
+        case "idTo_SelectedDeliveryNotesTable": 
+          this.aRemovedSelectedDeliveryNotesRecords = selectedContexts.map(oContext => {
+            let sSelectedDeliveryNotes_Id = oDetailDetailModel.getProperty(oContext.sPath+"/selectedDeliveryNotes_Id");
+            if (sSelectedDeliveryNotes_Id) {
+              return { "selectedDeliveryNotes_Id": sSelectedDeliveryNotes_Id};
+            }
+          });
+          break;
+        case "idTo_SelectedServiceEntrySheetsTable": 
+          this.aRemovedSelectedServiceEntrySheetsRecords = selectedContexts.map(oContext => {
+            let sSelectedServiceEntrySheets_Id = oDetailDetailModel.getProperty(oContext.sPath+"/selectedServiceEntrySheets_Id");
+            if (sSelectedServiceEntrySheets_Id) {
+              return { "selectedServiceEntrySheets_Id": sSelectedServiceEntrySheets_Id};
+            }
+          });
+          break;
         default: 
           this.aRemovedSupplierInvoiceWhldgTaxRecords = selectedContexts.map(oContext => {
             let sSupplierInvoiceWhldgTax_Id = oDetailDetailModel.getProperty(oContext.sPath+"/supplierInvoiceWhldgTax_Id");
@@ -952,14 +1059,29 @@ sap.ui.define([
       this.onSelectionGLAccountChange();
     },
 
-    
+    onDeleteTo_SelectedPurchaseOrdersRows: function () {
+      this._handleRemovedLineDetailCache("idTo_SelectedPurchaseOrdersTable");
+      this._onDeleteSelectedRows("idTo_SelectedPurchaseOrdersTable", "/currentInvoice/To_SelectedPurchaseOrders");
+      this.onSelectionTo_SelectedPurchaseOrdersChange();
+    },
+
+    onDeleteTo_SelectedDeliveryNotesRows: function () {
+      this._handleRemovedLineDetailCache("idTo_SelectedDeliveryNotesTable");
+      this._onDeleteSelectedRows("idTo_SelectedDeliveryNotesTable", "/currentInvoice/To_SelectedDeliveryNotes");
+      this.onSelectionTo_SelectedDeliveryNotesChange();
+    },
+
+    onDeleteTo_SelectedServiceEntrySheetsRows: function () {
+      this._handleRemovedLineDetailCache("idTo_SelectedServiceEntrySheetsTable");
+      this._onDeleteSelectedRows("idTo_SelectedServiceEntrySheetsTable", "/currentInvoice/To_SelectedServiceEntrySheets");
+      this.onSelectionTo_SelectedServiceEntrySheetsChange();
+    },
 
     onDeleteSelectedSupplierInvoiceWhldgTaxRows: function () {
       this._handleRemovedLineDetailCache("idSupplierInvoiceWhldgTaxTable");
       this._onDeleteSelectedRows("idSupplierInvoiceWhldgTaxTable", "/currentInvoice/To_SupplierInvoiceWhldgTax");
       this.onSelectionSupplierInvoiceWhldgTaxChange();
     },
-
 
     handleAboutPress: function () {
       var oNextUIState = this.getOwnerComponent().getHelper().getNextUIState(3);
@@ -4777,28 +4899,35 @@ sap.ui.define([
     },
 
     _removeAllRefDocumentCategoryValues: function (sKey) {
+      let aTo_SelectedPurchaseOrders = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedPurchaseOrders");
+      let aTo_SelectedDeliveryNotes = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedDeliveryNotes");
+      let aTo_SelectedServiceEntrySheets = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedServiceEntrySheets");
       switch (sKey) {
         case "keyRefDocCategory1":
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes_InboundDeliveryNote", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
+          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id}));
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
           break;
         case "keyRefDocCategory2":
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrder", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrderItem", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id}));
+          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id}));
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
           break;
         case "keyRefDocCategoryS":
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id}));
+          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
           break;
         default:
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrder", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders_PurchaseOrderItem", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes_InboundDeliveryNote", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheet", null);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets_ServiceEntrySheetItem", null);
+          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id}));
+          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
+          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
+          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
       }
     },
 
@@ -4809,23 +4938,23 @@ sap.ui.define([
     },
 
     onChangeTo_SelectedPurchaseOrders_PurchaseOrder: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/To_SelectedPurchaseOrders_PurchaseOrder");
+      this._onChangeEventHandler(oEvent, "/PurchaseOrder");
     },
 
     onChangeTo_SelectedPurchaseOrders_PurchaseOrderItem: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/To_SelectedPurchaseOrders_PurchaseOrderItem");
+      this._onChangeEventHandler(oEvent, "/PurchaseOrderItem");
     },
 
     onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/To_SelectedDeliveryNotes_InboundDeliveryNote");
+      this._onChangeEventHandler(oEvent, "/InboundDeliveryNote");
     },
 
     onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/To_SelectedServiceEntrySheets_ServiceEntrySheet");
+      this._onChangeEventHandler(oEvent, "/ServiceEntrySheet");
     },
 
     onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem: function (oEvent) {
-      this._onChangeEventHandler(oEvent, "/To_SelectedServiceEntrySheets_ServiceEntrySheetItem");
+      this._onChangeEventHandler(oEvent, "/ServiceEntrySheetItem");
     },
 
     onChangePurchaseOrder: function (oEvent) {
@@ -4998,6 +5127,9 @@ sap.ui.define([
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords,
+          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords,
+          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords,
           RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords,
           RemovedPoLineDetails: this.aRemovedPoLineDetails,
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
@@ -5107,6 +5239,9 @@ sap.ui.define([
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords,
+          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords,
+          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords,
           RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords,
           RemovedPoLineDetails: this.aRemovedPoLineDetails,
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
