@@ -7,10 +7,10 @@
                     <Title text="Document View" textAlign="Center" />
                 </f:heading>
                 <f:expandedContent>
-                    <Label text="File: {appmodel>/detail/header/FILENAME}" />
+                    <Label text="File: {detailModel>/InvoiceAttachment/title}" />
                 </f:expandedContent>
                 <f:snappedContent>
-                    <Label text="File: {appmodel>/detail/header/FILENAME}" />
+                    <Label text="File: {detailModel>/InvoiceAttachment/title}" />
                 </f:snappedContent>
                 <f:actions>
                     <Button icon="sap-icon://decline" press="onCancelPress" tooltip="Close" type="Transparent">
@@ -43,10 +43,10 @@
             </f:DynamicPageHeader>
         </f:header> -->
         <f:content>
-            <VBox id="idViewerArea" >
+            <VBox id="idViewerArea" height="100%">
                 <!-- <ocr:OCRViewer id="ocrDetailViewer0" class="sapUiSmallMarginBeginEnd" totalPages="{appmodel>/pages}" currentPage="1" imageUrl="{appmodel>/imgurl}" doxObject="{appmodel>/job}" onPageChange="_handlePageChange" /> -->
 
-                <PDFViewer source="{/Source}" isTrustedSource="true" title="{/Title}" >
+                <PDFViewer source="{detailModel>/InvoiceAttachment/source}" isTrustedSource="true" >
                     <layoutData>
                         <FlexItemData growFactor="1" />
                     </layoutData>

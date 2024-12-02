@@ -1,9 +1,11 @@
 sap.ui.define([
   "./BaseController",
   "sap/ui/model/json/JSONModel",
+  "sap/m/MessageBox",
   "vim_ui/utils/formatter"
-], function (BaseController, JSONModel, formatter) {
+], function (BaseController, JSONModel, MessageBox, formatter) {
   "use strict";
+  var sResponsivePaddingClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer";
   //manifest base URL
   var baseManifestUrl;
 
@@ -22,7 +24,8 @@ sap.ui.define([
 
     _onRouteMatched: function (oEvent) {
       this._packageId = oEvent.getParameter("arguments").packageId || this._packageId || "0";
-      // this.fetchData(this._packageId)
+      this.getView().setModel(new JSONModel({}), "detailModel");
+      this.fetchAttachment(this._packageId)
       //   .then(this.getDoxData.bind(this))
       //   .then(function (data) {
       //     // do something after dox data loads
@@ -38,6 +41,49 @@ sap.ui.define([
       //   .catch(function (error) {
       //     console.log(error);
       //   }.bind(this));
+    },
+
+    fetchAttachment : function (packageId) {
+      var oDetailModel = this.getView().getModel("detailModel");
+      var aURL = baseManifestUrl + "/odata/getAttachment()?PackageId=" + packageId;
+      var source = null,
+      title = null;
+      const oSuccessFunction = (data) => {
+        const result = data.value[0].result;
+        if (result) {
+          let base64EncodedPDF = data.value[0].result.attachment,
+            decodedPdfContent = atob(base64EncodedPDF),
+            byteArray = new Uint8Array(decodedPdfContent.length);
+          for(var i=0; i<decodedPdfContent.length; i++){
+            byteArray[i] = decodedPdfContent.charCodeAt(i);
+          }
+          let blob = new Blob([byteArray.buffer], { type: 'application/pdf' });
+          source = URL.createObjectURL(blob);
+          title = result.nomeAttachment;
+          jQuery.sap.addUrlWhitelist("blob");
+        }
+        let InvoiceAttachment = {
+          source: source,
+          title: title
+        }
+        // Update the 'lock' property in the 'detailDetailModel' with the result
+        oDetailModel.setProperty("/InvoiceAttachment", InvoiceAttachment);
+
+        return data;
+      };
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        console.log(errorThrown);
+        // Show error message to the user
+        MessageBox.error(oBundle.getText("AlertErrorToLoadAttachment"), {
+          title: "Error",
+          details: errorThrown,  // Provide error details
+          styleClass: sResponsivePaddingClasses
+        });
+      };
+
+      this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+      
     },
 
     _fullReload: function (oEvent) {
