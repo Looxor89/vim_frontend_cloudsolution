@@ -37,8 +37,13 @@ sap.ui.define([
       oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
       //set manifest base URL
       baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
-      // Create a MessagePopover for showing messages and notifications
-      this.createMessagePopover();
+
+      aRemovedSupplierInvoiceWhldgTaxRecords = [];
+      aRemovedPoLineDetails = [];
+      aRemovedGlAccountLineDetails = [];
+      aRemovedSelectedPurchaseOrdersRecords = [];
+      aRemovedSelectedDeliveryNotesRecords = [];
+      aRemovedSelectedServiceEntrySheetsRecords = [];
 
       // Retrieve the buttons for full-screen exit and enter and store them for later use
       var oExitButton = this.getView().byId("exitFullScreenBtn"),
@@ -200,191 +205,19 @@ sap.ui.define([
 
       // Read-only templates for NON-PO G/L account and asset line items
       this.oReadOnlyGLAccountTemplateNPo = this.getView().byId("readNonPOGLAccountTemplate");
-      // this.oReadOnlyAssetTemplateNPo = this.getView().byId("readNonPOAssetTemplate");
 
-      /**
-       * Define editable templates for NON-PO G/L account line items
-       * Includes inputs for G/L account, amount, tax code, cost center, and more
-       */
-      // this.oEditableTemplateGLAccountNPo = new sap.m.ColumnListItem({
-      //   cells: [
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>InvoiceLineItem}",
-      //       type: "Number",
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>GLAcc}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onGLAcctVH2.bind(this), // Value help for G/L account selection
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: {
-      //         path: 'detailDetailModel>Amount',
-      //         type: 'sap.ui.model.odata.type.Decimal',
-      //         formatOptions: {
-      //           minFractionDigits: 1,
-      //           maxFractionDigits: 3,
-      //           groupingEnabled: false
-      //         },
-      //         constraints: {
-      //           precision: 23,
-      //           scale: 4
-      //         }
-      //       }
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>TaxCode}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onTaxCodeVH.bind(this), // Value help for tax code
-      //       maxLength: 2
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Assignment}",
-      //       showValueHelp: true
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Text}"
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Business area}"
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>CostCen}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onCostCenterVH2.bind(this), // Value help for cost center
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Order}"
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>SalesOrder}"
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>ProfitCen}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onProfitCenterVH.bind(this), // Value help for profit center
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>WBSElem}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onWBSElementVH.bind(this), // Value help for WBS element
-      //       maxLength: 24
-      //     })
-      //   ]
-      // });
-
-      /**
-       * Define editable templates for NON-PO Asset line items.
-       * Includes inputs for asset number, valuation, quantity, and tax codes.
-       */
-      // this.oEditableTemplateAssetNPo = new sap.m.ColumnListItem({
-      //   cells: [
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>InvoiceLineItem}",
-      //       type: "Number",
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Bukrs}",
-      //       maxLength: 4,
-      //       showValueHelp: true,
-      //       valueHelpRequest: function (oEvent) {
-      //         this.onCompCodeVH(oEvent); // Value help for company code
-      //         this.flag = 'item'; // Additional logic for item flagging
-      //       }.bind(this)
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Asset}",
-      //       type: "Number",
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>AssetSecondaryNumber}",
-      //       type: "Number",
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.Input({
-      //       value: {
-      //         path: 'detailDetailModel>Amount',
-      //         type: 'sap.ui.model.odata.type.Decimal',
-      //         formatOptions: {
-      //           minFractionDigits: 1,
-      //           maxFractionDigits: 3,
-      //           groupingEnabled: false
-      //         },
-      //         constraints: {
-      //           precision: 23,
-      //           scale: 4
-      //         }
-      //       }
-      //     }),
-      //     new sap.m.Input({
-      //       value: {
-      //         path: 'detailDetailModel>Quantity',
-      //         type: 'sap.ui.model.odata.type.Decimal',
-      //         formatOptions: {
-      //           minFractionDigits: 1,
-      //           maxFractionDigits: 3,
-      //           groupingEnabled: false
-      //         },
-      //         constraints: {
-      //           precision: 23,
-      //           scale: 4
-      //         }
-      //       }
-      //     }),
-      //     new sap.m.TextArea({
-      //       value: "{detailDetailModel>BaseUnitOfMeasure}",
-      //       maxLength: 3
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>TaxCode}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onTaxCodeVH.bind(this), // Value help for tax code
-      //       maxLength: 2
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>Assigment}",
-      //       type: "Number",
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.TextArea({
-      //       value: "{detailDetailModel>Text}",
-      //       maxLength: 3
-      //     }),
-      //     new sap.m.Input({
-      //       value: "{detailDetailModel>ProfitCen}",
-      //       showValueHelp: true,
-      //       valueHelpRequest: this.onProfitCenterVH.bind(this), // Value help for profit center
-      //       maxLength: 10
-      //     }),
-      //     new sap.m.DatePicker({
-      //       value: "{detailDetailModel>AssetValueDate}",
-      //       placeholder: "DD/MM/YYYY",
-      //       valueFormat: "dd-MM-yyyy",
-      //       displayFormat: "dd/MM/yyyy"
-      //     })
-      //   ]
-      // });
     },
 
     createMessagePopover: function () {
+      let sTitle = oBundle.getText("MessagePopoverError");
       this.oMP = new MessagePopover({
         items: {
-          path: "msg>/aMsg",
+          path: "detailDetailModel>/errorLog",
           template: new MessageItem(
             {
-              title: "{msg>message}",
-              subtitle: "{msg>system}",
-              type: {
-                path: "msg>type",
-                formatter: formatter.toMsgType
-              },
-              description: "{msg>message}\n{msg>msg_id} {msg>log_msg_no} {msg>number}"
+              title: sTitle,
+              type: "Error",
+              description: "{detailDetailModel>ErrorMessage}\n{detailDetailModel>ID}"
             })
         }
       });
@@ -393,10 +226,11 @@ sap.ui.define([
     },
 
     handleMessagePopoverPress: function (oEvent) {
+      let control = oEvent ? oEvent.getSource() : this.getView().byId("messagePopoverBtn");
       if (!this.oMP) {
         this.createMessagePopover();
       }
-      this.oMP.toggle(oEvent.getSource());
+      this.oMP.toggle(control);
     },
 
     defineModelForCurrentPage: function () {
@@ -778,9 +612,9 @@ sap.ui.define([
 
     onAddTo_SelectedPurchaseOrdersRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
-        // Retrieve the PORecords data from the model
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+      // Retrieve the PORecords data from the model
       var aTo_SelectedPurchaseOrders = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedPurchaseOrders");
       aTo_SelectedPurchaseOrders.push({
         "selectedPurchaseOrders_Id": null,
@@ -793,9 +627,9 @@ sap.ui.define([
 
     onAddTo_SelectedDeliveryNotesRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
-        // Retrieve the PORecords data from the model
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+      // Retrieve the PORecords data from the model
       var aTo_SelectedDeliveryNotes = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedDeliveryNotes");
       aTo_SelectedDeliveryNotes.push({
         "selectedDeliveryNotes_Id": null,
@@ -807,9 +641,9 @@ sap.ui.define([
 
     onAddTo_SelectedServiceEntrySheetsRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
-        // Retrieve the PORecords data from the model
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+      // Retrieve the PORecords data from the model
       var aTo_SelectedServiceEntrySheets = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedServiceEntrySheets");
       aTo_SelectedServiceEntrySheets.push({
         "selectedServiceEntrySheets_Id": null,
@@ -822,9 +656,9 @@ sap.ui.define([
 
     onAddSupplierInvoiceWhldgTaxRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-      sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
-        // Retrieve the PORecords data from the model
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+      // Retrieve the PORecords data from the model
       var aTo_SupplierInvoiceWhldgTax = oDetailDetailModel.getProperty("/currentInvoice/To_SupplierInvoiceWhldgTax");
       aTo_SupplierInvoiceWhldgTax.push({
         "supplierInvoiceWhldgTax_Id": null,
@@ -839,9 +673,9 @@ sap.ui.define([
 
     onAddPORow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-      sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
-        // Retrieve the PORecords data from the model
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
+      // Retrieve the PORecords data from the model
       var aPORecords = oDetailDetailModel.getProperty("/currentInvoice/PORecords");
       aPORecords.push({
         "lineDetail_ID": null,
@@ -851,9 +685,9 @@ sap.ui.define([
         "PurchaseOrder": null,
         "PurchaseOrderItem": null,
         "Plant": null,
-        "IsSubsequentDebitCredit": null,
+        "IsSubsequentDebitCredit": this.getValueMappedToIsSubsequentDebitCredit(),
         "TaxCode": null,
-        "DocumentCurrency": null,
+        "DocumentCurrency": this.getValueMappedToDocumentCurrency(),
         "SupplierInvoiceItemAmount": null,
         "PurchaseOrderQuantityUnit": null,
         "QuantityInPurchaseOrderUnit": null,
@@ -883,10 +717,10 @@ sap.ui.define([
 
     onAddGLAccountRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-      oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-      sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
 
-        // Retrieve the GLAccountRecords data from the model
+      // Retrieve the GLAccountRecords data from the model
       var aGLAccountRecords = oDetailDetailModel.getProperty("/currentInvoice/GLAccountRecords");
       aGLAccountRecords.push({
         "lineDetail_ID": null,
@@ -895,8 +729,8 @@ sap.ui.define([
         "SupplierInvoiceItem": null,
         "CompanyCode": null,
         "GLAccount": null,
-        "DebitCreditCode": null,
-        "DocumentCurrency": null,
+        "DebitCreditCode": this.getValueMappedToIsSubsequentDebitCredit(),
+        "DocumentCurrency": this.getValueMappedToDocumentCurrency(),
         "SupplierInvoiceItemAmount": null,
         "TaxCode": null,
         "AssignmentReference": null,
@@ -1000,54 +834,54 @@ sap.ui.define([
         selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex));
 
       switch (sTableId) {
-        case "idInvLineItemTable": 
+        case "idInvLineItemTable":
           this.aRemovedPoLineDetails = selectedContexts.map(oContext => {
-            let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath+"/lineDetail_ID");
-            let sBodyPOIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath+"/bodyPOIntegrationInfo_Id");
+            let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath + "/lineDetail_ID");
+            let sBodyPOIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath + "/bodyPOIntegrationInfo_Id");
             if (sLineDetail_ID) {
-              return { "lineDetail_ID": sLineDetail_ID, "bodyPOIntegrationInfo_Id": sBodyPOIntegrationInfo_Id};
+              return { "lineDetail_ID": sLineDetail_ID, "bodyPOIntegrationInfo_Id": sBodyPOIntegrationInfo_Id };
             }
-            
+
           });
           break;
-        case "idNPOInvGLAccountLineTable": 
+        case "idNPOInvGLAccountLineTable":
           this.aRemovedGlAccountLineDetails = selectedContexts.map(oContext => {
-            let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath+"/lineDetail_ID");
-            let sBodyGLAccountIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath+"/bodyGLAccountIntegrationInfo_Id");
+            let sLineDetail_ID = oDetailDetailModel.getProperty(oContext.sPath + "/lineDetail_ID");
+            let sBodyGLAccountIntegrationInfo_Id = oDetailDetailModel.getProperty(oContext.sPath + "/bodyGLAccountIntegrationInfo_Id");
             if (sLineDetail_ID) {
-              return { "lineDetail_ID": sLineDetail_ID, "bodyGLAccountIntegrationInfo_Id": sBodyGLAccountIntegrationInfo_Id};
+              return { "lineDetail_ID": sLineDetail_ID, "bodyGLAccountIntegrationInfo_Id": sBodyGLAccountIntegrationInfo_Id };
             }
           });
           break;
-        case "idTo_SelectedPurchaseOrdersTable": 
+        case "idTo_SelectedPurchaseOrdersTable":
           this.aRemovedSelectedPurchaseOrdersRecords = selectedContexts.map(oContext => {
-            let sSelectedPurchaseOrders_Id = oDetailDetailModel.getProperty(oContext.sPath+"/selectedPurchaseOrders_Id");
+            let sSelectedPurchaseOrders_Id = oDetailDetailModel.getProperty(oContext.sPath + "/selectedPurchaseOrders_Id");
             if (sSelectedPurchaseOrders_Id) {
-              return { "selectedPurchaseOrders_Id": sSelectedPurchaseOrders_Id};
+              return { "selectedPurchaseOrders_Id": sSelectedPurchaseOrders_Id };
             }
           });
           break;
-        case "idTo_SelectedDeliveryNotesTable": 
+        case "idTo_SelectedDeliveryNotesTable":
           this.aRemovedSelectedDeliveryNotesRecords = selectedContexts.map(oContext => {
-            let sSelectedDeliveryNotes_Id = oDetailDetailModel.getProperty(oContext.sPath+"/selectedDeliveryNotes_Id");
+            let sSelectedDeliveryNotes_Id = oDetailDetailModel.getProperty(oContext.sPath + "/selectedDeliveryNotes_Id");
             if (sSelectedDeliveryNotes_Id) {
-              return { "selectedDeliveryNotes_Id": sSelectedDeliveryNotes_Id};
+              return { "selectedDeliveryNotes_Id": sSelectedDeliveryNotes_Id };
             }
           });
           break;
-        case "idTo_SelectedServiceEntrySheetsTable": 
+        case "idTo_SelectedServiceEntrySheetsTable":
           this.aRemovedSelectedServiceEntrySheetsRecords = selectedContexts.map(oContext => {
-            let sSelectedServiceEntrySheets_Id = oDetailDetailModel.getProperty(oContext.sPath+"/selectedServiceEntrySheets_Id");
+            let sSelectedServiceEntrySheets_Id = oDetailDetailModel.getProperty(oContext.sPath + "/selectedServiceEntrySheets_Id");
             if (sSelectedServiceEntrySheets_Id) {
-              return { "selectedServiceEntrySheets_Id": sSelectedServiceEntrySheets_Id};
+              return { "selectedServiceEntrySheets_Id": sSelectedServiceEntrySheets_Id };
             }
           });
           break;
-        default: 
+        default:
           this.aRemovedSupplierInvoiceWhldgTaxRecords = selectedContexts.map(oContext => {
-            let sSupplierInvoiceWhldgTax_Id = oDetailDetailModel.getProperty(oContext.sPath+"/supplierInvoiceWhldgTax_Id");
+            let sSupplierInvoiceWhldgTax_Id = oDetailDetailModel.getProperty(oContext.sPath + "/supplierInvoiceWhldgTax_Id");
             if (sSupplierInvoiceWhldgTax_Id) {
-              return { "supplierInvoiceWhldgTax_Id": sSupplierInvoiceWhldgTax_Id};
+              return { "supplierInvoiceWhldgTax_Id": sSupplierInvoiceWhldgTax_Id };
             }
           });
       }
@@ -3247,6 +3081,10 @@ sap.ui.define([
         .then(this.readSavedData.bind(this)) // Fetch saved data from the backend
         .then(function () {
           this.getView().byId('DDPage').setBusy(false); // Once done, mark the page as not busy
+          // Toggle MessagePopover for showing messages and notifications if there are errors
+          if (this.getView().getModel("detailDetailModel").getProperty("/errorLog").length > 0) {
+            this.handleMessagePopoverPress();
+          }
         }.bind(this))
         .catch(function (error) {
           console.log(error); // Handle errors during the process
@@ -3321,7 +3159,7 @@ sap.ui.define([
         if (oLineDetail.bodyPOIntegrationInfo_ID === null && oLineDetail.bodyGLAccountIntegrationInfo_ID === null) {
           return oLineDetail;
         }
-        
+
         oBodyPOInvoiceIntegrationInfo.forEach(oPOItem => {
           // If LineDetail is PO
           if (oLineDetail.bodyPOIntegrationInfo_ID === oPOItem.ID) {
@@ -3333,7 +3171,7 @@ sap.ui.define([
             return Object.assign({}, oLineDetail, oPOItem);
           }
         })
-        
+
         oBodyGLAccountIntegrationInfo.forEach(oGLAccountItem => {
           // If LineDetail is GL Account
           if (oLineDetail.bodyGLAccountIntegrationInfo_ID === oGLAccountItem.ID) {
@@ -3370,8 +3208,8 @@ sap.ui.define([
             bMultiplePO = false, // Flag for multiple POs
             sPOnumber = null, // PO number
             oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
-            // aLineItems = [], // Array to store PO line items
-            // aLineItems2 = []; // Array to store Non-PO line items
+          // aLineItems = [], // Array to store PO line items
+          // aLineItems2 = []; // Array to store Non-PO line items
 
           // Store InvoiceItalianTrace with body inside
           // this.getView().setModel(new JSONModel(record.InvoiceItalianTrace), "currentInvoiceItalianTrace");
@@ -3382,8 +3220,11 @@ sap.ui.define([
           // oDetailDetailModel.setProperty("/Filelist", record.Allegati);
           // delete record.Allegati;
 
+          oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
+          delete record.ErrorLog
           oDetailDetailModel.setProperty("/currentInvoice", record);
-          
+
+
 
           // Process data differently for PO mode and Non-PO mode
           // if (bPOMode) {
@@ -3616,7 +3457,7 @@ sap.ui.define([
           let sTransactionKey = record.Transaction;
           if (sTransactionKey) {
             let oSelectTransaction = this.getView().byId("idTransaction"),
-            oItem = oSelectTransaction.getItemByKey(sTransactionKey);
+              oItem = oSelectTransaction.getItemByKey(sTransactionKey);
             oSelectTransaction.setSelectedItem(oItem);
           }
 
@@ -3624,7 +3465,7 @@ sap.ui.define([
             let sRefDocumentCategoryKey = record.RefDocumentCategory;
             if (sRefDocumentCategoryKey) {
               let oSelectRefDocumentCategory = this.getView().byId("idRefDocCategory"),
-              oItem = oSelectRefDocumentCategory.getItemByKey(sRefDocumentCategoryKey);
+                oItem = oSelectRefDocumentCategory.getItemByKey(sRefDocumentCategoryKey);
               oSelectRefDocumentCategory.setSelectedItem(oItem);
               this._removeAllRefDocumentCategoryValues(sRefDocumentCategoryKey);
             }
@@ -3651,12 +3492,7 @@ sap.ui.define([
       this.getView().byId('DDPage').setBusy(true);
       // this._packageId = oEvent.getParameter("arguments").packageId || this._packageId || "0";
       this.fetchData(this._packageId)
-        .then(this.getDoxData)
-        .then(this._computeFields.bind(this))
-        .then(this.readSavedData.bind(this))
-        //.then(this.setInferSavedData.bind(this))
-        .then(this.restoreSavedData.bind(this))
-        // .then(this.calcTotals.bind(this)) CAP refactory: not present in functional analysis
+        .then(this.readSavedData.bind(this)) // Fetch saved data from the backend
         .then(function () {
           this.getView().byId('DDPage').setBusy(false);
         }.bind(this))
@@ -3784,7 +3620,7 @@ sap.ui.define([
       // If removing PO number completely
       if (!sValue || sValue.trim().length <= 0) {
         var msg = oBundle.getText("SwitchInvoiceTypeAlertToNonPo"),
-        textButton = oBundle.getText("SwitchInvoiceTypeButton");
+          textButton = oBundle.getText("SwitchInvoiceTypeButton");
 
         if (this.appmodel.getProperty("/props/POMode")) {
           MessageBox.warning(msg, {
@@ -3882,6 +3718,55 @@ sap.ui.define([
       }
     },
 
+    _confirmAssignation: function (sUrl, body) {
+      const oSuccessFunction = (data) => {
+        MessageBox.success(oBundle.getText("SuccessfullyAssigned"), {
+          actions: [MessageBox.Action.CLOSE],
+          title: "Success",
+          details: data,  // Provide details of the response
+          styleClass: sResponsivePaddingClasses,
+          onClose: function () {
+            this._getData();
+          }.bind(this)
+        });
+      };
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        sap.ui.core.BusyIndicator.hide();
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+        this._getData();
+      };
+
+      return this.executeRequest(sUrl, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
+    },
+
+    onAssignConfirm: function (oEvent) {
+      var that = this;
+      var sUrl;
+      var assignTo = oEvent.getParameter('selectedItem').getBindingContext('UserList').getObject('Email');
+      var body = undefined;
+
+      sUrl = baseManifestUrl + '/odata/assign';
+      body = {
+        payload: {
+          PackagesId: [this._packageId],
+          AssignedTo: assignTo
+        }
+      };
+
+      MessageBox.warning(oBundle.getText("AlertAssign", [assignTo]), {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if (sAction === MessageBox.Action.YES) {
+            that._confirmAssignation(sUrl, body);
+          }
+        }
+      });
+    },
+
     onFileListMainSelect: function (oEvent) {
       var jobId = oEvent.getSource().getParent().getBindingContext('appmodel').getObject('JobId');
       var packageId = oEvent.getSource().getParent().getBindingContext('appmodel').getObject('PackageId');
@@ -3894,7 +3779,7 @@ sap.ui.define([
       }
 
       if (oEvent.getParameter('selected')) {
-        var msg = oBundle.getText("SwitchPrimaryDocumentAlert",[fileName]);
+        var msg = oBundle.getText("SwitchPrimaryDocumentAlert", [fileName]);
         if (!this.appmodel.getProperty('/props/gEditMode')) {
           msg = oBundle.getText("SwitchPrimaryDocumentConfirmAlert", [fileName]);
         }
@@ -4021,7 +3906,7 @@ sap.ui.define([
 
           table.setBusy(false);
           // Show error message to the user
-          MessageBox.error(oBundle.getText("UnexpectedErrorOccured"), {
+          MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
             title: "Error",
             details: errorThrown,  // Provide error details
             styleClass: sResponsivePaddingClasses
@@ -4714,9 +4599,43 @@ sap.ui.define([
 
     onChangeTransaction: function (oEvent) {
       var sKey = oEvent.getParameters().selectedItem.getKey(),
-      oSelect = oEvent.getSource(),
-      sPath = oSelect.getBindingContext("detailDetailModel").getPath()+"/Transaction";
+        oSelect = oEvent.getSource(),
+        sPath = oSelect.getBindingContext("detailDetailModel").getPath() + "/Transaction";
       this.getView().getModel("detailDetailModel").setProperty(sPath, sKey);
+      this.setIsSubsequentDebitCredit(sKey);
+    },
+
+    setIsSubsequentDebitCredit: function (sKey) {
+      let aPORecords = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/PORecords");
+      let aGLAccountRecords = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/GLAccountRecords");
+      aPORecords = aPORecords.map(oRecord => {
+        oRecord.IsSubsequentDebitCredit = this.getValueMappedToIsSubsequentDebitCredit(sKey);
+        return oRecord;
+      });
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/PORecords", aPORecords);
+
+      aGLAccountRecords = aGLAccountRecords.map(oRecord => {
+        oRecord.DebitCreditCode = this.getValueMappedToIsSubsequentDebitCredit(sKey);
+        return oRecord;
+      });
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/GLAccountRecords", aGLAccountRecords);
+    },
+
+    getValueMappedToIsSubsequentDebitCredit: function (sKey) {
+      if (!sKey) {
+        sKey = this.getView().byId("idTransaction").getSelectedItem().getKey();
+      }
+
+      switch (sKey) {
+        case ("keyTransaction1" || "keyTransaction3"):
+          return "S";
+        default:
+          return "H";
+      }
+    },
+
+    getValueMappedToDocumentCurrency: function () {
+      return sCurrency = this.getView().byId("idCurrency").getValue();
     },
 
     _getControlValue: function (oControl) {
@@ -4733,40 +4652,57 @@ sap.ui.define([
 
     _onChangeEventHandler: function (oEvent, sProperty) {
       var oControl = oEvent.getSource(),
-      bControlBelongingToHeader = oControl.getBindingContext("detailDetailModel") === undefined,
-      sPath = bControlBelongingToHeader ? "/currentInvoice"+sProperty : oControl.getBindingContext("detailDetailModel").getPath()+sProperty,
-      sValue = this._getControlValue(oControl);
+        bControlBelongingToHeader = oControl.getBindingContext("detailDetailModel") === undefined,
+        sPath = bControlBelongingToHeader ? "/currentInvoice" + sProperty : oControl.getBindingContext("detailDetailModel").getPath() + sProperty,
+        sValue = this._getControlValue(oControl);
       if (sValue === "") {
         sValue = null;
       }
       this.getView().getModel("detailDetailModel").setProperty(sPath, sValue);
     },
 
-    onChangeCompanyCode : function (oEvent) {
+    onChangeCompanyCode: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/CompanyCode");
     },
 
-    onChangeDocumentDate : function (oEvent) {
+    onChangeDocumentDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/DocumentDate");
     },
 
-    onChangeInvoiceReceiptDate : function (oEvent) {
+    onChangeInvoiceReceiptDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/InvoiceReceiptDate");
     },
 
-    onChangePostingDate : function (oEvent) {
+    onChangePostingDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/PostingDate");
     },
 
-    onChangeInvoicingParty : function (oEvent) {
+    onChangeInvoicingParty: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/InvoicingParty");
     },
 
-    onChangeCurrency : function (oEvent) {
+    onChangeCurrency: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/Currency");
+      this.setDocumentCurrency();
     },
 
-    onChangeSupplierInvoiceIDByInvcgParty : function (oEvent) {
+    setDocumentCurrency: function () {
+      let aPORecords = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/PORecords");
+      let aGLAccountRecords = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/aGLAccountRecords");
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/PORecords", this.setCurrencyInLineDetails(aPORecords));
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/GLAccountRecords", this.setCurrencyInLineDetails(aGLAccountRecords));
+    },
+
+    setCurrencyInLineDetails: function (aLineDetails) {
+      let sCurrency = this.getValueMappedToDocumentCurrency();
+      aLineDetails = aLineDetails.map(oRecord => {
+        oRecord.DocumentCurrency = sCurrency;
+        return oRecord;
+      });
+      return aLineDetails;
+    },
+
+    onChangeSupplierInvoiceIDByInvcgParty: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/SupplierInvoiceIDByInvcgParty");
     },
 
@@ -4782,7 +4718,7 @@ sap.ui.define([
       this._onChangeEventHandler(oEvent, "/TaxIsCalculatedAutomatically");
     },
 
-    onChangeDueCalculationBaseDate : function (oEvent) {
+    onChangeDueCalculationBaseDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/DueCalculationBaseDate");
     },
 
@@ -4874,15 +4810,15 @@ sap.ui.define([
       this._onChangeEventHandler(oEvent, "/IsEUTriangularDeal");
     },
 
-    onChangeTaxDeterminationDate : function (oEvent) {
+    onChangeTaxDeterminationDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/TaxDeterminationDate");
     },
 
-    onChangeTaxReportingDate : function (oEvent) {
+    onChangeTaxReportingDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/TaxReportingDate");
     },
 
-    onChangeTaxFulfillmentDate : function (oEvent) {
+    onChangeTaxFulfillmentDate: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/TaxFulfillmentDate");
     },
 
@@ -4904,27 +4840,27 @@ sap.ui.define([
       let aTo_SelectedServiceEntrySheets = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedServiceEntrySheets");
       switch (sKey) {
         case "keyRefDocCategory1":
-          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
-          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id}));
+          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
+          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({ selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id }));
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
           break;
         case "keyRefDocCategory2":
-          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id}));
-          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id}));
+          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({ selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id }));
+          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({ selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id }));
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
           break;
         case "keyRefDocCategoryS":
-          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id}));
-          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
+          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({ selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id }));
+          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
           break;
         default:
-          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id}));
-          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
-          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id}));
+          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({ selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id }));
+          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
+          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
           this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
@@ -4932,7 +4868,7 @@ sap.ui.define([
     },
 
     onChangeRefDocCategory: function (oEvent) {
-      var sKey =  oEvent.getParameters().selectedItem.getKey();
+      var sKey = oEvent.getParameters().selectedItem.getKey();
       this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/RefDocumentCategory", sKey);
       this._removeAllRefDocumentCategoryValues(sKey);
     },
@@ -5101,7 +5037,18 @@ sap.ui.define([
       this._onChangeEventHandler(oEvent, "/EarmarkedFundsDocumentItem");
     },
 
-    
+    onDeletePress: function () {
+      var that = this;
+      MessageBox.warning(oBundle.getText("DeleteInvoiceAlert"), {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if (sAction === MessageBox.Action.YES) {
+            that._confirmDeleteInvoice([that._packageId], true, that);
+          }
+        }
+      });
+    },
 
     onSavePress: function () {
       var that = this;
@@ -5110,7 +5057,7 @@ sap.ui.define([
         emphasizedAction: MessageBox.Action.NO,
         onClose: function (sAction) {
           if (sAction === MessageBox.Action.YES) {
-            that._confirmSave().then(result => that._getData());
+            that._confirmSave();
           }
         }
       });
@@ -5121,18 +5068,17 @@ sap.ui.define([
       var body = {}; // Initialize request body
       var sUrl = baseManifestUrl + `/odata/save`; // API endpoint for saving data
       var oCurrentInvoice = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice");
-
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
-          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords,
-          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords,
-          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords,
-          RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords,
-          RemovedPoLineDetails: this.aRemovedPoLineDetails,
-          RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
+          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords ? this.aRemovedSelectedPurchaseOrdersRecords : [],
+          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords ? this.aRemovedSelectedDeliveryNotesRecords : [],
+          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords ? this.aRemovedSelectedServiceEntrySheetsRecords : [],
+          RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords ? this.aRemovedSupplierInvoiceWhldgTaxRecords : [],
+          RemovedPoLineDetails: this.aRemovedPoLineDetails ? this.aRemovedPoLineDetails : [],
+          RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails ? this.aRemovedGlAccountLineDetails : []
         }
       };
 
@@ -5151,16 +5097,20 @@ sap.ui.define([
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
         console.log(JSON.parse(XMLHttpRequest.responseText).error.message);  // Log the error
-
+        let that = this;
         // Show error message to the user
         MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
           title: "Error",
           details: JSON.parse(XMLHttpRequest.responseText).error.message,  // Provide error details
-          styleClass: sResponsivePaddingClasses
+          styleClass: sResponsivePaddingClasses,
+          onClose: function () {
+            // Call _getData() after error is handled
+            that._getData();
+          }
         });
 
         // Call the cancel handler to release the lock even in case of failure
-        return this._confirmCancelEdit();
+        this._confirmCancelEdit();
       };
 
       // Execute AJAX request
@@ -5233,18 +5183,17 @@ sap.ui.define([
 
       // Retrieve the current invoice data from the model
       var oCurrentInvoice = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice");
-
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
-          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords,
-          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords,
-          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords,
-          RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords,
-          RemovedPoLineDetails: this.aRemovedPoLineDetails,
-          RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails
+          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords ? this.aRemovedSelectedPurchaseOrdersRecords : [],
+          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords ? this.aRemovedSelectedDeliveryNotesRecords : [],
+          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords ? this.aRemovedSelectedServiceEntrySheetsRecords : [],
+          RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords ? this.aRemovedSupplierInvoiceWhldgTaxRecords : [],
+          RemovedPoLineDetails: this.aRemovedPoLineDetails ? this.aRemovedPoLineDetails : [],
+          RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails ? this.aRemovedGlAccountLineDetails : []
         }
       };
 
@@ -5263,751 +5212,31 @@ sap.ui.define([
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
         console.log(errorThrown);  // Log the error
-
+        let that = this;
         // Show error message to the user
-        MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
+        MessageBox.error(oBundle.getText("MessagePopoverError"), {
           title: "Error",
           details: JSON.parse(XMLHttpRequest.responseText).error.message,  // Provide error details
-          styleClass: sResponsivePaddingClasses
+          styleClass: sResponsivePaddingClasses,
+          onClose: function () {
+            // Call _getData() after error is handled
+            that._getData();
+          }
         });
 
         // Call the cancel handler to release the lock even in case of failure
-        return this._confirmCancelEdit();
+        this._confirmCancelEdit();
+
+        // Call _getData() after error is handled
+        this._getData();
       };
 
       // Execute AJAX request
       this.executeRequest(sUrl, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
 
     },
-
-    // CAP da rifattorizzare quando avremo il tenant di S4
-    // Submit Press Handler
-    onSubmitPressOld: function (oEvent) {
-      sap.ui.core.BusyIndicator.show();
-      this.getOwnerComponent().getModel('msg').setProperty("/aMsg", []);
-
-      function calcAmountCD(bCMemo, sCDInd, nAmt) {
-
-        if (bCMemo) {
-
-          if (sCDInd === "true") { // Credit
-            return (parseFloat(nAmt) * (-1));
-          } else if (sCDInd === "false") { // Debit
-            return parseFloat(nAmt);
-          }
-
-        } else {
-
-          if (sCDInd === "true") { // Credit
-            return (parseFloat(nAmt) * (-1));
-          } else if (sCDInd === "false") { // Debit
-            return parseFloat(nAmt);
-          }
-        }
-
-        return 0;
-      }
-
-      var oV = this.getView();
-      var aErr = [];
-
-      if (this.appmodel.getProperty("/props/POMode")) {
-        // If user is saving a PO based invoice
-
-        // validate the form
-        // -- header --
-        aErr = this.validatePOModeHeader(aErr);
-        aErr = this.validatePOModeLines(aErr);
-
-        // //debugger;
-        // if error then show errors.
-        if (aErr.length > 0) {
-          var aMsg = this._errorBuilder(aErr);
-          // MessageBox.error("Please fix errors before submitting.");
-          this.getOwnerComponent().getModel('msg').setProperty("/aMsg", aMsg);
-
-          var oButton = this.getView().byId("messagePopoverBtn");
-          console.log('Trigger Openby Msg')
-          setTimeout(function () {
-            this.oMP.openBy(oButton);
-          }.bind(this), 100);
-
-          return;
-        }
-
-        this.getOwnerComponent().getModel('msg').setProperty("/aMsg", []);
-        // build the JSON to send to API
-        var obj = this.savePayloadBuilder("PO", oV);
-
-        var lines = deepExtend([], this.appmodel.getProperty("/DocxLines"));
-        obj.lines = lines.map((line) => {
-          // line.InvoiceLineItem
-          line.Description = line.Description ? (line.Description).replace(/'/g, "''") : "";
-          line.Amount = line.Amount ? parseFloat(line.Amount) : 0;
-          line.Quantity = line.Quantity ? parseFloat(line.Quantity) : 0;
-
-          return line
-        });
-        // obj.lines = lines;
-
-        // Create SAP WS Payload
-
-        // Invoice Date (When invoice was recieved electronically)
-        var STRING_INV_DATE = this.appmodel.getProperty("/detail/header/CREATEDAT");
-        var INV_DATE = moment(new Date(STRING_INV_DATE)).format('YYYY-MM-DDTHH:mm');
-        var hdrToAttachPO = [];
-        var hdrToNotePO = [];
-
-
-        var fileAttachlen = this.getOwnerComponent().getModel('appmodel').getData().Filelist;
-        for (var i = 0; i < fileAttachlen.length; i++) {
-          // fileName.push(fileAttachlen[i].FileName) ;
-          // fileDesc.push(fileAttachlen[i].DocCategory);
-          // objectStoreRefVal.push(fileAttachlen[i].ObjectStoreRef);
-          var fileAttach = {
-            "InvType": "PO",
-            "FileName": "",
-            "FileDesc": "",
-            "ObjectStoreRefVal": "",
-            "Base64Str": ""
-          };
-          fileAttach.FileName = fileAttachlen[i].FileName;
-          fileAttach.FileDesc = fileAttachlen[i].DocCategory;
-          fileAttach.ObjectStoreRefVal = fileAttachlen[i].ObjectStoreRef;
-          hdrToAttachPO.push(fileAttach);
-        }
-
-        var aNotes = this.getOwnerComponent().getModel('appmodel').getProperty("/notes");
-        for (var i = 0; i < aNotes.length; i++) {
-          var oNote = {
-            "InvType": "PO",
-            "Tdformat": "St",
-            "Tdline": aNotes[i].Note
-          };
-
-          hdrToNotePO.push(oNote);
-        }
-
-
-        var sap_obj = {
-          "InvType": "PO",
-          "InvoiceInd": obj.header.InvInd ? null : "X", // Credit Memo CHAR1
-          "DocType": obj.header.InvDocTyp ? obj.header.InvDocTyp : "", // CHAR2
-          //"DocDate": moment(obj.header.DocDt).format('YYYY-MM-DD'), // DocDt CHAR8
-          "DocDate": INV_DATE,
-          "PstngDate": moment(new Date()).format('YYYY-MM-DDTHH:mm'),
-          "RefDocNo": obj.header.InvNum, // InvNum
-          "CompCode": obj.header.dBukrs,
-          // Manually added for testing
-          //"CompCode": null, // CHAR3
-          "Currency": obj.header.Curr,
-          "GrossAmount": parseFloat(obj.header.GrossAmt) ? (parseFloat(obj.header.GrossAmt)).toFixed(2) : null, // GrossAmt DEC23,4          
-          //"GrossAmount": parseFloat(obj.header.GrossAmt) ? (parseFloat(obj.header.GrossAmt)).toFixed(2) : null, // GrossAmt DEC23,4
-          "to_item": [],
-          "to_note": hdrToNotePO,
-          "to_return": [],
-          "to_attach": hdrToAttachPO,
-        };
-
-        var HDR_RET = []
-        var HDR_RET1 = {
-          "InvType": "PO"
-        }
-        HDR_RET.push(HDR_RET1);
-
-        function calcItemAmt(ItmAmt, TaxAmt) {
-          if (!ItmAmt) {
-            ItmAmt = 0;
-          }
-          if (!TaxAmt) {
-            TaxAmt = 0;
-          }
-          return (parseFloat(ItmAmt) + parseFloat(TaxAmt));
-        }
-
-
-        sap_obj.to_item = obj.lines.map((item, idx) => {
-          var sap_item_obj = {
-            "InvType": "PO",
-            "InvoiceDocItem": (parseInt(item.InvoiceLineItem) + idx).toString(), // CHAR10
-            "PoNumber": item.PONumber, // CHAR10
-            "PoItem": item.POLineItem, // CHAR5
-            "TaxCode": item.TaxCode, // CHAR2
-            "ItemAmount": parseFloat(item.Amount) ? (parseFloat(item.Amount)).toFixed(2) : 0, // DEC 23,4
-            "Quantity": parseFloat(item.Quantity) ? (parseFloat(item.Quantity)).toFixed(2) : 0, // QUAN 13,3
-            "PoUnit": item.UoM
-          };
-          return sap_item_obj;
-        });
-
-        sap_obj.to_return = HDR_RET;
-
-        if (obj.header.TaxExemptAmt) {
-          var withtaxdata = {
-            "WI_TAX_BASE": (parseFloat(obj.header.GrossAmt) - parseFloat(obj.header.TaxExemptAmt)) ? (parseFloat(obj.header.GrossAmt) - parseFloat(obj.header.TaxExemptAmt)).toFixed(2) : null// DEC 23,4
-          }
-          // sap_obj.WITHTAXDATA.item.push(withtaxdata);
-        }
-
-        // call save API
-        var jobId = this.appmodel.getProperty("/detail/header/JOBID");
-        var packageId = this.appmodel.getProperty("/detail/header/PACKAGEID");
-        var url = `/api/sap/submit?jobId=${jobId}&packageId=${this._packageId}&mode=PO`;
-        var that = this;
-        console.log("sap_obj: " + sap_obj);
-        sap.ui.core.BusyIndicator.show();
-        this.ajax('POST', url, {
-          dox: obj,
-          userdata: sap_obj
-        })
-          .then(function (data) {
-            //old odata & set - ZTAP_INV_POST_SRV/HEADERDATASet
-            jQuery.ajax("/sap/opu/odata/sap/Z_SB_INVOICE_POSTING/ZC_INV_HEADER", {
-              type: "GET",
-              contentType: 'application/json',
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-CSRF-Token", "Fetch");
-              },
-              success: function (responseToken, textStatus, XMLHttpRequest) {
-                var token = XMLHttpRequest.getResponseHeader('X-CSRF-Token');
-                console.log("token = " + token);
-                jQuery.ajax("/sap/opu/odata/sap/Z_SB_INVOICE_POSTING/ZC_INV_HEADER", {
-                  type: "POST",
-                  data: JSON.stringify(data.ws),
-                  contentType: 'application/json',
-                  // dataType: 'json',
-                  beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRF-Token", token);
-                    xhr.setRequestHeader("Accept", "application/json");
-                  },
-                  success: function (response) {
-                    sap.ui.core.BusyIndicator.hide();
-                    // will be called once the xsjs file sends a response
-                    var resHdr2Ret = response.d.to_return.results;
-                    // Safety check if ws_response exists.
-                    //if (resHdr2Ret[0].Type === "S" || resHdr2Ret[0].Type === "") {
-                    var aMsg = [];
-                    var soap_res = resHdr2Ret;
-                    var bCreated = resHdr2Ret[0].Type === "S" ? true : false;
-                    if (resHdr2Ret[0].Type === "S") {
-                      MessageBox.success(oBundle.getText("SuccessfullyCreatedInvoiceDocumentNo", [resHdr2Ret[0].Invoicedocnumber, resHdr2Ret[0].Fiscalyear]), {
-                        title: "Success",
-                        details: soap_res,
-                        styleClass: sResponsivePaddingClasses
-                      });
-                      that.asyncInvoiceStatusUpdate(resHdr2Ret[0].Invoicedocnumber);
-                    } else if (resHdr2Ret[0].Type === "") {
-                      MessageBox.success(oBundle.getText("SuccessfullyCreatedInvoiceDocumentNo", [resHdr2Ret[0].Invoicedocnumber, resHdr2Ret[0].Fiscalyear]), {
-                        title: "Success",
-                        details: soap_res,
-                        styleClass: sResponsivePaddingClasses
-                      });
-                      that.asyncInvoiceStatusUpdate(resHdr2Ret[0].Invoicedocnumber);
-                    } else {
-                      MessageBox.error(resHdr2Ret[0].Message, {
-                        title: "Error",
-                        details: soap_res,
-                        styleClass: sResponsivePaddingClasses
-                      });
-                    }
-
-                    var oMsg = {
-                      "message": resHdr2Ret[0].Message,
-                      "type": resHdr2Ret[0].Type,
-                      "system": null,
-                      "number": null,
-                      "log_msg_no": null,
-                      "msg_id": null,
-                    }
-
-                    aMsg.push(oMsg);
-                    that.getOwnerComponent().getModel('msg').setProperty('/aMsg', aMsg);
-
-                    if (resHdr2Ret[0].Type === "S") {
-                      var invoice = soap_res[0].Invoicedocnumber;
-                      // async file attach to SAP
-                      that.asyncFileAttachToSAP(invoice);
-                    }
-
-                    //}
-
-                    // fire cancel press so that lock is released
-                    that._confirmCancelEdit();
-
-                    if (invoice) {
-                      that.loadHeaderFromDB(this._packageId);
-                    }
-                  }
-                    .bind(this),
-                  error: function (e) {
-                    sap.ui.core.BusyIndicator.hide();
-                    // will be called in case of any errors:
-                    var errMsg = e.responseJSON.error.message.value;
-                    MessageBox.error(errMsg, {
-                      title: "Error",
-                      styleClass: sResponsivePaddingClasses
-                    });
-                    console.log(e);
-                  }
-                });
-              },
-              error: function (e) {
-                sap.ui.core.BusyIndicator.hide();
-                // will be called in case of any errors:
-                var errMsg = e.responseJSON.error.message.value;
-                MessageBox.error(errMsg, {
-                  title: "Error",
-                  styleClass: sResponsivePaddingClasses
-                });
-              }
-            });
-
-          }.bind(this))
-          .catch(function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            console.log(err);
-            var aMsg = [];
-
-            var soap_res = err.responseJSON.ws;
-
-            // means errors are present
-
-
-            if (err.status === 400) {
-
-              aMsg = soap_res.return.map((item) => {
-                var oMsg = {
-                  "message": item.message,
-                  "type": item.type,
-                  "system": item.system,
-                  "number": item.number,
-                  "log_msg_no": item.log_msg_no,
-                  "msg_id": item.id
-                }
-
-                return oMsg;
-              });
-
-              this.getOwnerComponent().getModel('msg').setProperty("/aMsg", aMsg);
-
-              var oButton = this.getView().byId("messagePopoverBtn");
-              console.log('Trigger Openby Msg')
-              setTimeout(function () {
-                this.oMP.openBy(oButton);
-              }.bind(this), 100);
-
-            } else if (err.status === 500) {
-              MessageBox.error(oBundle.getText("SAPRequestFailed"), {
-                title: "Error",
-                details: soap_res,
-                styleClass: sResponsivePaddingClasses
-              });
-            } else {
-              MessageBox.error(oBundle.getText("ErrorCreatingInvoiceDocument"), {
-                title: "Error",
-                details: soap_res,
-                styleClass: sResponsivePaddingClasses
-              });
-            }
-
-            // fire cancel press so that lock is released
-            this._confirmCancelEdit();
-
-          }.bind(this));
-
-        return;
-
-      } else {
-        // If user is saving a NON-PO based invoice
-
-        // validate the form
-        aErr = this.validateNON_POModeHeader(aErr);
-
-        // if error then show errors.
-        if (aErr.length > 0) {
-          var aMsg = this._errorBuilder(aErr);
-          // MessageBox.error("Please fix errors before submitting.");
-          this.getOwnerComponent().getModel('msg').setProperty("/aMsg", aMsg);
-
-          var oButton = this.getView().byId("messagePopoverBtn");
-          console.log('Trigger Openby Msg')
-          setTimeout(function () {
-            this.oMP.openBy(oButton);
-          }.bind(this), 100);
-
-          return;
-        }
-
-        this.getOwnerComponent().getModel('msg').setProperty("/aMsg", []);
-
-        // build the JSON to send to API
-        var obj = this.savePayloadBuilder("NONPO", oV);
-
-        var lines = deepExtend([], this.appmodel.getProperty("/NonPoDocxLines"));
-        obj.lines = lines.map((line) => {
-          // make necessary transform
-          return line
-        });
-        // obj.lines = lines;
-
-        // build the JSON to send to API
-        // Create SAP WS Payload
-        var dateNow = new Date();
-        var STRING_INV_DATE = this.appmodel.getProperty("/detail/header/CREATEDAT");
-        var INV_DATE = moment(new Date(STRING_INV_DATE)).format('YYYY-MM-DDTHH:mm');
-        var fileName = [];
-        var fileDesc = [];
-        var objectStoreRefVal = [];
-        var hdrToAttachNPO = [];
-
-        var fileAttachlen = this.getOwnerComponent().getModel('appmodel').getData().Filelist;
-        for (var i = 0; i < fileAttachlen.length; i++) {
-          var fileAttach = {
-            "InvType": "NPO",
-            "FileName": "",
-            "FileDesc": "",
-            "ObjectStoreRefVal": "",
-            "Base64Str": ""
-          };
-          fileAttach.FileName = fileAttachlen[i].FileName;
-          fileAttach.FileDesc = fileAttachlen[i].DocCategory;
-          fileAttach.ObjectStoreRefVal = fileAttachlen[i].ObjectStoreRef;
-          hdrToAttachNPO.push(fileAttach);
-        }
-        var sap_obj = {
-          "InvType": "NPO",
-          "CompCode": obj.header.Bukrs,
-          "HeaderTxt": obj.header.FreeTxt ? obj.header.FreeTxt.substring(0, 25) : "", // TODO: 25 Char
-          "DocType": obj.header.InvDocTyp,
-          //"NEG_POSTNG": obj.header.InvInd ? "X" : null,
-          //"BILL_CATEGORY": obj.header.CalcTaxInd ? "X" : null,
-          //"DocDate": moment(obj.header.DocDt).format('YYYY-MM-DD'), // DocDt,
-          "DocDate": INV_DATE,
-          "RefDocNo": obj.header.InvNum,
-          //"FISC_YEAR": dateNow.getFullYear().toString(),
-          //"REF_DOC_NO_LONG": "",
-          "Username": "ARIKAR",//"ARIKAR" this._sLoggedInUser,// We need to send logged in user id
-          "PstngDate": moment(new Date()).format('YYYY-MM-DDTHH:mm'),//"2022-11-21",          
-          // "HdrToAccgl": [],
-          // "HdrToAccpbl": [],
-          // "HdrToCurramt": [],
-          // "HdrToNote": [],
-          "to_return": [],
-          "to_attach": hdrToAttachNPO,
-        };
-
-        var CURRENCYAMOUNT = []
-        var ACCOUNTPAYABLE = []
-        var ACCOUNTGL = []
-        var ACCOUNTTAX = []
-        var LT_NOTE = []
-        var HDR_RET = []
-        var HDR_RET1 = {
-          "InvType": "NPO"
-        }
-        HDR_RET.push(HDR_RET1);
-
-
-        // ACCOUNTPAYABLE
-        var ACCOUNTPAYABLE_item = {
-          "InvType": "NPO",
-          "ItemnoAcc": "1", // CHAR10
-          "VendorNo": obj.header.VendorNumber, // CHAR10
-          //"PARTNER_BK": obj.header.PartBank, // CHAR4
-          //"BlineDate": moment(obj.header.DocDt).format('YYYY-MM-DD'), // CHAR8
-          "BlineDate": INV_DATE,
-          "Pmnttrms": obj.header.PaymentTerms, // CHAR4
-          "ItemText": obj.header.FreeTxt ? obj.header.FreeTxt.substring(0, 50) : "", // CHAR50
-          "CompCode": obj.header.Bukrs,
-          "TaxCode": obj.header.TaxCode,
-          "Taxjurcode": "7700000000"
-        }
-        ACCOUNTPAYABLE.push(ACCOUNTPAYABLE_item);
-
-        // CURRENCYAMOUNT
-        var sParsedGrsAmt = obj.header.GrossAmt === '' ? "0" : (parseFloat(obj.header.GrossAmt)).toFixed(2);
-        var CURRENCYAMOUNT_item = {
-          "InvType": "NPO",
-          "ItemnoAcc": "1",
-          //"CURRENCY_ISO": obj.header.Curr,
-          "AmtDoccur": obj.header.InvInd ? sParsedGrsAmt : (((-1) * sParsedGrsAmt).toString()), //DEC 23,4
-          //"DiscBase": 0, // DEC24,4
-          //"DiscAmt": 0, // DEC24,4
-          //"TaxAmt": 0, // DEC24,4
-          "Currency": obj.header.Curr
-        }
-        CURRENCYAMOUNT.push(CURRENCYAMOUNT_item);
-
-        obj.lines.map((line, idx) => {
-          ////debugger;
-          // CURRENCYAMOUNT
-          var CURRENCYAMOUNT_item = {
-            "InvType": "NPO",
-            "ItemnoAcc": (parseInt(idx) + 2).toString(), // CHAR10
-            "Currency": obj.header.Curr, // CHAR3
-            // "AMT_DOCCUR": obj.header.InvInd ? (parseFloat(line.Amount) * (-1)) : parseFloat(line.Amount),
-            "AmtDoccur": calcAmountCD(obj.header.InvInd, line.CDInd, line.Amount).toFixed(2),
-            //"DiscBase": 0,
-            //"DiscAmt": 0,
-            //"TaxAmt": parseFloat(line.TaxAmount) ? (parseFloat(line.TaxAmount)).toFixed(2) : 0,  // DEC 23,4
-          }
-          CURRENCYAMOUNT.push(CURRENCYAMOUNT_item);
-
-          // ACCOUNTGL
-          var ACCOUNTGL_item = {
-            "ItemnoAcc": (parseInt(idx) + 2).toString(), // CHAR10
-            "InvType": "NPO",
-            //"FISC_YEAR": dateNow.getFullYear().toString(), // CHAR4
-            //"COMP_CODE": line.Bukrs, // CHAR4
-            //"COSTCENTER": line.CostCen, // CHAR10
-            "GlAccount": line.GLAcc, // CHAR10
-            "PstngDate": moment(new Date()).format('YYYY-MM-DDTHH:mm'),
-            //"PROFIT_CTR": line.ProfitCen, // CHAR10
-            //"WBS_ELEMENT": line.WBSElem, // CHAR24
-            "TaxCode": line.TaxCode, // CHAR2
-            // ITEM TEXT IS MAPPED TO HEADER TEXT AS PER SIT DEFECT.
-            //"ITEM_TEXT": obj.header.FreeTxt ? obj.header.FreeTxt.substring(0, 50) : "", // CHAR50,
-            "VendorNo": obj.header.VendorNumber,
-            "Taxjurcode": "7700000000",
-            "ItmNumber": "000001",
-            "ItemnoTax": "000001"
-          }
-          ACCOUNTGL.push(ACCOUNTGL_item);
-
-          // ACCOUNTTAX 
-          var ACCOUNTTAX_item = {
-            "ITEMNO_ACC": (parseInt(idx) + 2).toString(), // CHAR10
-            "COND_KEY": "PA00", // CHAR4
-            "TAX_CODE": line.TaxCode, // CHAR2
-          }
-          ACCOUNTTAX.push(ACCOUNTTAX_item);
-
-        });
-
-        sap_obj.to_curramt = CURRENCYAMOUNT;
-        sap_obj.to_accpayable = ACCOUNTPAYABLE;
-        sap_obj.to_accgl = ACCOUNTGL;
-        sap_obj.to_note = LT_NOTE;
-        sap_obj.to_return = HDR_RET;
-
-        if (obj.header.TaxExemptAmt) {
-          var withtaxdata = {
-            "BAS_AMT_TC": (parseFloat(obj.header.GrossAmt) - parseFloat(obj.header.TaxExemptAmt)).toFixed(2), // DEC 23,4
-            "BAS_AMT_IND": "X" //CHAR1
-          }
-          //sap_obj.ACCOUNTWT.item.push(withtaxdata);
-
-        }
-
-        // call save API 
-        let initiator = "";
-
-        if (sap.ushell && sap.ushell.Container && sap.ushell.Container.getService("UserInfo")) {
-          const userId = sap.ushell.Container.getService("UserInfo").getId();
-          if (userId) {
-            initiator = userId;
-          } else { // If user ID is not available, use default email          
-            initiator = "rutuja.shantaram-pangavhane@capgemini.com";
-          }
-        } else {
-          initiator = "rutuja.shantaram-pangavhane@capgemini.com";
-        }
-        var currentDate = new Date();
-        var year = currentDate.getFullYear();
-        var month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 to month as it's 0-indexed
-        var day = String(currentDate.getDate()).padStart(2, '0');
-        var formattedDate = year + month + day;
-        const ItemAmountArray = CURRENCYAMOUNT.slice(1).map(function (item) {
-          var amountString = item.AmtDoccur;
-          return parseFloat(amountString);
-        });
-        var jobId = this.appmodel.getProperty("/detail/header/JOBID");
-        var packageId = this.appmodel.getProperty("/detail/header/PACKAGEID");
-        var url = `/api/sap/submit?jobId=${jobId}&packageId=${this._packageId}&mode=NONPO`;
-        var that = this;
-        console.log("sap_obj: " + sap_obj);
-        this.ajax('POST', url, {
-          dox: obj,
-          userdata: sap_obj
-        })
-          .then(function (data) {
-            jQuery.ajax("/sap/opu/odata/sap/Z_SB_INVOICE_POSTING/ZC_NPO_HEADER", {
-              type: "GET",
-              contentType: 'application/json',
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-CSRF-Token", "Fetch");
-              },
-              success: function (responseToken, textStatus, XMLHttpRequest) {
-                var token = XMLHttpRequest.getResponseHeader('X-CSRF-Token');
-                console.log("token = " + token);
-                jQuery.ajax("/sap/opu/odata/sap/Z_SB_INVOICE_POSTING/ZC_NPO_HEADER", {
-                  type: "POST",
-                  // data: JSON.stringify(oWfPayload),
-                  data: JSON.stringify(data.ws),
-                  contentType: 'application/json',
-                  // dataType: 'json',
-                  beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRF-Token", token);
-                    xhr.setRequestHeader("Accept", "application/json");
-                  },
-                  success: function (response) {
-                    sap.ui.core.BusyIndicator.hide();
-                    // will be called once the xsjs file sends a response  
-                    var resHdr2Ret = response.d.to_return.results;
-                    // Safety check if ws_response exists.
-
-                    var aMsg = [];
-                    var soap_res = resHdr2Ret;
-                    var bCreated = resHdr2Ret[0].Type === "S" ? true : false;
-                    if (resHdr2Ret[0].Type === "S") {
-                      MessageBox.success(resHdr2Ret[0].Message, {
-                        title: "Success",
-                        details: soap_res,
-                        styleClass: sResponsivePaddingClasses
-                      });
-                    } else if (resHdr2Ret[0].Type === "") {
-                      MessageBox.warning(resHdr2Ret[0].Message, {
-                        title: "Success",
-                        details: soap_res,
-                        styleClass: sResponsivePaddingClasses
-                      });
-                    } else {
-                      MessageBox.error(resHdr2Ret[0].Message, {
-                        title: "Error",
-                        details: soap_res,
-                        styleClass: sResponsivePaddingClasses
-                      });
-                    }
-
-                    var oMsg = {
-                      "message": resHdr2Ret[0].Message,
-                      "type": resHdr2Ret[0].Type,
-                      "system": null,
-                      "number": null,
-                      "log_msg_no": null,
-                      "msg_id": null,
-                    }
-
-                    aMsg.push(oMsg);
-                    that.getOwnerComponent().getModel('msg').setProperty('/aMsg', aMsg);
-
-                    if (resHdr2Ret[0].Type === "S") {
-                      var invoice = soap_res[0].Invoicedocnumber;
-                      // async file attach to SAP
-                      that.asyncFileAttachToSAP(invoice);
-                      that.asyncInvoiceStatusUpdate(invoice);
-                    }
-
-                    // fire cancel press so that lock is released
-                    that._confirmCancelEdit();
-
-                    if (invoice) {
-                      that.loadHeaderFromDB(this._packageId);
-                    }
-                  }.bind(this),
-                  error: function (e) {
-                    sap.ui.core.BusyIndicator.hide();
-                    // will be called in case of any errors:
-                    var errMsg = e.responseJSON.error.message.value;
-                    MessageBox.error(errMsg, {
-                      title: "Error",
-                      styleClass: sResponsivePaddingClasses
-                    });
-                    console.log(e);
-                  }
-                });
-              },
-              error: function (e) {
-                sap.ui.core.BusyIndicator.hide();
-                // will be called in case of any errors:
-                var errMsg = e.responseJSON.error.message.value
-                MessageBox.error(errMsg, {
-                  title: "Error",
-                  styleClass: sResponsivePaddingClasses
-                });
-                console.log(e);
-              }
-            }).bind(this);
-          })
-          .catch(function (err) {
-            sap.ui.core.BusyIndicator.hide();
-            var aMsg = [];
-            var soap_res = err.responseJSON.ws;
-            // means errors are present
-            if (err.status === 400) {
-
-              aMsg = soap_res.return.map((item) => {
-                var oMsg = {
-                  "message": item.message,
-                  "type": item.type,
-                  "system": item.system,
-                  "number": item.number,
-                  "log_msg_no": item.log_msg_no,
-                  "msg_id": item.id
-                }
-
-                return oMsg;
-              });
-
-              this.getOwnerComponent().getModel('msg').setProperty("/aMsg", aMsg);
-              var oButton = this.getView().byId("messagePopoverBtn");
-              console.log('Trigger Openby Msg')
-              setTimeout(function () {
-                this.oMP.openBy(oButton);
-              }.bind(this), 100);
-            } else if (err.status === 500) {
-              MessageBox.error(oBundle.getText("SAPRequestFailed"), {
-                title: "Error",
-                details: soap_res,
-                styleClass: sResponsivePaddingClasses
-              });
-            } else {
-              MessageBox.error(oBundle.getText("ErrorCreatingInvoiceDocument"), {
-                title: "Error",
-                details: soap_res,
-                styleClass: sResponsivePaddingClasses
-              });
-            }
-
-            // fire cancel press so that lock is released
-            this._confirmCancelEdit();
-
-          }.bind(this));
-
-        return;
-
-      }
-    },
-
-    // onChangeGlAccountAsset: function (oEvent) {
-    //   var that = this;
-    //   var oDetailDetailModel = this.getView().getModel("detailDetailModel");
-    //   let sStartingLineItem = oEvent.getSource().getSelectedKey() === 'idGLAccountItem' ? 'G/L account' : 'Asset';
-    //   let sEndingLineItem = oEvent.getSource().getSelectedKey() === 'idGLAccountItem' ? 'Asset' : 'G/L account';
-    //   let sMsg = `You are going to erase every line item details if you change line items type from ${sStartingLineItem} to ${sEndingLineItem}. Do you want to proceed?`
-    //   MessageBox.warning(sMsg, {
-    //     actions: ["Switch line items type", MessageBox.Action.CLOSE],
-    //     emphasizedAction: "Switch line items type",
-    //     onClose: function (sAction) {
-    //       if (sAction === "Switch line items type") {
-    //         if (oEvent.getSource().getSelectedKey() === 'idGLAccountItem') {
-    //           that.getView().byId("idNPOInvGLAccountLineTable").setMode("MultiSelect");
-    //           that.rebindTable(that.oEditableTemplateGLAccountNPo, "Edit");
-    //           oDetailDetailModel.setProperty("/props/NONPOModeGLaccount", true);
-    //         } else {
-    //           that.getView().byId("idNPOInvAssetLineTable").setMode("MultiSelect");
-    //           that.rebindTable(that.oEditableTemplateAssetNPo, "Edit");
-    //           oDetailDetailModel.setProperty("/props/NONPOModeGLaccount", false);
-    //         }
-    //       }
-    //     }
-    //   })
-    // },
-
-    onForwardPressHandler: function (oEvent) {
-      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
-      var sDocStatus = oDetailDetailModel.getProperty("/detail/header/DOC_STATUS");
-      this.onForwardPress(oEvent, oDetailDetailModel, this._packageId, sDocStatus);
+    onAssignPressHandler: function (oEvent) {
+      this.onAssignPress(this.getView(), this);
     }
   });
 });

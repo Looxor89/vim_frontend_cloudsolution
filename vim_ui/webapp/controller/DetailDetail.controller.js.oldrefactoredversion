@@ -5498,10 +5498,10 @@ sap.ui.define([
       })
     },
 
-    onForwardPressHandler: function (oEvent) {
+    onAssignPressHandler: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       var sDocStatus = oDetailDetailModel.getProperty("/detail/header/DOC_STATUS");
-      this.onForwardPress(oEvent, oDetailDetailModel, this._packageId, sDocStatus);
+      this.onAssignPress(oEvent, oDetailDetailModel, this._packageId, sDocStatus);
     }
   });
 });

@@ -1,6 +1,7 @@
 sap.ui.define([
 
     "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
     "sap/ui/core/UIComponent",
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
@@ -9,7 +10,7 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
-], function (Controller, UIComponent, Fragment, MessageBox, MessageToast, deepExtend, History, Filter, FilterOperator) {
+], function (Controller, JSONModel, UIComponent, Fragment, MessageBox, MessageToast, deepExtend, History, Filter, FilterOperator) {
 
     var sResponsivePaddingClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer";
     "use strict";
@@ -87,112 +88,47 @@ sap.ui.define([
             });
         },
 
-        onForwardPress: function (oEvent, oModel, sPackageId, sDocStatus) {
-            var oView = this.getView();
-            // var oModel = this.getOwnerComponent().getModel("appmodel");
-            this.sAction = oEvent.getSource().getText();
+        onAssignPress: function (oView, oContext) {
+            var baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
+            var sUrl = baseManifestUrl + "/odata/users()?";
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            
+            const oSuccessFunction = (oData) => {
+                console.log("Filtered data:", oData);
+                var Users = oData.value[0].result;
+                this.getOwnerComponent().setModel(new JSONModel({Users}), "UserList");
+                sap.ui.core.BusyIndicator.hide();
+                 //create dialog
+                if (!oContext.byId("idAssignToDialog")) {
+                    //load asynchronous fragment (XML)
+                    Fragment.load({
+                        id: oView.getId(),
+                        name: "vim_ui.view.fragments.AssignTo",
+                        controller: oContext
+                    }).then(function (oMenu) {
+                        //connect Menu to rootview of this component (models, lifecycle)
+                        oView.addDependent(oMenu);
+                        oMenu.open();
+                    });
+                } else {
+                    oContext.byId("idAssignToDialog").open();
+                }
+                return oData;
+            };
 
-            this.getUsers(oModel);
+            const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+                sap.ui.core.BusyIndicator.hide();
+                let sMsg = oBundle.getText("ErrorLoadingData", [textStatus]);
+                MessageToast.show(sMsg);
+                console.log(errorThrown);
+            };
 
-            this.packageId = sPackageId;
-
-            var STATUS = sDocStatus;
-            if (STATUS === "POSTED" || STATUS === "REJSAP" || STATUS === "REJRTV") {
-
-                MessageBox.error("This document can no longer be forwarded or assinged.");
-                return;
-            }
-
-            oModel.setProperty("/sDialogTitle", this.sAction + " to user");
-
-            //create dialog
-            if (!this.byId("idAssignToDialog")) {
-                //load asynchronous fragment (XML)
-                Fragment.load({
-                    id: oView.getId(),
-                    name: "vim_ui.view.fragments.ForwardTo",
-                    controller: this
-                }).then(function (oMenu) {
-                    //connect Menu to rootview of this component (models, lifecycle)
-                    oView.addDependent(oMenu);
-                    oMenu.open();
-                });
-            } else {
-                this.byId("idAssignToDialog").open();
-            }
+            return this.executeRequest(sUrl, 'GET', null, oSuccessFunction, oErrorFunction);           
         },
 
-        onFwdConfirm: function (oEvent) {
-            var that = this;
-            var url;
-            var assignTo = oEvent.getParameter('selectedItem').getBindingContext('appmodel').getObject('Email');
-            var body = undefined;
+        
 
-            if (this.sAction === 'Assign') {
-                url = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + '/odata/assign';
-                body = {
-                    payload: {
-                        PackageId: this.packageId,
-                        AssignedTo: assignTo
-                    }
-                };
-
-                $.ajax({
-                    url: url,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    dataType: 'json',
-                    data: body ? JSON.stringify(body) : undefined,
-                    success: function (data) {
-                        MessageBox.success("Assigned to " + assignTo);
-                        that.loadDashboard();
-                    },
-                    error: function (err) {
-                        MessageBox.error("Unable to assign to " + assignTo, {
-                            details: err,
-                            styleClass: sResponsivePaddingClasses
-                        });
-                        that.loadDashboard();
-                    }
-                });
-
-            } else if (this.sAction === 'Forward') {
-                url = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + '/odata/forward';
-                body = {
-                    payload: {
-                        PackageId: this.packageId,
-                        ForwardedTo: assignTo
-                    }
-                };
-
-                $.ajax({
-                    url: url,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    dataType: 'json',
-                    data: body ? JSON.stringify(body) : undefined,
-                    success: function (data) {
-                        MessageBox.success("Forwarded to " + assignTo);
-                        that.loadDashboard();
-                    },
-                    error: function (err) {
-                        MessageBox.error("Unable to forward to " + assignTo, {
-                            details: err,
-                            styleClass: sResponsivePaddingClasses
-                        });
-                        that.loadDashboard();
-                    }
-                });
-            }
-        },
-
-        onFwdSearch: function (oEvent) {
+        onAssignSearch: function (oEvent) {
             sValue = oEvent.getParameter("value");
             if (sValue) {
                 var sFilter = new Filter({
@@ -207,23 +143,60 @@ sap.ui.define([
             oBinding.filter(sFilter);
         },
 
-        onRejectPress: function (oEvent) {
-            var oView = this.getView();
-            //create dialog
-            if (!this.oDialog) {
-                this.oDialog = Fragment.load({
-                    id: oView.getId("idRejectInvoice"),
-                    name: "vim_ui.view.fragments.RejectDialog",
-                    controller: this
-                }).then(function (oDialog) {
-                    // connect dialog to the root view of this component (models, lifecycle)
-                    oView.addDependent(oDialog);
-                    oDialog.open();
-                });
-            } else {
-                this.getView().byId("idRejectInvoice").open();
-            }
+        _confirmDeleteInvoice: function (aPackagesId, bFromInvoicesDetail, context) {
+            var body = {}; // Initialize request body
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            var sUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id) + `/odata/delete`; // API endpoint for deleting invoice
+            // Build the request payload
+            body = {
+                payload: {
+                    PackagesId: aPackagesId
+                }
+            };
 
+            const oSuccessFunction = (data) => {
+                console.log(data);  // Log the successful response
+                // Show success message to the user
+                MessageBox.success(oBundle.getText("SuccessfullyDeletedInvoice"), {
+                    title: "Success",
+                    details: data,  // Provide details of the response
+                    styleClass: sResponsivePaddingClasses
+                });
+
+                // Call nav back function if deletion is happened into invoices detail, otherwise call go press
+                if(bFromInvoicesDetail){
+                    this.onCancelPress();
+                } else {
+                    context.onGoPress();
+                }
+            };
+
+            const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+                console.log(JSON.parse(XMLHttpRequest.responseText).error.message);  // Log the error
+            
+                // Show error message to the user
+                MessageBox.error(oBundle.getText("UnexpectedErrorOccurred"), {
+                    title: "Error",
+                    details: JSON.parse(XMLHttpRequest.responseText).error.message,  // Provide error details
+                    styleClass: sResponsivePaddingClasses,
+                    onClose: function () {
+                        // If deletion coming from invoices detail call _getData() after error is handled
+                        if (bFromInvoicesDetail){
+                            context._getData();
+                        } else {
+                            context.onGoPress();
+                        }
+                    }
+                });
+
+                // If deletion coming from invoices detail call the cancel handler to release the lock even in case of failure
+                if (bFromInvoicesDetail){
+                    context._confirmCancelEdit();
+                }
+            };
+
+            // Execute AJAX request
+            this.executeRequest(sUrl, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
         },
 
         onRejectInvoice: function (oEvent) {

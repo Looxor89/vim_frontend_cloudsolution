@@ -6,18 +6,15 @@ sap.ui.define([
   return {
     moment: jQuery.sap.require("vim_ui.utils.moment"),
 
-    allowActions: function (sStatus, bAllow) {
+    allowActions: function (sStatus) {
       if(sStatus === "POSTED" || sStatus === "REJSAP" || sStatus === "REJRTV") {
         return false;
       }
-      if(bAllow) {
-        return true;
-      }
-      return false;
+      return true;
     },
 
-    allowAddAttachment: function (sStatus, bAllow) {
-      if(sStatus === "POSTED" && bAllow) {
+    allowAddAttachment: function (sStatus) {
+      if(sStatus === "POSTED") {
         return true;
       }
       return false;
@@ -178,6 +175,8 @@ sap.ui.define([
           return "REJECTED (Returned to Vendor)";
         case "POSTED":
           return "SUBMITTED";
+        case "ERROR":
+          return "In error";
         default:
           return "NONE";
       }

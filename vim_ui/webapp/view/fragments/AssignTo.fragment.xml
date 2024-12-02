@@ -5,16 +5,16 @@
 		id="idAssignToDialog"
 		noDataText="No Users found"
 		title="{detailDetailModel>/sDialogTitle}"
-		search=".onFwdSearch"
-		confirm=".onFwdConfirm"
-		cancel=".onFwdClose"
+		search=".onAssignSearch"
+		confirm=".onAssignConfirm"
+		cancel=".onAssignClose"
 		items="{
-			path: 'detailDetailModel>/UserList'
+			path: 'UserList>/Users'
 		}">
 		<StandardListItem
             id="assignedToList"
-			title="{detailDetailModel>FirstName} {detailDetailModel>LastName}"
-			description="{detailDetailModel>Email}"
+			title="{UserList>FirstName} {UserList>LastName}"
+			description="{UserList>Email}"
 			icon="sap-icon://employee"
 			iconDensityAware="false"
 			iconInset="false"

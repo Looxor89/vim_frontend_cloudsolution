@@ -20,21 +20,21 @@
                     <m:Button type="Emphasized" text="Edit Document" icon="sap-icon://edit" press="handleGEdit" visible="{ parts:['appmodel>/props/gEditMode', 'appmodel>/detail/header/DOC_STATUS', 'props>/action/admin'], formatter: '.formatter.detailDetailEdit' }" enabled="{props>/action/save}" />
                     <m:Button type="Emphasized" text="Cancel Edit" icon="sap-icon://edit-outside" press="handleCancelGEdit" visible="{ parts:['appmodel>/props/gEditMode', 'appmodel>/detail/header/DOC_STATUS' , 'props>/action/admin'] , formatter: '.formatter.detailDetailEditCancel' }" />
                     <!-- INIZIO: CAP elementi aggiunti in attesa di capire cosa fare con la Detail view -->
-                    <m:Button text="Assign" icon="sap-icon://activity-individual" press="onForwardPress" 
+                    <m:Button text="Assign" icon="sap-icon://activity-individual" press="onAssignPress" 
                         visible="{ parts:['appmodel>/detail/header/DOC_STATUS', 'props>/action/assign'], formatter: '.formatter.allowActions' }"
                         >
                         <m:layoutData>
                             <m:OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
-                    <m:Button text="Forward" icon="sap-icon://forward" press="onForwardPress" 
+                    <m:Button text="Forward" icon="sap-icon://forward" press="onAssignPress" 
                         visible="{ parts:['appmodel>/detail/header/DOC_STATUS', 'props>/action/forward'], formatter: '.formatter.allowActions' }"
                         >
                         <m:layoutData>
                             <m:OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
-                    <m:Button text="Reject" icon="sap-icon://employee-rejections" press="onRejectPress" 
+                    <m:Button text="Reject" icon="sap-icon://employee-rejections" press="onDeletePress" 
                         type="Reject"
                         visible="{ parts:['appmodel>/detail/header/DOC_STATUS', 'props>/action/reject'], formatter: '.formatter.allowActions' }"
                         >
@@ -780,10 +780,10 @@
         <f:footer>
             <m:OverflowToolbar visible="{appmodel>/props/gEditMode}">
                 <m:ToolbarSpacer />
-                <m:Button type="Reject" text="Reject" press="onRejectPress" icon="sap-icon://employee-rejections" 
+                <m:Button type="Reject" text="Reject" press="onDeletePress" icon="sap-icon://employee-rejections" 
                     visible="{ parts:['appmodel>/detail/header/DOCSTATUS', 'props>/action/reject'], formatter: '.formatter.allowActions' }"
                     />
-                <m:Button type="Default" text="Forward" press="onForwardPress" icon="sap-icon://forward" 
+                <m:Button type="Default" text="Forward" press="onAssignPress" icon="sap-icon://forward" 
                     visible="{ parts:['appmodel>/detail/header/DOCSTATUS', 'props>/action/forward'], formatter: '.formatter.allowActions' }"
                     />
                 <m:Button type="Emphasized" text="Save" icon="sap-icon://save" visible="{props>/action/save}" press=".onSavePress" />

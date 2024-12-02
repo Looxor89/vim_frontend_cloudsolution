@@ -160,7 +160,7 @@ sap.ui.define([
          */
         onListItemPress: function (oEvent) {
             var packageId = oEvent.getSource().getBindingContext("masterModel").getObject().PACKAGEID;
-            this.oRouter.navTo("detailDetail", { layout: sap.f.LayoutType.MidColumnFullScreen, packageId: packageId });
+            this.oRouter.navTo("detailDetail", { layout: sap.f.LayoutType.TwoColumnsMidExpanded, packageId: packageId });
         },
 
         /**
@@ -237,14 +237,70 @@ sap.ui.define([
             this._quickEditPress(oEvent);
         },
 
-        onForwardPressHandler: function (oEvent) {
-            let bIsMassiveAction = this.oCtx;
-            if (bIsMassiveAction) {
-
-            } else {
-                this._forwardPunctualPressHandler(oEvent);
-            }
+        onAssignPressHandler: function (oEvent) {
+            this.onAssignPress(this.getView(), this);
         },
+
+        _confirmAssignation: function (sUrl, body) {
+          const oSuccessFunction = (data) => {
+            MessageBox.success(oBundle.getText("SuccessfullyAssigned"), {
+              actions: [MessageBox.Action.CLOSE],
+              title: "Success",
+              details: data,  // Provide details of the response
+              onClose: function () {
+                this.onGoPress();
+              }.bind(this)
+            });
+          };
+    
+          const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+            sap.ui.core.BusyIndicator.hide();
+            let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+            MessageToast.show(sMsg);
+            console.log(errorThrown);
+            this.onGoPress();
+          };
+    
+          return this.executeRequest(sUrl, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
+        },
+
+        onAssignConfirm: function (oEvent) {            
+            var oTable = this.getView().byId("masterTable"),
+                aSelectedItems = oTable.getSelectedItems(),
+                aPackagesId = [],
+                bIsMassiveAction = this.oCtx !== null ? false : true,
+                sUrl,
+                body = undefined,
+                assignTo = oEvent.getParameter('selectedItem').getBindingContext('UserList').getObject('Email'),
+                that = this;
+
+            if (!bIsMassiveAction) {
+                let sPath = this.oCtx.getPath();
+                aPackagesId.push(this.getView().getModel("masterModel").getProperty(sPath+"/PACKAGEID"));
+            } else {
+                aPackagesId = aSelectedItems.map((oItem) => 
+                    oItem.getBindingContext("masterModel").getProperty("PACKAGEID")
+                );
+            }
+      
+            sUrl = baseManifestUrl + '/odata/assign';
+            body = {
+              payload: {
+                PackagesId: aPackagesId,
+                AssignedTo: assignTo
+              }
+            };
+      
+            MessageBox.warning(oBundle.getText("AlertAssign", [assignTo]), {
+              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+              emphasizedAction: MessageBox.Action.NO,
+              onClose: function (sAction) {
+                if (sAction === MessageBox.Action.YES) {
+                  that._confirmAssignation(sUrl, body);
+                }
+              }
+            });
+          },
 
 
         /**
@@ -254,7 +310,7 @@ sap.ui.define([
             var oMasterModel = this.getView().getModel("masterModel");
             var sDocStatus = oMasterModel.getProperty(this.oCtx + "/DOC_STATUS");
             var sPackage_Id = oMasterModel.getProperty(this.oCtx + "/PACKAGEID");
-            this.onForwardPress(oEvent, oMasterModel, sPackage_Id, sDocStatus);
+            this.onAssignPress();
         },
 
         /**
@@ -289,14 +345,41 @@ sap.ui.define([
             this.getView().byId("quickMassiveActionButton").setEnabled(bEnableQuickMassiveEdit);
         },
 
+        onDeletePress: function () {
+            var oTable = this.getView().byId("masterTable"),
+                aSelectedItems = oTable.getSelectedItems(),
+                aPackagesId = [],
+                bIsMassiveAction = this.oCtx !== null ? false : true,
+                that = this;
+
+            if (!bIsMassiveAction) {
+                let sPath = this.oCtx.getPath();
+                aPackagesId.push(this.getView().getModel("masterModel").getProperty(sPath+"/PACKAGEID"));
+            } else {
+                aPackagesId = aSelectedItems.map((oItem) => 
+                    oItem.getBindingContext("masterModel").getProperty("PACKAGEID")
+                );
+            }
+
+            MessageBox.warning(oBundle.getText("DeleteInvoiceAlert"), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.NO,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._confirmDeleteInvoice(aPackagesId, false, that);
+                    }
+                }
+            });
+        },
+
         onSubmitPress: function () {
             var oTable = this.getView().byId("masterTable"),
                 oMasterModel = this.getView().getModel("masterModel"),
                 aSelectedItems = oTable.getSelectedItems(),
                 that = this;
 
-            aSelectedItems = aSelectedItems.map((oItem) => {
-                if (oItem.getBindingContext("masterModel").getProperty("DOC_STATUS") == "SUBMITTED") {
+            aSelectedItems = aSelectedItems.map(oItem => {
+                if (oItem.getBindingContext("masterModel").getProperty("DOC_STATUS") !== "SUBMITTED") {
                     return {
                         "PackageId": oItem.getBindingContext("masterModel").getProperty("PACKAGEID"),
                         "DocCategory": oItem.getBindingContext("masterModel").getProperty("DOCCATEGORY")

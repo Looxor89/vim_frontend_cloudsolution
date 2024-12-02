@@ -377,9 +377,18 @@
           ]
         },
         {
+          "pattern": "detail/{packageId}/{layout}",
+          "name": "detail",
+          "target": [
+            "detail",
+            "detailDetail"
+          ]
+        },
+        {
           "pattern": "detailDetail/{packageId}/{layout}",
           "name": "detailDetail",
           "target": [
+            "detail",
             "detailDetail"
           ]
         }
@@ -387,6 +396,10 @@
       "targets": {
         "master": {
           "viewName": "Master",
+          "controlAggregation": "beginColumnPages"
+        },
+        "detail": {
+          "viewName": "Detail",
           "controlAggregation": "beginColumnPages"
         },
         "detailDetail": {

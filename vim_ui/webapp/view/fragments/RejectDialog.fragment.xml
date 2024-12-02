@@ -9,7 +9,7 @@
 
         </FlexBox>
         <buttons>
-            <Button text="Return to Vendor" press="onRejectInvoice" icon="sap-icon://sys-back"/>
+            <Button text="{i18n>DeleteInvoice}" press="onRejectInvoice" icon="sap-icon://sys-back"/>
             <Button text="Enter manually in SAP" press="onRejectInvoice" icon="sap-icon://sap-logo-shape"/>
             <Button text="Cancel" press="onCancelReject"/>
         </buttons>

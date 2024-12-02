@@ -16,12 +16,8 @@ sap.ui.define([
       this.oRouter = this.getOwnerComponent().getRouter();
       this.oRouter.getRoute("detailDetail").attachPatternMatched(this._onRouteMatched, this);
       var bus = this.getOwnerComponent().getEventBus();
-      bus.subscribe("reload", this._fullReload, this);
+      // bus.subscribe("reload", this._fullReload, this);
 
-    },
-
-    onAfterRendering: function () {
-      this.getView().byId("ocrViewer0").setCurrentPage(1);
     },
 
     _onRouteMatched: function (oEvent) {
@@ -37,11 +33,11 @@ sap.ui.define([
       //     console.log(error);
       //   }.bind(this));
 
-      this.fetchData(this._packageId)
-        .then(this.getDoxData.bind(this))
-        .catch(function (error) {
-          console.log(error);
-        }.bind(this));
+      // this.fetchData(this._packageId)
+      //   .then(this.getDoxData.bind(this))
+      //   .catch(function (error) {
+      //     console.log(error);
+      //   }.bind(this));
     },
 
     _fullReload: function (oEvent) {

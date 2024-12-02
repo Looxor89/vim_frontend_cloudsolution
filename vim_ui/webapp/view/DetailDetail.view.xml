@@ -18,37 +18,29 @@
                 </f:snappedContent>
 
                 <f:navigationActions>
-                    <m:Button type="Emphasized" text="{i18n>EditDocumentButton}" icon="sap-icon://edit" press="handleGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/admin'], formatter: '.formatter.detailDetailEdit' }" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/save'], formatter: '.formatter.allowActions' }" />
+                    <m:Button type="Emphasized" text="{i18n>EditDocumentButton}" icon="sap-icon://edit" press="handleGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/admin'], formatter: '.formatter.detailDetailEdit' }" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS'], formatter: '.formatter.allowActions' }" />
                     <m:Button type="Emphasized" text="{i18n>CancelEditButton}" icon="sap-icon://edit-outside" press="handleCancelGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS' , 'props>/action/admin'] , formatter: '.formatter.detailDetailEditCancel' }" />
-                    <m:Button text="{i18n>AssignButton}" icon="sap-icon://activity-individual" press="onForwardPressHandler" 
-                        visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/assign'], formatter: '.formatter.allowActions' }"
-                        >
-                        <m:layoutData>
-                            <m:OverflowToolbarLayoutData priority="AlwaysOverflow" closeOverflowOnInteraction="false" />
-                        </m:layoutData>
-                    </m:Button>
-                    <m:Button text="{i18n>ForwardButton}" icon="sap-icon://forward" press="onForwardPressHandler" 
-                        visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/forward'], formatter: '.formatter.allowActions' }"
-                        >
-                        <m:layoutData>
-                            <m:OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
-                        </m:layoutData>
-                    </m:Button>
-                    <m:Button text="{i18n>RejectButton}" icon="sap-icon://employee-rejections" press="onRejectPress" 
+                    
+                    <m:Button type="Accept" text="{i18n>SubmitButton}" icon="sap-icon://accept" enabled="{= !${detailDetailModel>/props/lineItemTable/editMode} }" press=".onSubmitPress" />   
+                    <m:Button text="{i18n>AssignButton}" icon="sap-icon://add-employee" enabled="{= !${detailDetailModel>/props/lineItemTable/editMode} }" press=".onAssignPressHandler" />
+                    <m:Button text="{i18n>DeleteButton}" icon="sap-icon://employee-rejections" press="onDeletePress" 
                         type="Reject"
-                        visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/reject'], formatter: '.formatter.allowActions' }"
+                        visible="{ parts:['detailDetailModel>/detail/header/DOC_STATUS'], formatter: '.formatter.allowActions' }"
                         >
                         <m:layoutData>
                             <m:OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
+                    
+                    <m:OverflowToolbarButton id="messagePopoverBtn" visible="true" icon="sap-icon://message-popup" type="Emphasized" press=".handleMessagePopoverPress" ariaHasPopup="Dialog" />
+                    
                     <m:Button icon="sap-icon://decline" press="onCancelPress" tooltip="Close" type="Transparent">
                         <m:layoutData>
                             <m:OverflowToolbarLayoutData priority="High" closeOverflowOnInteraction="false" />
                         </m:layoutData>
                     </m:Button>
-                    <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline" press="onCancelPress" tooltip="Close column" visible="{= ${/actionButtonsInfo/endColumn/closeColumn} !== null }" />
-                    <m:OverflowToolbarButton id="messagePopoverBtn" visible="true" icon="sap-icon://message-popup" type="Emphasized" text="{=${msg>/aMsg}.length}" press=".handleMessagePopoverPress" ariaHasPopup="Dialog" />
+                    <!-- <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline" press="onCancelPress" tooltip="Close column" visible="{= ${/actionButtonsInfo/endColumn/closeColumn} !== null }" /> -->
+                    <!-- <m:OverflowToolbarButton id="messagePopoverBtn" visible="true" icon="sap-icon://message-popup" type="Emphasized" text="{=${msg>/aMsg}.length}" press=".handleMessagePopoverPress" ariaHasPopup="Dialog" /> -->
 
                 </f:navigationActions>
 
@@ -957,7 +949,7 @@
                                                     <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="txt,jpg,png,doc,docx,xls,xlsx,pdf,ppt,pptx,zip" placeholder="Choose a file for Upload..." visible="{detailDetailModel>/props/FileEditMode}" />
 
                                                     <m:Button icon="sap-icon://upload" press="handleUploadPress" tooltip="Upload file" visible="{detailDetailModel>/props/FileEditMode}" />
-                                                    <m:ToggleButton icon="sap-icon://edit" press="onFileListEdit" visible="{props>/action/upload}" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/upload'], formatter: '.formatter.allowAddAttachment' }"/>
+                                                    <m:ToggleButton icon="sap-icon://edit" press="onFileListEdit" visible="{props>/action/upload}" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS'], formatter: '.formatter.allowAddAttachment' }"/>
 
                                                 </m:Toolbar>
                                             </m:headerToolbar>
@@ -991,7 +983,7 @@
             <m:OverflowToolbar visible="{detailDetailModel>/props/gEditMode}">
                 <m:ToolbarSpacer />
                 <m:Button type="Emphasized" text="{i18n>SaveButton}" icon="sap-icon://save" visible="{props>/action/save}" press=".onSavePress" />
-                <m:Button type="Accept" text="{i18n>SubmitButton}" icon="sap-icon://accept" visible="{props>/action/savesap}" press=".onSubmitPress" />
+                <!-- <m:Button type="Accept" text="{i18n>SubmitButton}" icon="sap-icon://accept" visible="{props>/action/savesap}" press=".onSubmitPress" /> -->
             </m:OverflowToolbar>
         </f:footer>
     </f:DynamicPage>

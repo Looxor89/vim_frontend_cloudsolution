@@ -179,11 +179,11 @@ sap.ui.define([
 
         },
 
-        onForwardPressHandler : function (oEvent) {
+        onAssignPressHandler : function (oEvent) {
             var oMasterModel = this.getView().getModel("masterModel");
             var sDocStatus = oMasterModel.getProperty(this.oCtx + "/DOC_STATUS");
             var sPackage_Id = oMasterModel.getProperty(this.oCtx + "/PACKAGEID");
-            this.onForwardPress(oEvent, oMasterModel, sPackage_Id, sDocStatus);
+            this.onAssignPress(oEvent, oMasterModel, sPackage_Id, sDocStatus);
         },
 
         onSort: function (oEvent) {
