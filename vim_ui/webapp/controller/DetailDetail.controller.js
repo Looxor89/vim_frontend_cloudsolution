@@ -5072,7 +5072,7 @@ sap.ui.define([
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
-          Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          Invoice: oCurrentInvoice,  // Convert invoice data to JSON string
           RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords ? this.aRemovedSelectedPurchaseOrdersRecords : [],
           RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords ? this.aRemovedSelectedDeliveryNotesRecords : [],
           RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords ? this.aRemovedSelectedServiceEntrySheetsRecords : [],
@@ -5187,7 +5187,7 @@ sap.ui.define([
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
-          Invoice: JSON.stringify(oCurrentInvoice),  // Convert invoice data to JSON string
+          Invoice: oCurrentInvoice,  // Convert invoice data to JSON string
           RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords ? this.aRemovedSelectedPurchaseOrdersRecords : [],
           RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords ? this.aRemovedSelectedDeliveryNotesRecords : [],
           RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords ? this.aRemovedSelectedServiceEntrySheetsRecords : [],
