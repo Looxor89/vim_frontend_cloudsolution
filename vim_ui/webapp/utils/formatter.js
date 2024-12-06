@@ -98,11 +98,13 @@ sap.ui.define([
 
     statusText: function (sStatus) {
       switch (sStatus) {
-        case "READY":
+        case "ASSIGN":
           return "Information";
         case "PROCESSING":
           return "Warning";
-        case "CONFIRMED":
+        case "ERROR":
+          return "Error";
+        case "POSTED":
           return "Success";
         default:
           return "None";
@@ -155,6 +157,7 @@ sap.ui.define([
       }
       return "";
     },
+
     formatDocStatus: function (sStatus, AssignedTo, ActionBy, oData) {
       switch (sStatus) {
         case "INITIAL":
@@ -175,8 +178,10 @@ sap.ui.define([
           return "REJECTED (Returned to Vendor)";
         case "POSTED":
           return "SUBMITTED";
+        case "PROCESSING":
+          return "IN PROCESS";
         case "ERROR":
-          return "In error";
+          return "IN ERROR";
         default:
           return "NONE";
       }

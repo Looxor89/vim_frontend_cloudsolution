@@ -129,7 +129,7 @@ sap.ui.define([
         
 
         onAssignSearch: function (oEvent) {
-            sValue = oEvent.getParameter("value");
+            var sValue = oEvent.getParameter("value");
             if (sValue) {
                 var sFilter = new Filter({
                     filters: [

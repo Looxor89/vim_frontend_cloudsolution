@@ -654,21 +654,154 @@ sap.ui.define([
       oDetailDetailModel.setProperty("/currentInvoice/To_SelectedServiceEntrySheets", aTo_SelectedServiceEntrySheets);
     },
 
-    onAddSupplierInvoiceWhldgTaxRow: function (oEvent) {
+    _getDefaultWithholdingTaxValues: function (sInvoicingParty) {
+      var aURL = baseManifestUrl + "/odata/getWithholdingTax()?Supplier="+sInvoicingParty;
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        this.getView().byId('DDPage').setBusy(false);
+        return data.value[0].result[0];
+      }
+
+      const oErrorFunction = (data) => {
+        this.getView().byId('DDPage').setBusy(false);
+      }
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onAddSupplierInvoiceWhldgTaxRow: async function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
         oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
+        sInvoicingParty = oCurrentInvoice.InvoicingParty,
+        oWhldgValues = null,
         sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+
+        if (sInvoicingParty && sInvoicingParty !== '') {
+          oWhldgValues = await this._getDefaultWithholdingTaxValues(sInvoicingParty)
+        }
       // Retrieve the PORecords data from the model
       var aTo_SupplierInvoiceWhldgTax = oDetailDetailModel.getProperty("/currentInvoice/To_SupplierInvoiceWhldgTax");
       aTo_SupplierInvoiceWhldgTax.push({
         "supplierInvoiceWhldgTax_Id": null,
         "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
-        "WithholdingTaxType": null,
-        "WithholdingTaxCode": null,
+        "WithholdingTaxType": oWhldgValues ? oWhldgValues.WithholdingTaxType : null,
+        "WithholdingTaxCode": oWhldgValues ? oWhldgValues.WithholdingTaxCode : null,
         "WithholdingTaxBaseAmount": null,
         "WhldgTaxBaseIsEnteredManually": null
       });
       oDetailDetailModel.setProperty("/currentInvoice/To_SupplierInvoiceWhldgTax", aTo_SupplierInvoiceWhldgTax);
+    },
+
+    onWithholdingTaxTypeVH: function (oEvent) {
+      this.oInputWithholdingTaxType = oEvent.getSource();
+      var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/getWithholdingTaxesType()";
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/withholdingTaxesType", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idWhldgTaxTypeDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.WhldgTaxTypeVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idWhldgTaxTypeDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchWhldgTaxType: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("WithholdingTaxType", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idWhldgTaxTypeDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+
+    onConfirmWhldgTaxType: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sWithholdingTaxType = this.getView().getModel("detailDetailModel").getProperty(sPath + "/WithholdingTaxType");
+      this.oInputWithholdingTaxType.setValue(sWithholdingTaxType);
+      this.oInputWithholdingTaxType.fireChangeEvent(sWithholdingTaxType);
+    },
+
+    onWithholdingTaxCodeVH: function (oEvent) {
+      this.oInputWithholdingTaxCode = oEvent.getSource();
+      var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/getWithholdingTaxesCode()";
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/withholdingTaxesCode", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idWhldgTaxCodeDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.WhldgTaxCodeVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idWhldgTaxCodeDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchWhldgTaxName: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("WithholdingTaxCode", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idWhldgTaxCodeDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+
+    onConfirmWhldgTaxCode: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sWithholdingTaxCode = this.getView().getModel("detailDetailModel").getProperty(sPath + "/WithholdingTaxCode");
+      this.oInputWithholdingTaxCode.setValue(sWithholdingTaxCode);
+      this.oInputWithholdingTaxCode.fireChangeEvent(sWithholdingTaxCode);
     },
 
     onAddPORow: function (oEvent) {
@@ -843,6 +976,8 @@ sap.ui.define([
             }
 
           });
+          // remove inconsistent object if any
+          this.aRemovedPoLineDetails = this.aRemovedPoLineDetails.filter(item => item && item.lineDetail_ID !== null && item.lineDetail_ID !== '' && item.bodyPOIntegrationInfo_Id !== null && item.bodyPOIntegrationInfo_Id !== '');
           break;
         case "idNPOInvGLAccountLineTable":
           this.aRemovedGlAccountLineDetails = selectedContexts.map(oContext => {
@@ -852,6 +987,8 @@ sap.ui.define([
               return { "lineDetail_ID": sLineDetail_ID, "bodyGLAccountIntegrationInfo_Id": sBodyGLAccountIntegrationInfo_Id };
             }
           });
+          // remove inconsistent object if any
+          this.aRemovedGlAccountLineDetails = this.aRemovedGlAccountLineDetails.filter(item => item && item.lineDetail_ID !== null && item.lineDetail_ID !== '' && item.bodyGLAccountIntegrationInfo_Id !== null && item.bodyGLAccountIntegrationInfo_Id !== '');
           break;
         case "idTo_SelectedPurchaseOrdersTable":
           this.aRemovedSelectedPurchaseOrdersRecords = selectedContexts.map(oContext => {
@@ -860,6 +997,8 @@ sap.ui.define([
               return { "selectedPurchaseOrders_Id": sSelectedPurchaseOrders_Id };
             }
           });
+          // remove inconsistent object if any
+          this.aRemovedSelectedPurchaseOrdersRecords = this.aRemovedSelectedPurchaseOrdersRecords.filter(item => item && item.selectedPurchaseOrders_Id !== null && item.selectedPurchaseOrders_Id !== '');
           break;
         case "idTo_SelectedDeliveryNotesTable":
           this.aRemovedSelectedDeliveryNotesRecords = selectedContexts.map(oContext => {
@@ -868,6 +1007,8 @@ sap.ui.define([
               return { "selectedDeliveryNotes_Id": sSelectedDeliveryNotes_Id };
             }
           });
+          // remove inconsistent object if any
+          this.aRemovedSelectedDeliveryNotesRecords = this.aRemovedSelectedDeliveryNotesRecords.filter(item => item && item.selectedDeliveryNotes_Id !== null && item.selectedDeliveryNotes_Id !== '');
           break;
         case "idTo_SelectedServiceEntrySheetsTable":
           this.aRemovedSelectedServiceEntrySheetsRecords = selectedContexts.map(oContext => {
@@ -876,6 +1017,8 @@ sap.ui.define([
               return { "selectedServiceEntrySheets_Id": sSelectedServiceEntrySheets_Id };
             }
           });
+          // remove inconsistent object if any
+          this.aRemovedSelectedServiceEntrySheetsRecords = this.aRemovedSelectedServiceEntrySheetsRecords.filter(item => item && item.selectedServiceEntrySheets_Id !== null && item.selectedServiceEntrySheets_Id !== '');
           break;
         default:
           this.aRemovedSupplierInvoiceWhldgTaxRecords = selectedContexts.map(oContext => {
@@ -884,6 +1027,8 @@ sap.ui.define([
               return { "supplierInvoiceWhldgTax_Id": sSupplierInvoiceWhldgTax_Id };
             }
           });
+          // remove inconsistent object if any
+          this.aRemovedSupplierInvoiceWhldgTaxRecords = this.aRemovedSupplierInvoiceWhldgTaxRecords.filter(item => item && item.supplierInvoiceWhldgTax_Id !== null && item.supplierInvoiceWhldgTax_Id !== '');
       }
     },
 
@@ -2209,95 +2354,398 @@ sap.ui.define([
     onPayTermsVH: function (oEvent) {
       this.oInput = oEvent.getSource();
       var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/getPaymentTerms()";
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
 
-      //create dialog
-      if (!this.getView().byId("idPayDialog_VH")) {
-        //load asynchronous fragment (XML)
-        Fragment.load({
-          id: oView.getId(),
-          name: "vim_ui.view.fragments.PayTermsVH",
-          controller: this
-        }).then(function (oDialog) {
-          //connect Menu to rootview of this component (models, lifecycle)
-          oView.addDependent(oDialog);
-          oDialog.open();
-        });
-      } else {
-        this.getView().byId("idPayDialog_VH").open();
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/paymentTerms", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idPayDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.PayTermsVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idPayDialog_VH").open();
+        }
       }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
     onSearchPayTerms: function (oEvent) {
-      var oDialog = this.getView().byId("idPayDialog_VH");
-      var sTerm = oEvent.getParameter('query');
-      sTerm = this.convertToPattern(sTerm);
-
-      var List2 = oDialog.getContent()[1];
-      var oBinding = List2.getBinding("items");
-
-      // build filter array
-      var aFilter = [];
-
-      if (sTerm) {
-        aFilter.push(new Filter("CustomerPaymentTerms", FilterOperator.EQ, sTerm));
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("PaymentTerms", FilterOperator.Contains, sValue),
+                  new Filter("PaymentTermsName", FilterOperator.Contains, sValue)
+              ]
+          });
       }
-
-      // filter binding
-      oBinding.filter(aFilter);
-
+      var oList = this.getView().byId("idPayDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
     },
 
 
     onConfirmPayTerms: function (oEvent) {
-      //debugger;
-      var oPath = oEvent.getParameter("listItem").getBindingContext("appmodel").sPath;
-      var sKostl = oEvent.getParameter("listItem").getBindingContext("appmodel").getObject(oPath).value;
-      this.oInput.setValue(sKostl);
-      this.getView().byId("idPayTermsVH").removeSelections(true);
-      this.getView().byId("idPayDialog_VH").close();
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sPaymentTerms = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PaymentTerms");
+      this.getView().byId("idPaymentTerms").setValue(sPaymentTerms);
+      this.getView().byId("idPaymentTerms").fireChangeEvent(sPaymentTerms);
     },
 
-    // onConfirmPayTerms2: function (oEvent) {
-    //   //debugger;
-    //   //var oPath=oEvent.getParameter("listItem").getBindingContext("PurchaseOrderModel").sPath;
-    //   var oPath=oEvent.getParameter("listItem").getBindingContext().sPath;
-    //   //var sKostl = oEvent.getParameter("listItem").getBindingContext("PurchaseOrderModel").getObject(oPath).Paymentterms;
-    //   var sKostl = oEvent.getParameter("listItem").getBindingContext().getObject(oPath).CustomerPaymentTerms;
-    //   this.oInput.setValue(sKostl);
-    //   this.getView().byId("idPayDialog_VH").close();
-    // },
+    _checkConsistencyOfPreparatoryValue: function (sPath, sMessage) {
+      var sValue = this.getView().getModel("detailDetailModel").getProperty(sPath);
+      if (!sValue || sValue === "") {
+        MessageToast.show(sMessage);
+        return null;
+      }
+      return sValue;
+    },
 
-    onConfirmPayTerms2: function (oEvent) {
-      // Get the binding context of the selected list item with the model name "PurchaseOrderModel"
-      var oSelectedItem = oEvent.getParameter("listItem");
-      var oBindingContext = oSelectedItem.getBindingContext("appmodel");
 
-      // Check if a valid binding context exists
-      if (oBindingContext) {
-        // Retrieve the value of the "CustomerPaymentTerms" property
-        var sCustomerPaymentTerms = oBindingContext.getProperty("CustomerPaymentTerms");
+    onLiveChangeBPBankAccountInternalID: function (oEvent) {
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/InvoicingParty", oBundle.getText("MissingInputAlert", [oBundle.getText("InvoicingPartyVendorCode")]));
+      if (!sConsistentValue) {
+        this.getView().byId("idBPBankAccountInternalID").setValue(null);
+      }
+    },
 
-        // Set the value in your input field
-        this.oInput.setValue(sCustomerPaymentTerms);
-      } else {
-        // Handle the case where there is no valid binding context
-        // You can log an error or perform other error handling here
+    //Bank Account Internal ID (Business Partner Bank)
+    onBankAccountInternalVH: function (oEvent) {
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/InvoicingParty", oBundle.getText("MissingInputAlert", [oBundle.getText("InvoicingPartyVendorCode")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      this.oInput = oEvent.getSource();
+      var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/getBusinessPartnerBank()?BusinessPartner="+sConsistentValue;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/businessPartnerBanks", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        //create dialog
+        if (!this.getView().byId("idPartnerBankDialog_VH")) {
+          //load asynchronous fragment (XML)
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.PartnerBank",
+            controller: this
+          }).then(function (oDialog) {
+            //connect Menu to rootview of this component (models, lifecycle)
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idPartnerBankDialog_VH").open();
+        }
       }
 
-      // Close the dialog
-      this.getView().byId("idPayDialog_VH").getContent()[1].removeSelections(true);
-      this.getView().byId("idPayDialog_VH").close();
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchBusinessPartnerBanks: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("BankIdentification", FilterOperator.Contains, sValue),
+                  new Filter("BankName", FilterOperator.Contains, sValue),
+                  new Filter("BankNumber", FilterOperator.Contains, sValue),
+                  new Filter("IBAN", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idPartnerBankDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
     },
 
 
+    onConfirmBusinessPartnerBanks: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sBankIdentification = this.getView().getModel("detailDetailModel").getProperty(sPath + "/BankIdentification");
+      this.getView().byId("idBPBankAccountInternalID").setValue(sBankIdentification);
+      this.getView().byId("idBPBankAccountInternalID").fireChangeEvent(sBankIdentification);
+    },
 
-    onCancelPaymentTermsVH: function () {
-      this.getView().byId("idPayDialog_VH").close();
+    //Payment Methods
+    onPayMethodsVH: function (oEvent) {
+      this.oInput = oEvent.getSource();
+      var oView = this.getView();
+      var sID = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/header_Id_ItalianInvoiceTrace");
+      var aURL = baseManifestUrl + "/odata/getPaymentMethods()?header_Id_ItalianInvoiceTrace="+sID;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/paymentMethods", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idPayMethodsDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.PayMethodsVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idPayMethodsDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchPayMethods: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("PaymentMethod", FilterOperator.Contains, sValue),
+                  new Filter("PaymentMethodName", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idPayMethodsDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
     },
 
 
-    //Partner Bank Type
+    onConfirmPayMethods: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sPaymentMethod = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PaymentMethod");
+      this.getView().byId("idPaymentMethod").setValue(sPaymentMethod);
+      this.getView().byId("idPaymentMethod").fireChangeEvent(sPaymentMethod);
+    },
 
+    //House Bank
+    onHouseBankVH: function (oEvent) {
+      this.oInput = oEvent.getSource();
+      var oView = this.getView();
+      var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
+      var aURL = baseManifestUrl + "/odata/getHouseBanks()?CompanyCode="+sCompanyCode;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/houseBanks", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        //create dialog
+        if (!this.getView().byId("idHouseBankDialog_VH")) {
+          //load asynchronous fragment (XML)
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.HouseBanks",
+            controller: this
+          }).then(function (oDialog) {
+            //connect Menu to rootview of this component (models, lifecycle)
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idHouseBankDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchHouseBanks: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("HouseBank", FilterOperator.Contains, sValue),
+                  new Filter("BankName", FilterOperator.Contains, sValue),
+                  new Filter("SWIFTCode", FilterOperator.Contains, sValue),
+                  new Filter("Bank", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idHouseBankDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+    onConfirmHouseBanks: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sHouseBank = this.getView().getModel("detailDetailModel").getProperty(sPath + "/HouseBank");
+      this.getView().byId("idHouseBank").setValue(sHouseBank);
+      this.getView().byId("idHouseBank").fireChangeEvent(sHouseBank);
+    },
+
+    //House Bank Account
+    onHouseBankAccountVH: function (oEvent) {
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/HouseBank", oBundle.getText("MissingInputAlert", [oBundle.getText("HouseBank")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
+      this.oInput = oEvent.getSource();
+      var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/getHouseBanksAccounts()?CompanyCode="+sCompanyCode+"&HouseBank="+sConsistentValue;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/houseBanksAccount", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        //create dialog
+        if (!this.getView().byId("idHouseBanksAccountDialog_VH")) {
+          //load asynchronous fragment (XML)
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.HouseBanksAccount",
+            controller: this
+          }).then(function (oDialog) {
+            //connect Menu to rootview of this component (models, lifecycle)
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idHouseBanksAccountDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchHouseBanksAccount: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("HouseBankAccount", FilterOperator.Contains, sValue),
+                  new Filter("IBAN", FilterOperator.Contains, sValue),
+                  new Filter("BankAccountDescription", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idHouseBanksAccountDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+
+    onConfirmHouseBanksAccount: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sHouseBankAccount = this.getView().getModel("detailDetailModel").getProperty(sPath + "/HouseBankAccount");
+      this.getView().byId("idHouseBankAccount").setValue(sHouseBankAccount);
+      this.getView().byId("idHouseBankAccount").fireChangeEvent(sHouseBankAccount);
+    },
+
+    onLiveChangeHouseBanksAccount: function (oEvent) {
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/HouseBank", oBundle.getText("MissingInputAlert", [oBundle.getText("HouseBank")]));
+      if (!sConsistentValue) {
+        this.getView().byId("idHouseBankAccount").setValue(null);
+      }
+    },
+
+    //Accounting Document Type
+    onAccountingDocumentTypeVH: function (oEvent) {
+      this.oInput = oEvent.getSource();
+      var oView = this.getView();
+      var sID = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/header_Id_ItalianInvoiceTrace");
+      var aURL = baseManifestUrl + "/odata/getAccountingDocumentType()?header_Id_ItalianInvoiceTrace="+sID;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/accountingDocumentType", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idAccDocumentTypeDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.AccountingDocumentTypeVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idAccDocumentTypeDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchAccDocumentType: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("AccountingDocumentType", FilterOperator.Contains, sValue),
+                  new Filter("AccountingDocumentTypeName", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idAccDocumentTypeDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+
+    onConfirmAccDocumentType: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sAccountingDocumentType = this.getView().getModel("detailDetailModel").getProperty(sPath + "/AccountingDocumentType");
+      this.getView().byId("idInvDocType").setValue(sAccountingDocumentType);
+      this.getView().byId("idInvDocType").fireChangeEvent(sAccountingDocumentType);
+    },
 
     onPartnerBankVH: function (oEvent) {
       this.oInput = oEvent.getSource();
@@ -3219,7 +3667,7 @@ sap.ui.define([
           // Store attachments (if any)
           // oDetailDetailModel.setProperty("/Filelist", record.Allegati);
           // delete record.Allegati;
-
+          
           oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
           delete record.ErrorLog
           oDetailDetailModel.setProperty("/currentInvoice", record);
@@ -4635,7 +5083,7 @@ sap.ui.define([
     },
 
     getValueMappedToDocumentCurrency: function () {
-      return sCurrency = this.getView().byId("idCurrency").getValue();
+      return this.getView().byId("idCurrency").getValue();
     },
 
     _getControlValue: function (oControl) {

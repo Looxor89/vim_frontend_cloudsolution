@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idPayMethodsDialog_VH" 
+		noDataText="{i18n>NoPaymentMethodsFound}"
+		items="{path: 'detailDetailModel>/valuehelps/paymentMethods'}"
+		title="{i18n>TitleSearchPaymentMethods}"
+		search="onSearchPayMethods"
+		confirm="onConfirmPayMethods">
+		<StandardListItem 
+			title="{detailDetailModel>PaymentMethod}" 
+			description="{detailDetailModel>PaymentMethodName}"/>	
+	</SelectDialog>
+</core:FragmentDefinition>

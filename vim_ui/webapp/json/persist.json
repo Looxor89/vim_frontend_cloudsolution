@@ -32,8 +32,12 @@
                 "status": "Assigned"
             },
             {
-                "id": "RELEASED",
-                "status": "Released for approval"
+                "id": "PROCESSING",
+                "status": "In process"
+            },
+            {
+                "id": "ERROR",
+                "status": "In error"
             },
             {
                 "id": "POSTED",

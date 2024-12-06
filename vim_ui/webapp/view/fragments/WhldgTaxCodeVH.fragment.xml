@@ -1,0 +1,12 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idWhldgTaxCodeDialog_VH" 
+		noDataText="{i18n>NoWhldgTaxCodeFound}"
+		items="{path: 'detailDetailModel>/valuehelps/withholdingTaxesCode'}"
+		title="{i18n>TitleSearchWhldgTaxCode}"
+		search="onSearchWhldgTaxCode"
+		confirm="onConfirmWhldgTaxCode">
+		<StandardListItem 
+			title="{detailDetailModel>WithholdingTaxCode}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idAccDocumentTypeDialog_VH" 
+		noDataText="{i18n>NoAccountingDocumentTypeFound}"
+		items="{path: 'detailDetailModel>/valuehelps/accountingDocumentType'}"
+		title="{i18n>TitleSearchAccountingDocumentType}"
+		search="onSearchAccDocumentType"
+		confirm="onConfirmAccDocumentType">
+		<StandardListItem 
+			title="{detailDetailModel>AccountingDocumentType}" 
+			description="{detailDetailModel>AccountingDocumentTypeName}"/>	
+	</SelectDialog>
+</core:FragmentDefinition>

@@ -12,7 +12,6 @@
 			path: 'UserList>/Users'
 		}">
 		<StandardListItem
-            id="assignedToList"
 			title="{UserList>FirstName} {UserList>LastName}"
 			description="{UserList>Email}"
 			icon="sap-icon://employee"

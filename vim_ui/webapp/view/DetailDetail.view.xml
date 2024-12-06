@@ -69,7 +69,7 @@
                                 <l:BlockLayoutRow>
                                     <l:BlockLayoutCell>
 
-                                        <m:Label text="{i18n>Transaction}" required="true" />
+                                        <m:Label text="{i18n>Transaction}" />
                                         <m:Select id="idTransaction" change=".onChangeTransaction">
                                             <core:Item key="keyTransaction1" text="{i18n>Invoice}" />
                                             <core:Item key="keyTransaction2" text="{i18n>CreditMemo}" />
@@ -82,15 +82,15 @@
 
                                                 <core:Title text="{i18n>BasicData}" />
 
-                                                <m:Label text="{i18n>CompanyCode}" required="true" />
+                                                <m:Label text="{i18n>CompanyCode}" />
                                                 <m:Input id="idCompanyCode" value="{detailDetailModel>/currentInvoice/CompanyCode}" change=".onChangeCompanyCode" maxLength="4"/>
                                                 
-                                                <m:Label text="{i18n>Invoicedate}" required="true" />
+                                                <m:Label text="{i18n>Invoicedate}" />
                                                 <m:DatePicker id="idInvDate" value="{
                                                     'path': 'detailDetailModel>/currentInvoice/DocumentDate'
                                                 }" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" change=".onChangeDocumentDate" placeholder="YYYY-MM-DD"  />
 
-                                                <m:Label text="{i18n>InvoiceReceiptDate}" required="true" />
+                                                <m:Label text="{i18n>InvoiceReceiptDate}" />
                                                 <m:DatePicker id="idDocDate" value="{
                                                     'path':'detailDetailModel>/currentInvoice/InvoiceReceiptDate'
                                                 }" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" change=".onChangeInvoiceReceiptDate" placeholder="YYYY-MM-DD" />
@@ -100,18 +100,16 @@
                                                     'path':'detailDetailModel>/currentInvoice/PostingDate'
                                                 }" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" change=".onChangePostingDate" placeholder="YYYY-MM-DD" />
 
-                                                <m:Label text="{i18n>InvoicingPartyVendorCode}" required="true" />
+                                                <m:Label text="{i18n>InvoicingPartyVendorCode}" />
                                                 <m:Input id="idInvoicingPartyVendorCode" value="{detailDetailModel>/currentInvoice/InvoicingParty}" change=".onChangeInvoicingParty" maxLength="10"/>
                                                 
                                                 <m:Label text="{i18n>Currency}" required="true" />
-                                                <m:Input id="idCurrency" change=".onChangeCurrency" value="{detailDetailModel>/currentInvoice/Currency}" 
-                                                    showValueHelp="true" valueHelpRequest=".onVHCurrency" 
-                                                    maxLength="5"/>
+                                                <m:Input id="idCurrency" change=".onChangeCurrency" value="{detailDetailModel>/currentInvoice/Currency}" maxLength="5"/>
 
                                                 <m:Label text="{i18n>SupplierInvoiceIDByInvcgParty}" required="true" />
                                                 <m:Input id="idSupplierInvoiceIDByInvcgParty" value="{detailDetailModel>/currentInvoice/SupplierInvoiceIDByInvcgParty}" change=".onChangeSupplierInvoiceIDByInvcgParty" maxLength="16"/>
                                                 
-                                                <m:Label text="{i18n>GrossAmount}" required="true" />
+                                                <m:Label text="{i18n>GrossAmount}" required="true"/>
                                                 <m:Input id="idGrossAmt" 
                                                     value="{
                                                         'path': 'detailDetailModel>/currentInvoice/InvoiceGrossAmount',
@@ -129,20 +127,20 @@
                                                     type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" 
                                                     placeholder="0.00"/>
 
-                                                <m:Label text="{i18n>SupplierPostingLineItemText}" required="true" />
+                                                <m:Label text="{i18n>SupplierPostingLineItemText}" />
                                                 <m:Input id="idSupplierPostingLineItemText" value="{detailDetailModel>/currentInvoice/SupplierPostingLineItemText}" change=".onChangeSupplierPostingLineItemText" maxLength="50"/>
 
-                                                <m:Label text="{i18n>TaxIsCalculatedAutomatically}" required="true" />
+                                                <m:Label text="{i18n>TaxIsCalculatedAutomatically}" />
                                                 <m:CheckBox id="idTaxIsCalculatedAutomatically" selected="{detailDetailModel>/currentInvoice/TaxIsCalculatedAutomatically}" select=".onChangeTaxIsCalculatedAutomatically"/>
                                                 
                                                 <core:Title text="{i18n>Payment}" />
 
-                                                <m:Label text="{i18n>BaselineDate}" required="true" />
+                                                <m:Label text="{i18n>BaselineDate}" />
                                                 <m:DatePicker id="idDueCalculationBaseDate" value="{
                                                     'path':'detailDetailModel>/currentInvoice/DueCalculationBaseDate'
                                                 }" change=".onChangeDueCalculationBaseDate" placeholder="YYYY-MM-DD" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
 
-                                                <m:Label text="{i18n>ManualCashDiscount}" required="true" />
+                                                <m:Label text="{i18n>ManualCashDiscount}" />
                                                 <m:Input id="idManualCashDiscount" value="{
                                                     'path': 'detailDetailModel>/currentInvoice/ManualCashDiscount',
                                                     type: 'sap.ui.model.odata.type.Decimal',
@@ -221,33 +219,33 @@
                                                 }" change=".onChangeNetPaymentDays"/>
                                                 
                                                 <m:Label text="{i18n>BPBankAccountInternalID}" />
-                                                <m:Input id="idBPBankAccountInternalID" value="{detailDetailModel>/currentInvoice/BPBankAccountInternalID}" change=".onChangeBPBankAccountInternalID" maxLength="4"/>
+                                                <m:Input id="idBPBankAccountInternalID" showValueHelp="true" valueHelpRequest=".onBankAccountInternalVH" value="{detailDetailModel>/currentInvoice/BPBankAccountInternalID}" liveChange=".onLiveChangeBPBankAccountInternalID" change=".onChangeBPBankAccountInternalID" maxLength="4"/>
                                                 
                                                 <m:Label text="{i18n>PaymentMethod}" />
-                                                <m:Input id="idPaymentMethod" value="{detailDetailModel>/currentInvoice/PaymentMethod}" change=".onChangePaymentMethod" maxLength="1"/>
+                                                <m:Input id="idPaymentMethod" showValueHelp="true" valueHelpRequest=".onPayMethodsVH" value="{detailDetailModel>/currentInvoice/PaymentMethod}" change=".onChangePaymentMethod" maxLength="1"/>
 
-                                                <m:Label text="{i18n>Reference}" required="true" />
+                                                <m:Label text="{i18n>Reference}" />
                                                 <m:Input id="idReference" value="{detailDetailModel>/currentInvoice/InvoiceReference}" change=".onChangeReference" maxLength="10"/>
 
-                                                <m:Label text="{i18n>InvoiceReferenceFiscalYear}" required="true" />
+                                                <m:Label text="{i18n>InvoiceReferenceFiscalYear}" />
                                                 <m:Input id="idInvoiceReferenceFiscalYear" value="{detailDetailModel>/currentInvoice/InvoiceReferenceFiscalYear}" change=".onChangeInvoiceReferenceFiscalYear" maxLength="4"/>
 
-                                                <m:Label text="{i18n>HouseBank}" required="true" />
-                                                <m:Input id="idHouseBank" value="{detailDetailModel>/currentInvoice/HouseBank}" change=".onChangeHouseBank" maxLength="5"/>
+                                                <m:Label text="{i18n>HouseBank}" />
+                                                <m:Input id="idHouseBank" showValueHelp="true" valueHelpRequest=".onHouseBankVH" value="{detailDetailModel>/currentInvoice/HouseBank}" change=".onChangeHouseBank" maxLength="5"/>
 
-                                                <m:Label text="{i18n>HouseBankAccount}" required="true" />
-                                                <m:Input id="idHouseBankAccount" value="{detailDetailModel>/currentInvoice/HouseBankAccount}" change=".onChangeHouseBankAccount" maxLength="5"/>
+                                                <m:Label text="{i18n>HouseBankAccount}" />
+                                                <m:Input id="idHouseBankAccount" showValueHelp="true" valueHelpRequest=".onHouseBankAccountVH" value="{detailDetailModel>/currentInvoice/HouseBankAccount}" liveChange=".onLiveChangeHouseBanksAccount" change=".onChangeHouseBankAccount" maxLength="5"/>
 
-                                                <m:Label text="{i18n>PaymentBlockingReason}" required="true" />
+                                                <m:Label text="{i18n>PaymentBlockingReason}" />
                                                 <m:Input id="idPaymentBlockingReason" value="{detailDetailModel>/currentInvoice/PaymentBlockingReason}" change=".onChangePaymentBlockingReason" maxLength="1"/>
 
-                                                <m:Label text="{i18n>PaymentReason}" required="true" />
+                                                <m:Label text="{i18n>PaymentReason}" />
                                                 <m:Input id="idPaymentReason" value="{detailDetailModel>/currentInvoice/PaymentReason}" change=".onChangePaymentReason" maxLength="4"/>
 
 
                                                 <core:Title text="{i18n>Details}" />
 
-                                                <m:Label text="{i18n>UnplannedDeliveryCost}" required="true" />
+                                                <m:Label text="{i18n>UnplannedDeliveryCost}" />
                                                 <m:Input id="idUnplannedDeliveryCost" value="{
                                                     'path': 'detailDetailModel>/currentInvoice/UnplannedDeliveryCost',
                                                     type: 'sap.ui.model.odata.type.Decimal',
@@ -265,16 +263,16 @@
                                                 <m:Label text="{i18n>Text}" />
                                                 <m:Input id="idFreeTxt" value="{detailDetailModel>/currentInvoice/DocumentHeaderText}" maxLength="25" change=".onChangeFreeTxt"/>
 
-                                                <m:Label text="{i18n>InvoiceDocumentType}" />
-                                                <m:Input id="idInvDocType" showValueHelp="true" valueHelpRequest=".onInvDocTypeVH" value="{detailDetailModel>/currentInvoice/AccountingDocumentType}" change=".onChangeInvDocType" maxLength="2"/>
+                                                <m:Label text="{i18n>InvoiceDocumentType}" required="true"/>
+                                                <m:Input id="idInvDocType" showValueHelp="true" valueHelpRequest=".onAccountingDocumentTypeVH" value="{detailDetailModel>/currentInvoice/AccountingDocumentType}" change=".onChangeInvDocType" maxLength="2"/>
 
-                                                <m:Label text="{i18n>SupplyingCountry}" required="true" />
+                                                <m:Label text="{i18n>SupplyingCountry}" />
                                                 <m:Input id="idSupplyingCountry" value="{detailDetailModel>/currentInvoice/SupplyingCountry}" change=".onChangeSupplyingCountry" maxLength="3"/>
 
-                                                <m:Label text="{i18n>Assignment}" required="true" />
+                                                <m:Label text="{i18n>Assignment}" />
                                                 <m:Input id="idAssignment" value="{detailDetailModel>/currentInvoice/AssignmentReference}" maxLength="18" change=".onChangeAssignment"/>
 
-                                                <m:Label text="{i18n>IsEUTriangularDeal}" required="true" />
+                                                <m:Label text="{i18n>IsEUTriangularDeal}" />
                                                 <m:CheckBox id="idIsEUTriangularDeal" selected="{detailDetailModel>/currentInvoice/IsEUTriangularDeal}" select=".onChangeIsEUTriangularDeal"/>
 
                                                 
@@ -310,19 +308,19 @@
                                                     </extension>
                                                     <columns>
                                                         <Column >
-                                                            <m:Label text="{i18n>WithholdingTaxType}" required="true" />
+                                                            <m:Label text="{i18n>WithholdingTaxType}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>WithholdingTaxType}" change=".onChangeWithholdingTaxType" maxLength="2"/>
+                                                                <m:Input showValueHelp="true" valueHelpRequest=".onWithholdingTaxTypeVH" value="{detailDetailModel>WithholdingTaxType}" change=".onChangeWithholdingTaxType" maxLength="2"/>
                                                             </template>
                                                         </Column>
                                                         <Column >
                                                             <m:Label text="{i18n>WithholdingTaxCode}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>WithholdingTaxCode}" change=".onChangeWithholdingTaxCode" maxLength="2"/>
+                                                                <m:Input showValueHelp="true" valueHelpRequest=".onWithholdingTaxCodeVH" value="{detailDetailModel>WithholdingTaxCode}" change=".onChangeWithholdingTaxCode" maxLength="2"/>
                                                             </template>
                                                         </Column>
                                                         <Column >
-                                                            <m:Label text="{i18n>WithholdingTaxBaseAmount}" required="true" />
+                                                            <m:Label text="{i18n>WithholdingTaxBaseAmount}" />
                                                             <template>
                                                                 <m:Input value="{
                                                                     'path': 'detailDetailModel>WithholdingTaxBaseAmount',
@@ -353,7 +351,7 @@
                                         <m:items>
                                             <m:IconTabFilter text="{i18n>PurchaseOrder}" count="{= ${detailDetailModel>/currentInvoice/PORecords/length}}">
 
-                                                <m:Label text="{i18n>RefDocCategory}" required="true" class="sapUiSmallMargin"/>
+                                                <m:Label text="{i18n>RefDocCategory}" class="sapUiSmallMargin"/>
                                                 <m:Select id="idRefDocCategory" change=".onChangeRefDocCategory" class="sapUiSmallMargin" enabled="{detailDetailModel>/props/lineItemTable/editMode}">
                                                     <core:Item key="keyRefDocCategory0" />
                                                     <core:Item key="keyRefDocCategory1" text="{i18n>PurchaseOrder}" />
@@ -362,7 +360,7 @@
                                                 </m:Select>
                                                 
                                                 <!-- <m:HBox> 
-                                                    <m:Label text="{i18n>RefDocCategory}" required="true" class="sapUiSmallMargin"/>
+                                                    <m:Label text="{i18n>RefDocCategory}" class="sapUiSmallMargin"/>
                                                     <m:Select id="idRefDocCategory" change=".onChangeRefDocCategory" class="sapUiSmallMargin" enabled="{detailDetailModel>/props/lineItemTable/editMode}">
                                                         <core:Item key="keyRefDocCategory0" />
                                                         <core:Item key="keyRefDocCategory1" text="{i18n>PurchaseOrder}" />
@@ -370,19 +368,19 @@
                                                         <core:Item key="keyRefDocCategoryS" text="{i18n>ServiceEntrySheet}" />
                                                     </m:Select>
 
-                                                    <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}" required="false" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}"/>
+                                                    <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}"/>
                                                     <m:Input id="idTo_SelectedPurchaseOrders_PurchaseOrder" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders'], formatter:'.formatter.fillTo_SelectedPurchaseOrders_PurchaseOrder'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrder" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}" maxLength="10"/>
 
-                                                    <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrderItem}" required="false" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}"/>
+                                                    <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrderItem}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}"/>
                                                     <m:Input id="idTo_SelectedPurchaseOrders_PurchaseOrderItem" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders'], formatter:'.formatter.fillTo_SelectedPurchaseOrders_PurchaseOrderItem'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrderItem" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}" maxLength="5"/>
 
-                                                    <m:Label text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}" required="false" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedDeliveryNotes_InboundDeliveryNote'}"/>
+                                                    <m:Label text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedDeliveryNotes_InboundDeliveryNote'}"/>
                                                     <m:Input id="idTo_SelectedDeliveryNotes_InboundDeliveryNote" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedDeliveryNotes'], formatter:'.formatter.fillTo_SelectedDeliveryNotes_InboundDeliveryNote'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedDeliveryNotes_InboundDeliveryNote'}" maxLength="16"/>
 
-                                                    <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheet}" required="false" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}"/>
+                                                    <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheet}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}"/>
                                                     <m:Input id="idTo_SelectedServiceEntrySheets_ServiceEntrySheet" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedServiceEntrySheets'], formatter:'.formatter.fillTo_SelectedServiceEntrySheets_ServiceEntrySheet'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}" maxLength="10"/>
 
-                                                    <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheetItem}" required="false" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}"/>
+                                                    <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheetItem}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}"/>
                                                     <m:Input id="idTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedServiceEntrySheets'], formatter:'.formatter.fillTo_SelectedServiceEntrySheets_ServiceEntrySheetItem'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}" maxLength="5"/>
                                                 </m:HBox> -->
 
@@ -404,14 +402,14 @@
                                                     </extension>
                                                     
                                                     <Column >
-                                                        <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}" required="true"/>
+                                                        <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}"/>
                                                         <template>
                                                             <m:Input value="{detailDetailModel>PurchaseOrder}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrder" maxLength="10"/>
                                                         </template>
                                                     </Column>
                                                     
                                                     <Column >
-                                                        <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrderItem}" required="true"/>
+                                                        <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrderItem}"/>
                                                         <template>
                                                             <m:Input value="{detailDetailModel>PurchaseOrderItem}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrderItem" maxLength="5"/>
                                                         </template>
@@ -436,7 +434,7 @@
                                                     </extension>
                                                     
                                                     <Column >
-                                                        <m:Label text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}" required="true"/>
+                                                        <m:Label text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}"/>
                                                         <template>
                                                             <m:Input value="{detailDetailModel>InboundDeliveryNote}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote" maxLength="16"/>
                                                         </template>
@@ -461,14 +459,14 @@
                                                     </extension>
                                                     
                                                     <Column >
-                                                        <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheet}" required="true"/>
+                                                        <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheet}"/>
                                                         <template>
                                                             <m:Input value="{detailDetailModel>ServiceEntrySheet}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet" maxLength="10"/>
                                                         </template>
                                                     </Column>
                                                     
                                                     <Column >
-                                                        <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheetItem}" required="true"/>
+                                                        <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheetItem}"/>
                                                         <template>
                                                             <m:Input value="{detailDetailModel>ServiceEntrySheetItem}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" maxLength="5"/>
                                                         </template>
@@ -493,44 +491,32 @@
                                                         </m:Toolbar>
                                                     </extension>
                                                     <columns>
-                                                        <!-- <Column width="8rem" >
-                                                            <m:Label text="{i18n>DocLineNo}" required="true"/>
-                                                            <template>
-                                                                <m:Input value="{detailDetailModel>SupplierInvoiceItem}" type="Number" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}"/>
-                                                            </template>
-                                                        </Column> -->
-                                                        <!-- <Column width="8rem" visible="{detailDetailModel>/props/bMultiplePO}">
-                                                            <m:Label text="{i18n>PurchaseOrder}" required="true"/>
-                                                            <template>
-                                                                <m:Input value="{detailDetailModel>PONumber}" showValueHelp="true" valueHelpRequest="onMultiplePOVH" change="onMultiPOInputChange" maxLength="10" visible="{detailDetailModel>/props/bMultiplePO}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" />
-                                                            </template>
-                                                        </Column> -->
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>PurchaseOrder}" required="true"/>
+                                                            <m:Label text="{i18n>PurchaseOrder}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>PurchaseOrder}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrder" maxLength="10"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>PurchaseOrderItem}" required="true"/>
+                                                            <m:Label text="{i18n>PurchaseOrderItem}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>PurchaseOrderItem}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrderItem" maxLength="5"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>Plant}" required="true"/>
+                                                            <m:Label text="{i18n>Plant}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Plant}"  maxLength="4" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePlant"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>TaxCode}" required="true"/>
+                                                            <m:Label text="{i18n>TaxCode}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>TaxCode}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTaxCode" maxLength="2"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" > 
-                                                            <m:Label text="{i18n>SupplierInvoiceItemAmount}" required="true"/>
+                                                            <m:Label text="{i18n>SupplierInvoiceItemAmount}"/>
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>SupplierInvoiceItemAmount',
@@ -548,13 +534,13 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>QuantityInPurchaseOrderUnit}" required="true"/>
+                                                            <m:Label text="{i18n>QuantityInPurchaseOrderUnit}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>QuantityInPurchaseOrderUnit}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeQuantityInPurchaseOrderUnit" maxLength="3"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>OrderUnit}" required="true"/>
+                                                            <m:Label text="{i18n>OrderUnit}"/>
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>QuantityInPurchaseOrderUnit',
@@ -578,7 +564,7 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>IsNotCashDiscountLiable}" required="true"/>
+                                                            <m:Label text="{i18n>IsNotCashDiscountLiable}"/>
                                                             <template>
                                                                 <m:CheckBox selected="{detailDetailModel>IsNotCashDiscountLiable}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" select=".onChangeIsNotCashDiscountLiable"/>
                                                             </template>
@@ -596,97 +582,97 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>IsFinallyInvoiced}" required="true"/>
+                                                            <m:Label text="{i18n>IsFinallyInvoiced}"/>
                                                             <template>
                                                                 <m:CheckBox selected="{detailDetailModel>IsFinallyInvoiced}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" select=".onChangeIsFinallyInvoiced"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>CostCenter}" required="true"/>
+                                                            <m:Label text="{i18n>CostCenter}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>CostCenter}" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeCostCenter"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>ControllingArea}" required="true"/>
+                                                            <m:Label text="{i18n>ControllingArea}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>ControllingArea}" maxLength="4" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeControllingArea"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>BusinessArea}" required="true"/>
+                                                            <m:Label text="{i18n>BusinessArea}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>BusinessArea}" maxLength="4" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeBusinessArea"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>ProfitCenter}" required="true"/>
+                                                            <m:Label text="{i18n>ProfitCenter}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>ProfitCenter}" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeProfitCenter"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>FunctionalArea}" required="true"/>
+                                                            <m:Label text="{i18n>FunctionalArea}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>FunctionalArea}" maxLength="16" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeFunctionalArea"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>WBSElement}" required="true"/>
+                                                            <m:Label text="{i18n>WBSElement}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>WBSElement}" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeWBSElement"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>SalesOrder}" required="true"/>
+                                                            <m:Label text="{i18n>SalesOrder}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>SalesOrder}" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeSalesOrder"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>SalesOrderItem}" required="true"/>
+                                                            <m:Label text="{i18n>SalesOrderItem}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>SalesOrderItem}" maxLength="6" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeSalesOrderItem"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>InternalOrder}" required="true"/>
+                                                            <m:Label text="{i18n>InternalOrder}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>InternalOrder}" maxLength="12" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeInternalOrder"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>CommitmentItem}" required="true"/>
+                                                            <m:Label text="{i18n>CommitmentItem}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>CommitmentItem}" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeCommitmentItem"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>FundsCenter}" required="true"/>
+                                                            <m:Label text="{i18n>FundsCenter}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>FundsCenter}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeFundsCenter" maxLength="16"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>Fund}" required="true"/>
+                                                            <m:Label text="{i18n>Fund}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Fund}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeFund" maxLength="10"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>GrantID}" required="true"/>
+                                                            <m:Label text="{i18n>GrantID}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>GrantID}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeGrantID" maxLength="20"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>ProfitabilitySegment}" required="true"/>
+                                                            <m:Label text="{i18n>ProfitabilitySegment}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>ProfitabilitySegment}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeProfitabilitySegment" maxLength="10"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>BudgetPeriod}" required="true"/>
+                                                            <m:Label text="{i18n>BudgetPeriod}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>BudgetPeriod}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeBudgetPeriod" maxLength="10"/>
                                                             </template>
@@ -770,13 +756,13 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>BusinessArea}" required="true"/>
+                                                            <m:Label text="{i18n>BusinessArea}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>BusinessArea}" maxLength="4" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeBusinessArea"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>PartnerBusinessArea}" required="true"/>
+                                                            <m:Label text="{i18n>PartnerBusinessArea}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>PartnerBusinessArea}" maxLength="4" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePartnerBusinessArea"/>
                                                             </template>
@@ -788,25 +774,25 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>FunctionalArea}" required="true"/>
+                                                            <m:Label text="{i18n>FunctionalArea}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>FunctionalArea}" maxLength="16" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeFunctionalArea"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>SalesOrder}" required="true"/>
+                                                            <m:Label text="{i18n>SalesOrder}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>SalesOrder}" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeSalesOrder"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>SalesOrderItem}" required="true"/>
+                                                            <m:Label text="{i18n>SalesOrderItem}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>SalesOrderItem}" maxLength="6" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeSalesOrderItem"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>CostCtrActivityType}" required="true"/>
+                                                            <m:Label text="{i18n>CostCtrActivityType}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>CostCtrActivityType}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeCostCtrActivityType" maxLength="6"/>
                                                             </template>
@@ -818,49 +804,49 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>PersonnelNumber}" required="true"/>
+                                                            <m:Label text="{i18n>PersonnelNumber}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>PersonnelNumber}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePersonnelNumber" maxLength="8"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>IsNotCashDiscountLiable}" required="true"/>
+                                                            <m:Label text="{i18n>IsNotCashDiscountLiable}"/>
                                                             <template>
                                                                 <m:CheckBox selected="{detailDetailModel>IsNotCashDiscountLiable}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" select=".onChangeIsNotCashDiscountLiable"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>InternalOrder}" required="true"/>
+                                                            <m:Label text="{i18n>InternalOrder}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>InternalOrder}" maxLength="12" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeInternalOrder"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>CommitmentItem}" required="true"/>
+                                                            <m:Label text="{i18n>CommitmentItem}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>CommitmentItem}" maxLength="24" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeCommitmentItem"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>Fund}" required="true"/>
+                                                            <m:Label text="{i18n>Fund}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>Fund}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeFund" maxLength="10"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>GrantID}" required="true"/>
+                                                            <m:Label text="{i18n>GrantID}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>GrantID}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeGrantID" maxLength="20"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>QuantityUnit}" required="true"/>
+                                                            <m:Label text="{i18n>QuantityUnit}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>QuantityUnit}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeQuantityUnit" maxLength="3"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>Quantity}" required="true"/>
+                                                            <m:Label text="{i18n>Quantity}"/>
                                                             <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>Quantity',
@@ -878,25 +864,25 @@
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>FinancialTransactionType}" required="true"/>
+                                                            <m:Label text="{i18n>FinancialTransactionType}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>FinancialTransactionType}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeFinancialTransactionType" maxLength="3"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>EarmarkedFundsDocument}" required="true"/>
+                                                            <m:Label text="{i18n>EarmarkedFundsDocument}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>EarmarkedFundsDocument}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeEarmarkedFundsDocument" maxLength="10"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>EarmarkedFundsDocumentItem}" required="true"/>
+                                                            <m:Label text="{i18n>EarmarkedFundsDocumentItem}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>EarmarkedFundsDocumentItem}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeEarmarkedFundsDocumentItem" maxLength="3"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
-                                                            <m:Label text="{i18n>BudgetPeriod}" required="true"/>
+                                                            <m:Label text="{i18n>BudgetPeriod}"/>
                                                             <template>
                                                                 <m:Input value="{detailDetailModel>BudgetPeriod}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeBudgetPeriod" maxLength="10"/>
                                                             </template>
