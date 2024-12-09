@@ -71,12 +71,13 @@ sap.ui.define([
             var sDocStatus = oView.byId("idSelectDocStatus").getSelectedKeys();
             var sAssignedTo = oView.byId("idAssignedToInp").getValue();
             var sDocCategory = oView.byId("idSelectDocumentCategory").getSelectedKey();
-            var sCreatedBy = oView.byId("idSentByInp").getValue();
+            var sVendor = oView.byId("idSentByInp").getValue();
+            var sVAT = oView.byId("idVATRegistrationNumber").getValue();
             var sCreatedDateFrom = oView.byId("idSentOn").getDateValue();
             var sCreatedDateTo = oView.byId("idSentOn").getSecondDateValue();
 
             // Build query URL with parameters
-            var sUrl = this._buildFilterQuery(sDocStatus, sAssignedTo, sDocCategory, sCreatedBy, sCreatedDateFrom, sCreatedDateTo);
+            var sUrl = this._buildFilterQuery(sDocStatus, sAssignedTo, sDocCategory, sVendor, sVAT, sCreatedDateFrom, sCreatedDateTo);
 
             // Get the master model to update the data list after the request
             var oMasterModel = this.getView().getModel("masterModel");
@@ -104,7 +105,7 @@ sap.ui.define([
         /**
          * Helper method to build the query URL with the given parameters.
          */
-        _buildFilterQuery: function (sDocStatus, sAssignedTo, sDocCategory, sCreatedBy, sCreatedDateFrom, sCreatedDateTo) {
+        _buildFilterQuery: function (sDocStatus, sAssignedTo, sDocCategory, sVendor, sVAT, sCreatedDateFrom, sCreatedDateTo) {
             var url = baseManifestUrl + "/odata/extended()?";
             var aParams = [];
 
@@ -117,8 +118,11 @@ sap.ui.define([
             if (sDocCategory) {
                 aParams.push("DOCCATEGORY=" + sDocCategory);
             }
-            if (sCreatedBy) {
-                aParams.push("CREATEDBY=" + sCreatedBy);
+            if (sVendor) {
+                aParams.push("VENDOR_NAME=" + sVendor);
+            }
+            if (sVAT) {
+                aParams.push("VAT=" + sVAT);
             }
             if (sCreatedDateFrom || sCreatedDateTo) {
                 aParams.push("CREATEDAT=" + sCreatedDateFrom.toJSON() + "," + sCreatedDateTo.toJSON());
@@ -150,6 +154,7 @@ sap.ui.define([
             oView.byId("idAssignedToInp").setValue(null);
             oView.byId("idSelectDocumentCategory").setSelectedKey(null);
             oView.byId("idSentByInp").setValue(null);
+            oView.byId("idVATRegistrationNumber").setValue(null);
             oView.byId("idSentOn").setDateValue(null);
             oView.byId("idSentOn").setSecondDateValue(null);
         },
@@ -335,11 +340,10 @@ sap.ui.define([
                 bEnableQuickMassiveEdit = aItems.length > 1;
             oTable.getItems().forEach(oItem => {
                 if (aItems.length > 1) {
-                    oItem.getAggregation("cells")[7].setEnabled(false);
+                    oItem.getAggregation("cells")[8].setEnabled(false);
                 } else {
-                    oItem.getAggregation("cells")[7].setEnabled(true);
+                    oItem.getAggregation("cells")[8].setEnabled(true);
                 }
-                oItem.setHighlight(ValueState.None);
             });
             this.getView().byId("dynamicPageId").setShowFooter(bShowFooter);
             this.getView().byId("quickMassiveActionButton").setEnabled(bEnableQuickMassiveEdit);

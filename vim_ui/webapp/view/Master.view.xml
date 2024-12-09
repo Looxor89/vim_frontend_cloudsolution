@@ -58,15 +58,22 @@
                                 </fb:control>
                             </fb:FilterGroupItem>
 
+                            <!-- Sent By Filter -->
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="{i18n>VATRegistrationNumber}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="idVATRegistrationNumber" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
                             <!-- Assigned To Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="{i18n>AssignedTo}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="{i18n>AssignedTo}" visibleInFilterBar="true">
                                 <fb:control>
                                     <Input id="idAssignedToInp" />
                                 </fb:control>
                             </fb:FilterGroupItem>
 
                             <!-- Document Category Filter -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="{i18n>DocumentCategory}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="{i18n>DocumentCategory}" visibleInFilterBar="true">
                                 <fb:control>
                                     <Select id="idSelectDocumentCategory" forceSelection="false" items="{prmodel>/filterProps/DocumentCategory}">
                                         <core:Item key="{prmodel>id}" text="{prmodel>status}" />
@@ -75,7 +82,7 @@
                             </fb:FilterGroupItem>
 
                             <!-- Received Between Filter (Date Range) -->
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="{i18n>ReceivedBetween}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="H" label="{i18n>ReceivedBetween}" visibleInFilterBar="true">
                                 <fb:control>
                                     <DateRangeSelection id="idSentOn" displayFormat="long" />
                                 </fb:control>
@@ -137,6 +144,11 @@
                         <Text text="{i18n>VendorNameColumn}" />
                     </Column>
 
+                    <!-- Vendor name Column -->
+                    <Column hAlign="Initial" width="15%">
+                        <Text text="{i18n>VATRegistrationNumberColumn}" />
+                    </Column>
+
                     <!-- Assigned To Column -->
                     <Column hAlign="Initial" width="15%">
                         <Text text="{i18n>AssignedToColumn}" />
@@ -178,8 +190,11 @@
                             <!-- Received on -->
                             <Text text="{path:'masterModel>CREATEDAT', formatter:'.formatter.formatDateString'}" />
 
-                            <!-- Sent By -->
-                            <Text text="{masterModel>CREATEDBY}" />
+                            <!-- VENDOR -->
+                            <Text text="{masterModel>VENDOR_NAME}" />
+
+                            <!-- VAT -->
+                            <Text text="{masterModel>VAT}" />
                             
                             <!-- Assigned To Name -->
                             <Text text="{masterModel>ASSIGNEDTONAME}" />
