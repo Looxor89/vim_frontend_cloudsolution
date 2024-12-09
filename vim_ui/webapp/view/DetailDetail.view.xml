@@ -83,12 +83,12 @@
                                                 <core:Title text="{i18n>BasicData}" />
 
                                                 <m:Label text="{i18n>CompanyCode}" />
-                                                <m:Input id="idCompanyCode" value="{detailDetailModel>/currentInvoice/CompanyCode}" change=".onChangeCompanyCode" maxLength="4"/>
+                                                <m:Input id="idCompanyCode" value="{detailDetailModel>/currentInvoice/CompanyCode}" editable="false" maxLength="4"/>
                                                 
                                                 <m:Label text="{i18n>Invoicedate}" />
                                                 <m:DatePicker id="idInvDate" value="{
                                                     'path': 'detailDetailModel>/currentInvoice/DocumentDate'
-                                                }" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" change=".onChangeDocumentDate" placeholder="YYYY-MM-DD"  />
+                                                }" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" editable="false" placeholder="YYYY-MM-DD"  />
 
                                                 <m:Label text="{i18n>InvoiceReceiptDate}" />
                                                 <m:DatePicker id="idDocDate" value="{
@@ -123,7 +123,7 @@
                                                                         precision: 14,
                                                                         scale: 3
                                                                     }
-                                                    }" change=".onChangeInvoiceGrossAmount"
+                                                    }" editable="false"
                                                     type="Number" description="{appmodel>/detailDetail/header/currencyCode/value}" 
                                                     placeholder="0.00"/>
 
@@ -267,7 +267,7 @@
                                                 <m:Input id="idInvDocType" showValueHelp="true" valueHelpRequest=".onAccountingDocumentTypeVH" value="{detailDetailModel>/currentInvoice/AccountingDocumentType}" change=".onChangeInvDocType" maxLength="2"/>
 
                                                 <m:Label text="{i18n>SupplyingCountry}" />
-                                                <m:Input id="idSupplyingCountry" value="{detailDetailModel>/currentInvoice/SupplyingCountry}" change=".onChangeSupplyingCountry" maxLength="3"/>
+                                                <m:Input id="idSupplyingCountry" value="{detailDetailModel>/currentInvoice/SupplyingCountry}" editable="false" maxLength="3"/>
 
                                                 <m:Label text="{i18n>Assignment}" />
                                                 <m:Input id="idAssignment" value="{detailDetailModel>/currentInvoice/AssignmentReference}" maxLength="18" change=".onChangeAssignment"/>
