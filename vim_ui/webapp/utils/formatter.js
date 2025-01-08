@@ -325,6 +325,34 @@ sap.ui.define([
         return new Date(sYear, sMonth, sDay);
       }
       return null;
+    },
+
+    enableNextAttachmentButton: function (oCurrentAttachment, aInvoiceAttachments) {
+      if (aInvoiceAttachments) {
+        let aInvoiceAttachmentsLength = aInvoiceAttachments.length;
+        if (oCurrentAttachment && aInvoiceAttachmentsLength > 1) {
+          for (let i = 0; i<aInvoiceAttachmentsLength; i++) {
+            if (aInvoiceAttachments[i].id === oCurrentAttachment.id && i < aInvoiceAttachmentsLength - 1 ) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    },
+
+    enablePreviousAttachmentButton: function (oCurrentAttachment, aInvoiceAttachments) {
+      if (aInvoiceAttachments) {
+        let aInvoiceAttachmentsLength = aInvoiceAttachments.length;
+        if (oCurrentAttachment && aInvoiceAttachmentsLength > 1) {
+          for (let i = 0; i<aInvoiceAttachmentsLength; i++) {
+            if (aInvoiceAttachments[i].id === oCurrentAttachment.id && i > 0 ) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
     }
   };
 });

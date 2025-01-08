@@ -8,6 +8,7 @@ sap.ui.define([
   var sResponsivePaddingClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer";
   //manifest base URL
   var baseManifestUrl;
+  var indexOfCurrentAttachment;
 
   return BaseController.extend("vim_ui.controller.Detail", {
     formatter: formatter,
@@ -15,6 +16,7 @@ sap.ui.define([
     onInit: function () {
       //set manifest base URL
       baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
+      indexOfCurrentAttachment = 0;
       this.oRouter = this.getOwnerComponent().getRouter();
       this.oRouter.getRoute("detailDetail").attachPatternMatched(this._onRouteMatched, this);
       var bus = this.getOwnerComponent().getEventBus();
@@ -25,7 +27,8 @@ sap.ui.define([
     _onRouteMatched: function (oEvent) {
       this._packageId = oEvent.getParameter("arguments").packageId || this._packageId || "0";
       this.getView().setModel(new JSONModel({}), "detailModel");
-      this.fetchAttachment(this._packageId)
+      this.fetchAttachments(this._packageId);
+      
       //   .then(this.getDoxData.bind(this))
       //   .then(function (data) {
       //     // do something after dox data loads
@@ -43,32 +46,40 @@ sap.ui.define([
       //   }.bind(this));
     },
 
-    fetchAttachment : function (packageId) {
+    fetchAttachments : function (packageId) {
       var oDetailModel = this.getView().getModel("detailModel");
-      var aURL = baseManifestUrl + "/odata/getAttachment()?PackageId=" + packageId;
-      var source = null,
-      title = null;
+      var aURL = baseManifestUrl + "/odata/getAttachment()?PackageId=" + packageId + "&Extension=PDF";
+
       const oSuccessFunction = (data) => {
+        let InvoiceAttachments = [];
         const result = data.value[0].result;
         if (result) {
-          let base64EncodedPDF = data.value[0].result.attachment,
+          result.forEach(element => {
+            let source = null,
+              title = null;
+              
+            let base64EncodedPDF = element.attachment,
             decodedPdfContent = atob(base64EncodedPDF),
             byteArray = new Uint8Array(decodedPdfContent.length);
-          for(var i=0; i<decodedPdfContent.length; i++){
-            byteArray[i] = decodedPdfContent.charCodeAt(i);
-          }
-          let blob = new Blob([byteArray.buffer], { type: 'application/pdf' });
-          source = URL.createObjectURL(blob);
-          title = result.nomeAttachment;
-          jQuery.sap.addUrlWhitelist("blob");
-        }
-        let InvoiceAttachment = {
-          source: source,
-          title: title
-        }
-        // Update the 'lock' property in the 'detailDetailModel' with the result
-        oDetailModel.setProperty("/InvoiceAttachment", InvoiceAttachment);
+            for(var i=0; i<decodedPdfContent.length; i++){
+              byteArray[i] = decodedPdfContent.charCodeAt(i);
+            }
+            let blob = new Blob([byteArray.buffer], { type: 'application/pdf' });
+            source = URL.createObjectURL(blob);
+            title = element.nomeAttachment;
+            jQuery.sap.addUrlWhitelist("blob");
 
+            InvoiceAttachments.push({
+              id: element.ID,
+              body_Id: element.body_Id,
+              source: source,
+              title: title
+            });
+          });
+        }
+        
+        oDetailModel.setProperty("/InvoiceAttachments", InvoiceAttachments);
+        this.setCurrentAttachment(indexOfCurrentAttachment);
         return data;
       };
 
@@ -84,6 +95,26 @@ sap.ui.define([
 
       this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
       
+    },
+
+    setCurrentAttachment: function (attachmentNumber) {
+      var oDetailModel = this.getView().getModel("detailModel"),
+      aInvoiceAttachments = oDetailModel.getProperty("/InvoiceAttachments");
+      if (!aInvoiceAttachments) {
+        oDetailModel.setProperty("/CurrentAttachment", []);
+      } else {
+        oDetailModel.setProperty("/CurrentAttachment", aInvoiceAttachments.at(attachmentNumber));
+      }
+    },
+
+    onPreviousAttachment: function () {
+      indexOfCurrentAttachment = indexOfCurrentAttachment - 1;
+      this.setCurrentAttachment(indexOfCurrentAttachment);
+    },
+
+    onNextAttachment: function () {
+      indexOfCurrentAttachment = indexOfCurrentAttachment + 1;
+      this.setCurrentAttachment(indexOfCurrentAttachment);
     },
 
     _fullReload: function (oEvent) {
@@ -255,6 +286,6 @@ sap.ui.define([
       }
       console.log('reached end of page-bounds');
     }
-
+    
   });
 });

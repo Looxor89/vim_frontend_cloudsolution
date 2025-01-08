@@ -7,10 +7,10 @@
                     <Title text="Document View" textAlign="Center" />
                 </f:heading>
                 <f:expandedContent>
-                    <Label text="File: {detailModel>/InvoiceAttachment/title}" />
+                    <Label text="File: {detailModel>/CurrentAttachment/title}" />
                 </f:expandedContent>
                 <f:snappedContent>
-                    <Label text="File: {detailModel>/InvoiceAttachment/title}" />
+                    <Label text="File: {detailModel>/CurrentAttachment/title}" />
                 </f:snappedContent>
                 <f:actions>
                     <Button icon="sap-icon://decline" press="onCancelPress" tooltip="Close" type="Transparent">
@@ -44,9 +44,13 @@
         </f:header> -->
         <f:content>
             <VBox id="idViewerArea" height="100%">
+                <HBox>
+                    <Button text="Previous PDF attachment" icon="sap-icon://navigation-left-arrow" press="onPreviousAttachment" tooltip="Previous PDF attachment" type="Transparent" enabled="{ parts:['detailModel>/CurrentAttachment', 'detailModel>/InvoiceAttachments'], formatter: '.formatter.enablePreviousAttachmentButton'}"/>
+                    <Button text="Next PDF attachment" iconFirst="false" icon="sap-icon://navigation-right-arrow" press="onNextAttachment" tooltip="Next PDF attachment" type="Transparent" enabled="{ parts:['detailModel>/CurrentAttachment', 'detailModel>/InvoiceAttachments'], formatter: '.formatter.enableNextAttachmentButton'}"/>
+                </HBox>
                 <!-- <ocr:OCRViewer id="ocrDetailViewer0" class="sapUiSmallMarginBeginEnd" totalPages="{appmodel>/pages}" currentPage="1" imageUrl="{appmodel>/imgurl}" doxObject="{appmodel>/job}" onPageChange="_handlePageChange" /> -->
 
-                <PDFViewer source="{detailModel>/InvoiceAttachment/source}" isTrustedSource="true" >
+                <PDFViewer source="{detailModel>/CurrentAttachment/source}" isTrustedSource="true" >
                     <layoutData>
                         <FlexItemData growFactor="1" />
                     </layoutData>
