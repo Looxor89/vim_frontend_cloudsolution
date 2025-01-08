@@ -36,8 +36,14 @@ sap.ui.define([
          */
         _onRouteMatched: function () {
             this.defineModelForCurrentPage();
+            this._setDefaultDocumentStatus();
             this.onGoPress();
             this.resetState();
+        },
+
+        _setDefaultDocumentStatus() {
+            // Set default document status 
+            this.getView().byId("idSelectDocStatus").setSelectedKeys(["INITIAL","ASSIGN","PROCESSING","ERROR"]);
         },
 
         /**
