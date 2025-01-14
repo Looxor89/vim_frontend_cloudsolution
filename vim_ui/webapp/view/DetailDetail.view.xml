@@ -536,12 +536,6 @@
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>QuantityInPurchaseOrderUnit}"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>QuantityInPurchaseOrderUnit}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeQuantityInPurchaseOrderUnit" maxLength="3"/>
-                                                            </template>
-                                                        </Column>
-                                                        <Column width="8rem" >
-                                                            <m:Label text="{i18n>OrderUnit}"/>
-                                                            <template>
                                                                 <m:Input value="{
                                                                     path: 'detailDetailModel>QuantityInPurchaseOrderUnit',
                                                                     type: 'sap.ui.model.odata.type.Decimal',
@@ -555,6 +549,12 @@
                                                                         scale: 3
                                                                     }
                                                                 }" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeQuantityInPurchaseOrderUnit"/>
+                                                            </template>
+                                                        </Column>
+                                                        <Column width="8rem" >
+                                                            <m:Label text="{i18n>PurchaseOrderQuantityUnit}"/>
+                                                            <template>
+                                                                <m:Input value="{detailDetailModel>PurchaseOrderQuantityUnit}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrderQuantityUnit" maxLength="3"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
