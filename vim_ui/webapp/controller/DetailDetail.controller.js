@@ -2217,6 +2217,41 @@ sap.ui.define([
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
+    //Cost Centers
+    onCostCentersVH: function (oEvent) {
+      this.oInputCostCenter = oEvent.getSource();
+      var oView = this.getView();
+      var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
+      var aURL = baseManifestUrl + "/odata/getCostCenters()?CompanyCode="+sCompanyCode;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/costCenters", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idCostCentersDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.CostCentersVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idCostCentersDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
 
     onSearchPayTerms: function (oEvent) {
       var sValue = oEvent.getParameter("value");
@@ -2248,6 +2283,22 @@ sap.ui.define([
       oBinding.filter(sFilter);
     },
 
+    onSearchCostCenters: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                new Filter("CostCenter", FilterOperator.Contains, sValue),
+                new Filter("CostCenterName", FilterOperator.Contains, sValue),
+                new Filter("ValidityEndDate", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idGlAccountsDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
 
     onConfirmPayTerms: function (oEvent) {
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
@@ -2262,6 +2313,14 @@ sap.ui.define([
       var sGLAccount = this.getView().getModel("detailDetailModel").getProperty(sPath + "/GLAccount");
       this.oInputGlAccount.setValue(sGLAccount);
       this.oInputGlAccount.fireChangeEvent(sGLAccount);
+    },
+
+
+    onConfirmCostCenter: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sCostCenter = this.getView().getModel("detailDetailModel").getProperty(sPath + "/CostCenter");
+      this.oInputCostCenter.setValue(sCostCenter);
+      this.oInputCostCenter.fireChangeEvent(sCostCenter);
     },
 
     _checkConsistencyOfPreparatoryValue: function (sPath, sMessage) {
