@@ -1,111 +1,132 @@
 {
-  "xsappname": "vim_app_cloudsolution",
-  "tenant-mode": "dedicated",
-  "description": "Security profile of called application",
-  "scopes": [
-    {
-        "name": "uaa.user",
-        "description": "UAA"
-    },
-    {
-        "name": "$XSAPPNAME.admin",
-        "description": "Admin"
-    },
-    {
-        "name": "$XSAPPNAME.readall",
-        "description": "Read all"
-    },
-    {
-        "name": "$XSAPPNAME.read",
-        "description": "Read selected"
-    },
-    {
-        "name": "$XSAPPNAME.write",
-        "description": "Write Document"
-    },
-    {
-        "name": "$XSAPPNAME.process",
-        "description": "Process Document (Send to SAP)"
-    },
-    {
-        "name": "$XSAPPNAME.comment",
-        "description": "Add comments"
-    },
-    {
-        "name": "$XSAPPNAME.forward",
-        "description": "Forward Document"
-    },
-    {
-        "name": "$XSAPPNAME.assign",
-        "description": "Assign Document"
-    },
-    {
-        "name": "$XSAPPNAME.upload",
-        "description": "Upload Attachment"
-    },
-    {
-        "name": "$XSAPPNAME.download",
-        "description": "Download Attachment"
-    }
-  ],
-  "role-templates": [
-    {
-        "name": "ZRT_TCL_AP_SuperAdmin",
-        "description": "Role for Super-Admin",
-        "scope-references": [
-            "uaa.user",
-            "$XSAPPNAME.admin"
-        ]
-    },
-    {
-        "name": "ZRT_TCL_AP_Manager",
-        "description": "Role for Manager (read, assign, edit, forward all documents)",
-        "scope-references": [
-            "uaa.user",
-            "$XSAPPNAME.readall",
-            "$XSAPPNAME.write",
-            "$XSAPPNAME.process",
-            "$XSAPPNAME.comment",
-            "$XSAPPNAME.upload",
-            "$XSAPPNAME.download",
-            "$XSAPPNAME.assign",
-            "$XSAPPNAME.forward"
-        ]
-    },
-    {
-        "name": "ZRT_TCL_AP_Operator",
-        "description": "Role for Operator (read, edit, forward assigned documents)",
-        "scope-references": [
-            "uaa.user",
-            "$XSAPPNAME.read",
-            "$XSAPPNAME.write",
-            "$XSAPPNAME.process",
-            "$XSAPPNAME.comment",
-            "$XSAPPNAME.upload",
-            "$XSAPPNAME.download",
-            "$XSAPPNAME.forward"
-        ]
-    },
-    {
-        "name": "ZRT_TCL_AP_Reviewer",
-        "description": "Role for Reviewer (add comments, view assigned documents)",
-        "scope-references": [
-            "uaa.user",
-            "$XSAPPNAME.read",
-            "$XSAPPNAME.comment",
-            "$XSAPPNAME.upload",
-            "$XSAPPNAME.download",
-            "$XSAPPNAME.forward"
-        ]
-    },
-    {
-        "name": "ZRT_TCL_AP_Auditor",
-        "description": "Role for Auditor (read all data)",
-        "scope-references": [
-            "uaa.user",
-            "$XSAPPNAME.readall",
-            "$XSAPPNAME.download"
-        ]
-    }
-  ]
+    "xsappname": "vim_app_cloudsolution",
+    "tenant-mode": "dedicated",
+    "description": "Security profile of called application",
+    "scopes": [
+        {
+            "name": "uaa.user",
+            "description": "UAA"
+        },
+        {
+            "name": "$XSAPPNAME.display",
+            "description": "Display"
+        },
+        {
+            "name": "$XSAPPNAME.admin",
+            "description": "Admin"
+        },
+        {
+            "name": "$XSAPPNAME.readall",
+            "description": "Read all"
+        },
+        {
+            "name": "$XSAPPNAME.read",
+            "description": "Read selected"
+        },
+        {
+            "name": "$XSAPPNAME.write",
+            "description": "Write Document"
+        },
+        {
+            "name": "$XSAPPNAME.process",
+            "description": "Process Document (Send to SAP)"
+        },
+        {
+            "name": "$XSAPPNAME.comment",
+            "description": "Add comments"
+        },
+        {
+            "name": "$XSAPPNAME.forward",
+            "description": "Forward Document"
+        },
+        {
+            "name": "$XSAPPNAME.assign",
+            "description": "Assign Document"
+        },
+        {
+            "name": "$XSAPPNAME.upload",
+            "description": "Upload Attachment"
+        },
+        {
+            "name": "$XSAPPNAME.download",
+            "description": "Download Attachment"
+        }
+    ],
+    "role-templates": [
+        {
+            "name": "VIM_Viewer",
+            "description": "Role for viewer",
+            "scope-references": [
+                "uaa.user",
+                "$XSAPPNAME.display",
+                "$XSAPPNAME.admin",
+                "$XSAPPNAME.readall",
+                "$XSAPPNAME.write",
+                "$XSAPPNAME.process",
+                "$XSAPPNAME.comment",
+                "$XSAPPNAME.upload",
+                "$XSAPPNAME.download",
+                "$XSAPPNAME.assign",
+                "$XSAPPNAME.forward"
+            ]
+        },
+        {
+            "name": "ZRT_TCL_AP_SuperAdmin",
+            "description": "Role for Super-Admin",
+            "scope-references": [
+                "uaa.user",
+                "$XSAPPNAME.admin"
+            ]
+        },
+        {
+            "name": "ZRT_TCL_AP_Manager",
+            "description": "Role for Manager (read, assign, edit, forward all documents)",
+            "scope-references": [
+                "uaa.user",
+                "$XSAPPNAME.readall",
+                "$XSAPPNAME.write",
+                "$XSAPPNAME.process",
+                "$XSAPPNAME.comment",
+                "$XSAPPNAME.upload",
+                "$XSAPPNAME.download",
+                "$XSAPPNAME.assign",
+                "$XSAPPNAME.forward"
+            ]
+        },
+        {
+            "name": "ZRT_TCL_AP_Operator",
+            "description": "Role for Operator (read, edit, forward assigned documents)",
+            "scope-references": [
+                "uaa.user",
+                "$XSAPPNAME.read",
+                "$XSAPPNAME.write",
+                "$XSAPPNAME.process",
+                "$XSAPPNAME.comment",
+                "$XSAPPNAME.upload",
+                "$XSAPPNAME.download",
+                "$XSAPPNAME.forward"
+            ]
+        },
+        {
+            "name": "ZRT_TCL_AP_Reviewer",
+            "description": "Role for Reviewer (add comments, view assigned documents)",
+            "scope-references": [
+                "uaa.user",
+                "$XSAPPNAME.read",
+                "$XSAPPNAME.comment",
+                "$XSAPPNAME.upload",
+                "$XSAPPNAME.download",
+                "$XSAPPNAME.forward"
+            ]
+        },
+        {
+            "name": "ZRT_TCL_AP_Auditor",
+            "description": "Role for Auditor (read all data)",
+            "scope-references": [
+                "uaa.user",
+                "$XSAPPNAME.readall",
+                "$XSAPPNAME.download"
+            ]
+        }
+    ]
 }
