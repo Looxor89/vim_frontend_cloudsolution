@@ -1701,207 +1701,40 @@ sap.ui.define([
 
     },
 
-    /* Non PO Value Helps */
-    /* GL Account */
-    // CAP refactory - never called function 
-    // onGLAcctVH: function (oEvent) {
-    //   this.oInput = oEvent.getSource();
-    //   var oView = this.getView();
-    //   var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
-
-    //   if (!sBukrs || sBukrs.length <= 0) {
-    //     MessageToast.show("Select a company code.");
-    //     return;
-    //   }
-    //   var oModel = this.getOwnerComponent().getModel("APModel");
-
-    //   function bindList(oDialog, oModel, oView) {
-    //     oDialog.setModel(oModel);
-    //     oDialog.bindAggregation("items", {
-    //       path: "/glaccountSet",
-    //       // filters: new Filter("Bukrs", FilterOperator.EQ, sBukrs),
-    //       template: new sap.m.StandardListItem({
-    //         title: "{Saknr}"
-    //         // description: "{Bukrs}"
-    //       })
-    //     });
-    //     // oView.getModel("APModel").refresh();
-    //   }
-    //   //create dialog
-    //   if (!this.getView().byId("glacctDialog")) {
-    //     //load asynchronous fragment (XML)
-    //     Fragment.load({
-    //       id: oView.getId(),
-    //       name: "vim_ui.view.fragments.GLAccount",
-    //       controller: this
-    //     }).then(function (oDialog) {
-    //       //connect Menu to rootview of this component (models, lifecycle)
-    //       oView.addDependent(oDialog);
-
-    //       bindList(oDialog, oModel, oView);
-    //       if (sBukrs) {
-    //         oDialog.getBinding("items").filter(new Filter("Bukrs", FilterOperator.EQ, sBukrs));
-    //       }
-
-    //       oDialog.open();
-    //     });
-    //   } else {
-    //     var oDialog = this.getView().byId("glacctDialog");
-    //     bindList(oDialog, oModel, oView);
-    //     if (sBukrs) {
-    //       oDialog.getBinding("items").filter(new Filter("Bukrs", FilterOperator.EQ, sBukrs));
-    //     }
-
-    //     oDialog.open();
-
-    //   }
-    // },
-
-    onSearchGLAcct: function (oEvent) {
-      var oDialog = this.getView().byId("glacctDialog");
-      var sTerm = oEvent.getParameter('value');
-
-      sTerm = this.convertToPattern(sTerm);
-
-      var oBinding = oDialog.getBinding("items");
-      // build filter array
-      var aFilter = [];
-      // get existing Bukrs filter
-      aFilter.push(new Filter("Bukrs", FilterOperator.EQ, oBinding.aFilters[0].oValue1));
-
-      if (sTerm) {
-        aFilter.push(new Filter("Saknr", FilterOperator.EQ, sTerm));
-      }
-
-      // filter binding
-      oBinding.filter(aFilter);
-      // oEvent.getSource().getBinding("items").filter(aFilter);
-
-    },
-
-    onConfirmGLAcct: function (oEvent) {
-      var sSaknr = oEvent.getParameter("selectedItem").getTitle();
-      this.oInput.setValue(sSaknr);
-    },
-
-    onCancelGLAcct: function (oEvent) {
-      // this.getView().byId("glacctDialog").close();
-    },
-
-    /* GL Account Value help methods in accordance with DAR Service */
-    onSearchGLAcct2: function (oEvent) {
-      ////debugger;
-      var oDialog = this.getView().byId("idGLAcc2_VH");
-      var sTerm = oEvent.getParameter('query');
-
-      sTerm = this.convertToPattern(sTerm);
-
-      var List2 = oDialog.getContent()[1];
-      var oBinding = List2.getBinding("items");
-      // build filter array
-      var aFilter = [];
-
-      aFilter.push(new Filter("Bukrs", FilterOperator.EQ, oBinding.aFilters[0].oValue1));
-
-      if (sTerm) {
-        aFilter.push(new Filter("Saknr", FilterOperator.EQ, sTerm));
-      }
-      // filter binding
-      oBinding.filter(aFilter);
-    },
-
-    onCancelGLAcct2: function () {
-      this.getView().byId("idGLAcc2_VH").close();
-    },
-
-    onConfirmGLAcct2: function (oEvent) {
-      ////debugger;
-      var oPath = oEvent.getParameter("listItem").getBindingContext("appmodel").sPath;
-      var sSaknr = oEvent.getParameter("listItem").getBindingContext("appmodel").getObject(oPath).value;
-      this.oInput.setValue(sSaknr);
-      this.getView().byId("idGLAcc2_VH").getContent()[0].removeSelections(true);
-      this.getView().byId("idGLAcc2_VH").close();
-    },
-    onConfirmGLAcct2Odata: function (oEvent) {
-      // //debugger;
-      var sSaknr = oEvent.getParameter("listItem").getBindingContext().getObject('GLAccount');
-      this.oInput.setValue(sSaknr);
-      this.getView().byId("idGLAcc2_VH").close();
-    },
-
-    onGLAcctVH2: function (oEvent) {
-      this.oInput = oEvent.getSource();
+    //Gl Account
+    onGLAcctVH: function (oEvent) {
+      this.oInputGlAccount = oEvent.getSource();
       var oView = this.getView();
+      var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
+      var aURL = baseManifestUrl + "/odata/getGlAccount()?CompanyCode="+sCompanyCode;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
 
-      var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
-
-      if (!sBukrs || sBukrs.length <= 0) {
-        MessageToast.show(oBundle.getText("SelectCompanyCode"));
-        return;
-      }
-
-      var oPayload = {
-        sBukrs: sBukrs,
-        sMwskz: oEvent.getSource().getBindingContext("appmodel").getObject("TaxCode"),
-        sWrbtr: oEvent.getSource().getBindingContext("appmodel").getObject("Amount")
-      }
-
-      var oModel = this.getOwnerComponent().getModel("GlAccountModel");
-      this.appmodel.setProperty("/valuehelps/HKONTData", []);
-
-      function bindList(oDialog, oModel, oView) {
-        oDialog.setModel(oModel);
-        oDialog.bindAggregation("items", {
-          path: "/C_GLAccountValueHelp",
-          template: new sap.m.StandardListItem({
-            title: "{GLAccount}"
-          })
-        });
-        // oView.getModel("APModel").refresh();
-      }
-
-
-      //create dialog
-      if (!this.getView().byId("idGLAcc2_VH")) {
-        //load asynchronous fragment (XML)
-        Fragment.load({
-          id: oView.getId(),
-          name: "vim_ui.view.fragments.GLAccount2",
-          controller: this
-        }).then(function (oDialog) {
-          //connect Menu to rootview of this component (models, lifecycle)
-          oView.addDependent(oDialog);
-
-          var List1 = oDialog.getContent()[0];
-          var List2 = oDialog.getContent()[1];
-
-          bindList(List2, oModel, oView);
-          if (sBukrs) {
-            List2.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, sBukrs));
-          }
-
-          // this.bindIORList_GL(List1, oPayload, oView);
-          // this.bindDARList_GL(List1, oPayload, oView);
-
-          oDialog.open();
-        }.bind(this));
-
-      } else {
-        var oDialog = this.getView().byId("idGLAcc2_VH");
-        var List1 = oDialog.getContent()[0];
-        var List2 = oDialog.getContent()[1];
-
-        bindList(List2, oModel, oView);
-        if (sBukrs) {
-          List2.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, sBukrs));
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/glAccounts", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idGlAccountsDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.GlAccountsVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idGlAccountsDialog_VH").open();
         }
-
-        // this.bindIORList_GL(List1, oPayload, oView);
-        // this.bindDARList_GL(List1, oPayload, oView);
-
-        oDialog.open();
-
       }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
     // CAP da rifattorizzare - non mi torna l'URL... nel backend non c'è traccia della funzione inference
@@ -2400,12 +2233,35 @@ sap.ui.define([
       oBinding.filter(sFilter);
     },
 
+    onSearchGlAccounts: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                  new Filter("GLAccount", FilterOperator.Contains, sValue),
+                  new Filter("GLAccountLongName", FilterOperator.Contains, sValue)
+              ]
+          });
+      }
+      var oList = this.getView().byId("idGlAccountsDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
 
     onConfirmPayTerms: function (oEvent) {
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
       var sPaymentTerms = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PaymentTerms");
       this.getView().byId("idPaymentTerms").setValue(sPaymentTerms);
       this.getView().byId("idPaymentTerms").fireChangeEvent(sPaymentTerms);
+    },
+
+
+    onConfirmGlAccount: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sGLAccount = this.getView().getModel("detailDetailModel").getProperty(sPath + "/GLAccount");
+      this.oInputGlAccount.setValue(sGLAccount);
+      this.oInputGlAccount.fireChangeEvent(sGLAccount);
     },
 
     _checkConsistencyOfPreparatoryValue: function (sPath, sMessage) {

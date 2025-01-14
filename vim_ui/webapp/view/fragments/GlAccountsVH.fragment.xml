@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idGlAccountsDialog_VH" 
+		noDataText="{i18n>NoGlAccountsFound}"
+		items="{path: 'detailDetailModel>/valuehelps/glAccounts'}"
+		title="{i18n>TitleSearchGlAccounts}"
+		search="onSearchGlAccounts"
+		confirm="onConfirmGlAccount">
+		<StandardListItem 
+			title="{detailDetailModel>GLAccount}" 
+			description="{detailDetailModel>GLAccountLongName}"/>	
+	</SelectDialog>
+</core:FragmentDefinition>

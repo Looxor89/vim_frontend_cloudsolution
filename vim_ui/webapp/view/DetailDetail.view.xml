@@ -705,7 +705,7 @@
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>GLAccount}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>GLAccount}" showValueHelp="true" valueHelpRequest="onGLAcctVH2" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeGLAccount"/>
+                                                                <m:Input value="{detailDetailModel>GLAccount}" showValueHelp="true" valueHelpRequest="onGLAcctVH" maxLength="10" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeGLAccount"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
