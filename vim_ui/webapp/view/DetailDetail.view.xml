@@ -512,7 +512,7 @@
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>TaxCode}"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>TaxCode}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTaxCode" maxLength="2"/>
+                                                                <m:Input value="{detailDetailModel>TaxCode}" showValueHelp="true" valueHelpRequest="onTaxCodeVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTaxCode" maxLength="2"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" > 

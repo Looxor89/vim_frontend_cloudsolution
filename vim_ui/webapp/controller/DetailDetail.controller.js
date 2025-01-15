@@ -1736,454 +1736,7 @@ sap.ui.define([
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
-
-    // CAP da rifattorizzare - non mi torna l'URL... nel backend non c'è traccia della funzione inference
-    bindIORList_GL: function (oDialog, oParams, oView) {
-      //var URL = '/ior/inference';
-      var URL = '/api/inference'; // Using inference service created in mtastandalone-backend app
-      var BUDAT = oView.byId("idDocDate").getDateValue();
-
-      console.log("Params:", oParams);
-      var oPayload = [
-        {
-          UID: 1,
-          BUKRS: oParams.sBukrs,
-          KOART: 'K',
-          MWSKZ: oParams.sMwskz,
-          WRBTR: oParams.sWrbtr,
-          LIFNR: oView.byId("idVendorNumber").getValue(),
-          _BKPF_BLART: oView.byId("idInvDocType").getValue(),
-          _BKPF_BUDAT: moment(BUDAT).format('MM-DD-YYYY'),
-          _BKPF_WAERS: oView.byId("idCurrency").getValue()
-        }
-      ];
-
-      console.log("Payload type", typeof (oPayload));
-
-      this.ajax("POST", URL, oPayload)
-        .then(function (data) {
-          console.log("Payload for IOR", data);
-          // if(data.HKONT) {
-          //   for(var i=0; i< data.HKONT.length ; i++) {
-          //     data.HKONT[i].Conf = Math.round(parseFloat(data.HKONT[i].Conf) * 100)
-          //   }
-          // }
-
-          this.appmodel.setProperty("/valuehelps/HKONTData", data.HKONT);
-        }.bind(this))
-        .catch(function (err) {
-          console.log("Errored:", err);
-          this.appmodel.refresh();
-          MessageToast.show(oBundle.getText("ErrorLoadingRecommendedGLAccount"));
-        }.bind(this))
-    },
-
-    // CAP da rifattorizzare quando il DAR sarà in piedi
-    // bindDARList_GL: function (oDialog, oParams, oView) {
-    //   // var URL = '/ior/inference';
-    //   //var URL = "/dar/models/model_test2Schema_1678955861028/versions/1";
-    //   var oDARdetails = this.appmodel.getData().darDetails;
-    //   var oModelName = oDARdetails.ModelName
-    //   var URL = "/dar/models/" + oModelName + "/versions/1";
-    //   var featuresArray = [];
-    //   for (var i = 0; i < oDARdetails.DataSetSchemaPayload.features.length; i++) {
-    //     var data = {
-    //       "name": oDARdetails.DataSetSchemaPayload.features[i].label,
-    //       "value": ""
-    //     }
-    //     featuresArray.push(data);
-    //   }
-    //   var oPayload = {
-    //     "topN": 3,
-    //     "objects": [
-    //       {
-    //         "objectId": "44521",
-    //         "features": featuresArray
-    //       }
-    //     ]
-    //   }
-
-    //   console.log("Payload", oPayload);
-
-    //   this.ajax("POST", URL, oPayload)
-    //     .then(function (data) {
-    //       console.log("Payload for DAR Inference", data);
-    //       for (var i = 0; i < data.predictions[0].labels.length; i++) {
-    //         if (data.predictions[0].labels[i].name == "HKONT") {
-    //           this.appmodel.setProperty("/valuehelps/HKONT", data.predictions[0].labels[i].results);
-    //         } else if (data.predictions[0].labels[i].name == "KOSTL") {
-    //           this.appmodel.setProperty("/valuehelps/KOSTL", data.predictions[0].labels[i].results);
-    //         } else if (data.predictions[0].labels[i].name == "WBSelement") {
-    //           this.appmodel.setProperty("/valuehelps/WBSelement", data.predictions[0].labels[i].results);
-    //         } else if (data.predictions[0].labels[i].name == "Profitcenters") {
-    //           this.appmodel.setProperty("/valuehelps/Profitcenters", data.predictions[0].labels[i].results);
-    //         } else if (data.predictions[0].labels[i].name == "Paymentterms") {
-    //           this.appmodel.setProperty("/valuehelps/Paymentterms", data.predictions[0].labels[i].results);
-    //         } else if (data.predictions[0].labels[i].name == "Partnerbanktype") {
-    //           this.appmodel.setProperty("/valuehelps/Partnerbanktype", data.predictions[0].labels[i].results);
-    //         } else if (data.predictions[0].labels[i].name == "Taxcode") {
-    //           this.appmodel.setProperty("/valuehelps/Taxcode", data.predictions[0].labels[i].results);
-    //         }
-    //       }
-
-    //     }.bind(this))
-    //     .catch(function (err) {
-    //       console.log("Errored:", err);
-    //       MessageToast.show("Error in loading recommended G/L Account")
-    //       this.appmodel.refresh();
-    //     }.bind(this))
-    // },
-
-
-    onSwitchGL: function (oEvent) {
-      var bBool = oEvent.getParameter('state');
-
-      this.appmodel.setProperty("/props/ior_hkont", bBool);
-    },
-
-    /* Cost Center Value Help Methods */
-
-    onCostCenterVH: function (oEvent) {
-      // //debugger;
-      this.oInput = oEvent.getSource();
-      var oView = this.getView();
-      var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
-
-      if (!sBukrs || sBukrs.length <= 0) {
-        MessageToast.show(oBundle.getText("SelectCompanyCode"));
-        return;
-      }
-
-      var oModel = this.getOwnerComponent().getModel("CostCenterModel");
-
-      function bindList(oDialog, oModel, oView) {
-        oDialog.setModel(oModel);
-        oDialog.bindAggregation("items", {
-          path: "/A_CostCenter", ///costcenterSet",
-          filters: new Filter("CompanyCode", FilterOperator.EQ, sBukrs),
-          template: new sap.m.StandardListItem({
-            title: "{Kostl}"
-            // description: "{Bukrs}"
-          })
-        });
-        // oView.getModel("APModel").refresh();
-      }
-      //create dialog
-      if (!this.getView().byId("costcenterDialog")) {
-        //load asynchronous fragment (XML)
-        Fragment.load({
-          id: oView.getId(),
-          name: "vim_ui.view.fragments.CostCenter",
-          controller: this
-        }).then(function (oDialog) {
-          //connect Menu to rootview of this component (models, lifecycle)
-          oView.addDependent(oDialog);
-
-          bindList(oDialog, oModel, oView);
-          if (sBukrs) {
-            oDialog.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, sBukrs));
-          }
-
-          oDialog.open();
-        });
-      } else {
-        var oDialog = this.getView().byId("costcenterDialog");
-        bindList(oDialog, oModel, oView);
-        if (sBukrs) {
-          oDialog.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, sBukrs));
-        }
-
-        oDialog.open();
-
-      }
-    },
-
-    onSearchCostCenter: function (oEvent) {
-      var oDialog = this.getView().byId("costcenterDialog");
-      var sTerm = oEvent.getParameter('value');
-
-      var oBinding = oDialog.getBinding("items");
-
-      sTerm = this.convertToPattern(sTerm);
-      var aFilter = [];
-
-      aFilter.push(new Filter("CompanyCode", FilterOperator.EQ, oBinding.aFilters[0].oValue1));
-      // build filter array
-      if (sTerm) {
-        aFilter.push(new Filter("CostCenter", FilterOperator.EQ, sTerm));
-      }
-      // filter binding
-      oBinding.filter(aFilter);
-    },
-
-    onConfirmCostCenter: function (oEvent) {
-      var sKostl = oEvent.getParameter("selectedItem").getTitle();
-      this.oInput.setValue(sKostl);
-    },
-
-    onCancelCostCenter: function (oEvent) {
-      // this.getView().byId("costcenterDialog").close();
-    },
-
-    onSearchCostCenter2: function (oEvent) {
-      var oDialog = this.getView().byId("idCostCenter2_VH");
-      var sTerm = oEvent.getParameter('query');
-
-      sTerm = this.convertToPattern(sTerm);
-
-      var List2 = oDialog.getContent()[1];
-      var oBinding = List2.getBinding("items");
-
-      // build filter array
-      var aFilter = [];
-      aFilter.push(new Filter("CompanyCode", FilterOperator.EQ, oBinding.aFilters[0].oValue1));
-
-      if (sTerm) {
-        aFilter.push(new Filter("CostCenter", FilterOperator.EQ, sTerm));
-      }
-
-      // filter binding
-      oBinding.filter(aFilter);
-
-    },
-
-
-    onCancelCostCenter2: function () {
-      this.getView().byId("idCostCenter2_VH").close();
-    },
-
-    onConfirmCostCenter2: function (oEvent) {
-      //debugger;
-      var oPath = oEvent.getParameter("listItem").getBindingContext("appmodel").sPath;
-      var sKostl = oEvent.getParameter("listItem").getBindingContext("appmodel").getObject(oPath).value;
-      this.oInput.setValue(sKostl);
-      this.getView().byId("idCostCenter_VH").removeSelections(true);
-      this.getView().byId("idCostCenter2_VH").close();
-    },
-    // Commenting below as Kostl is showing underfined and data not getting selected created new function below
-    // onConfirmCostCenter2Odata: function (oEvent) {
-    //   //debugger;
-    //   var sKostl = oEvent.getParameter("listItem").getBindingContext().getObject('Kostl');
-    //   this.oInput.setValue(sKostl);
-    //   this.getView().byId("idCostCenter2_VH").close();
-    // },
-
-    // Working one for ConfirmCostCenter 1763 line 
-
-    onConfirmCostCenter2Odata: function (oEvent) {
-      // Get the binding context of the selected list item
-      var oSelectedItem = oEvent.getParameter("listItem");
-      var oBindingContext = oSelectedItem.getBindingContext();
-
-      // Check if a valid binding context exists
-      if (oBindingContext) {
-        // Use the correct property path to retrieve Kostl
-        var sKostl = oBindingContext.getProperty("CostCenter");
-
-        // Set the value in your input field
-        this.oInput.setValue(sKostl);
-      } else {
-        // Handle the case where there is no valid binding context
-        // You can log an error or perform other error handling here
-      }
-
-      // Close the value help dialog
-      this.getView().byId("idCostCenter2_VH").close();
-    },
-
-
-    onCostCenterVH2: function (oEvent) {
-      this.oInput = oEvent.getSource();
-      var oView = this.getView();
-
-      var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
-
-      var oPayload = {
-        sBukrs: sBukrs,
-        sMwskz: oEvent.getSource().getBindingContext("appmodel").getObject("TaxCode"),
-        sWrbtr: oEvent.getSource().getBindingContext("appmodel").getObject("Amount")
-      }
-
-      var oModel = this.getOwnerComponent().getModel("CostCenterModel");
-
-      function bindList(oDialog, oModel, oView) {
-        oDialog.setModel(oModel);
-        oDialog.bindAggregation("items", {
-          path: "/A_CostCenter", ///costcenterSet",
-          template: new sap.m.StandardListItem({
-            title: "{CostCenter}"
-          })
-        });
-        // oView.getModel("APModel").refresh();
-      }
-
-
-      //create dialog
-      if (!this.getView().byId("idCostCenter2_VH")) {
-        //load asynchronous fragment (XML)
-        Fragment.load({
-          id: oView.getId(),
-          name: "vim_ui.view.fragments.CostCenter2",
-          controller: this
-        }).then(function (oDialog) {
-          //connect Menu to rootview of this component (models, lifecycle)
-          oView.addDependent(oDialog);
-
-          var List1 = oDialog.getContent()[0];
-          var List2 = oDialog.getContent()[1];
-
-          bindList(List2, oModel, oView);
-          if (sBukrs) {
-            List2.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, sBukrs));
-          }
-
-          oDialog.open();
-        }.bind(this));
-
-      } else {
-        var oDialog = this.getView().byId("idCostCenter2_VH");
-        var List1 = oDialog.getContent()[0];
-        var List2 = oDialog.getContent()[1];
-
-        bindList(List2, oModel, oView);
-        if (sBukrs) {
-          List2.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, sBukrs));
-        }
-
-        oDialog.open();
-
-      }
-    },
-
-    onSwitchKOSTL: function (oEvent) {
-      var bBool = oEvent.getParameter('state');
-
-      this.appmodel.setProperty("/props/ior_kostl", bBool);
-    },
-
-
-
-
-    /* Profit Center Value Help Methods */
-
-    onProfitCenterVH: function (oEvent) {
-      this.oInput = oEvent.getSource();
-      var oView = this.getView();
-      var obj = oEvent.getSource().getBindingContext("appmodel").getObject();
-      // var oFilterBukrs = new Filter("Bukrs", FilterOperator.EQ, obj.Bukrs);
-      // var oFilterKostl = new Filter("Kostl", FilterOperator.EQ, obj.Kostl);
-
-      var filters = [
-        new Filter("CompanyCode", FilterOperator.EQ, obj.Bukrs),
-        // new Filter("ProfitCenter", FilterOperator.EQ, obj.CostCen)
-      ];
-
-      var oModel = this.getOwnerComponent().getModel("CostCenterModel");
-
-      function bindList(oDialog, oModel, oView) {
-        oDialog.setModel(oModel);
-        oDialog.bindAggregation("items", {
-          path: "/A_CostCenter",
-          filters: filters,
-          template: new sap.m.StandardListItem({
-            title: "{ProfitCenter}"
-            //infoState:"{path: 'probability',formatter: '.formatter.formatConfState'}"
-          })
-        });
-        oView.getModel("CostCenterModel").refresh();
-      }
-      //create dialog
-      if (!this.getView().byId("profitcenterDialog")) {
-        //load asynchronous fragment (XML)
-        Fragment.load({
-          id: oView.getId(),
-          name: "vim_ui.view.fragments.ProfitCenter",
-          controller: this
-        }).then(function (oDialog) {
-          //connect Menu to rootview of this component (models, lifecycle)
-          oView.addDependent(oDialog);
-          var List1 = oDialog.getContent()[0];
-          var List2 = oDialog.getContent()[1];
-          bindList(List2, oModel, oView);
-          if (obj.Bukrs && obj.CostCen) {
-            List2.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, obj.Bukrs));
-            List2.getBinding("items").filter(filters);
-          }
-          oDialog.open();
-        });
-      } else {
-        var oDialog = this.getView().byId("profitcenterDialog");
-        var List1 = oDialog.getContent()[0];
-        var List2 = oDialog.getContent()[1];
-        bindList(List2, oModel, oView);
-        if (obj.Bukrs && obj.CostCen) {
-          List2.getBinding("items").filter(new Filter("CompanyCode", FilterOperator.EQ, obj.Bukrs));
-          List2.getBinding("items").filter(filters);
-        }
-        oDialog.open();
-      }
-    },
-
-    onConfirmProfitCenter: function (oEvent) {
-      var sPrctr = oEvent.getParameter("selectedItem").getTitle();
-      this.oInput.setValue(sPrctr);
-    },
-
-    onSearchProfitCenter: function (oEvent) {
-      var oDialog = this.getView().byId("profitcenterDialog");
-      var sTerm = oEvent.getParameter('query');
-
-      sTerm = this.convertToPattern(sTerm);
-
-      // build filter array
-      var aFilter = [];
-      if (sTerm) {
-        aFilter.push(new Filter("ProfitCenter", FilterOperator.Contains, sTerm));
-      }
-
-      // filter binding
-      var oBinding = oDialog.getContent()[1].getBinding("items");
-      oBinding.filter(aFilter);
-
-    },
-
-    onConfirmProfitCenter: function (oEvent) {
-      var oPath = oEvent.getParameter("listItem").getBindingContext().sPath;
-      var sSaknr = oEvent.getParameter("listItem").getBindingContext().getObject(oPath).ProfitCenter;
-      this.oInput.setValue(sSaknr);
-      this.getView().byId("idProfitCenterVH").removeSelections(true);
-      this.getView().byId("profitcenterDialog").close();
-    },
-
-    onCancelProfitCenter: function (oEvent) {
-      this.getView().byId("profitcenterDialog").close();
-    },
-
-
-    // onProfitCenterVH: function (oEvent) {
-    //   this.oInput = oEvent.getSource();
-    //   var oView = this.getView();
-
-    //   //create dialog
-    //   if (!this.getView().byId("profitcenterDialog")) {
-    //     //load asynchronous fragment (XML)
-    //     Fragment.load({
-    //       id: oView.getId(),
-    //       name: "vim_ui.view.fragments.ProfitCenter",
-    //       controller: this
-    //     }).then(function (oDialog) {
-    //       //connect Menu to rootview of this component (models, lifecycle)
-    //       oView.addDependent(oDialog);
-    //       oDialog.open();
-    //     });
-    //   } else {
-    //     this.getView().byId("profitcenterDialog").open();
-    //   }
-    // },
-
-
-
-    //Payment Terms
+    
     onPayTermsVH: function (oEvent) {
       this.oInput = oEvent.getSource();
       var oView = this.getView();
@@ -2217,6 +1770,7 @@ sap.ui.define([
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
+    
     //Cost Centers
     onCostCentersVH: function (oEvent) {
       this.oInputCostCenter = oEvent.getSource();
@@ -2251,6 +1805,57 @@ sap.ui.define([
       };
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+
+    //Tax Code
+    onTaxCodeVH: function (oEvent) {
+      this.oInputTaxCode = oEvent.getSource();
+      var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/getTaxCodes()";
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/taxCodes", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idTaxCodesDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.TaxCodeVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idTaxCodesDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    onSearchTaxCodes: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+          var sFilter = new Filter({
+              filters: [
+                new Filter("TaxCode", FilterOperator.Contains, sValue),
+                new Filter("TaxCodeName", FilterOperator.Contains, sValue),
+              ]
+          });
+      }
+      var oList = this.getView().byId("idTaxCodesDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
     },
 
     onSearchPayTerms: function (oEvent) {
@@ -2294,11 +1899,17 @@ sap.ui.define([
               ]
           });
       }
-      var oList = this.getView().byId("idGlAccountsDialog_VH");
+      var oList = this.getView().byId("idCostCentersDialog_VH");
       var oBinding = oList.getBinding("items");
       oBinding.filter(sFilter);
     },
 
+    onConfirmTaxCode: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sTaxCode = this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode");
+      this.oInputTaxCode.setValue(sTaxCode);
+      this.oInputTaxCode.fireChangeEvent(sTaxCode);
+    },
 
     onConfirmPayTerms: function (oEvent) {
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
@@ -2692,151 +2303,6 @@ sap.ui.define([
     },
     onCancelPartnerBankVH: function () {
       this.getView().byId("idPartnerBankDialog_VH").close();
-    },
-
-    //Tax Code VH
-    // onTaxCodeVH: function (oEvent) {
-    //   this.oInput = oEvent.getSource();
-    //   var oView = this.getView();
-
-    //   //create dialog
-    //   if (!this.getView().byId("idTaxDialog_VH")) {
-    //     //load asynchronous fragment (XML)
-    //     Fragment.load({
-    //       id: oView.getId(),
-    //       name: "vim_ui.view.fragments.TaxCode_VH",
-    //       controller: this
-    //     }).then(function (oDialog) {
-    //       //connect Menu to rootview of this component (models, lifecycle)
-    //       oView.addDependent(oDialog);
-    //       oDialog.open();
-    //     });
-    //   } else {
-    //     this.getView().byId("idTaxDialog_VH").open();
-    //   }
-    // },
-    onConfirmTaxCodeVH: function (oEvent) {
-      //debugger;
-      var oPath, sKostl;
-      if (oEvent.getParameter("listItem").getBindingContext("ApProcessModel")) {
-        oPath = oEvent.getParameter("listItem").getBindingContext("ApProcessModel").sPath; //appmodel
-        sKostl = oEvent.getParameter("listItem").getBindingContext("ApProcessModel").getObject(oPath).value;
-      } else {
-        oPath = oEvent.getParameter("listItem").getBindingContext("appmodel").sPath;
-        sKostl = oEvent.getParameter("listItem").getBindingContext("appmodel").getObject(oPath).value;
-      }
-
-      this.oInput.setValue(sKostl);
-      this.getView().byId("iTaxCod_VH").removeSelections(true);
-      this.getView().byId("taxcodeDialog").close();
-    },
-
-    onCanceltaxCodeVH: function () {
-      this.getView().byId("taxcodeDialog").close();
-    },
-
-
-    /* Tax Code */
-
-    onTaxCodeVH: function (oEvent) {
-      this.oInput = oEvent.getSource();
-      var oView = this.getView();
-      var oModel = this.getOwnerComponent().getModel("ApProcessModel");
-
-      if (this.appmodel.getProperty("/props/POMode")) {
-        // var sEbeln = oEvent.getSource().getBindingContext("appmodel").getObject("PONumber");
-        var sEbeln;
-
-        if (this.appmodel.getProperty("/detailDetail/header/bMultiplePO")) {
-          sEbeln = oEvent.getSource().getBindingContext("appmodel").getObject("PONumber")
-        }
-        if (!sEbeln) {
-          sEbeln = this.getView().byId("idPurchaseOrder").getValue();
-        }
-
-        oModel.read("/ZCE_GET_TAXCODESET", { //taxcodeSet
-          filters: [new Filter("Ebeln", FilterOperator.EQ, sEbeln)],
-          success: function (oData) {
-            this.appmodel.setProperty("/valuehelps/taxcode2", oData.results);
-          }.bind(this),
-          error: function (oErr) {
-            console.log('taxcode2 error', oErr);
-          }
-        });
-      } else {
-        var sBukrs = oEvent.getSource().getBindingContext("appmodel").getObject("Bukrs");
-        if (!sBukrs) {
-          sBukrs = this.getView().byId("idCompanyCode").getValue();
-        }
-
-        oModel.read("/ZCE_GET_TAXCODESET", {  //taxcodeSet
-          filters: [new Filter("Bukrs", FilterOperator.EQ, sBukrs)],
-          success: function (oData) {
-            this.appmodel.setProperty("/valuehelps/taxcode2", oData.results);
-          }.bind(this),
-          error: function (oErr) {
-            console.log('taxcode2 error', oErr);
-          }
-        });
-      }
-
-      //create dialog
-      if (!this.getView().byId("taxcodeDialog")) {
-        //load asynchronous fragment (XML)
-        Fragment.load({
-          id: oView.getId(),
-          name: "vim_ui.view.fragments.TaxCode_VH",
-          controller: this
-        }).then(function (oDialog) {
-          //connect Menu to rootview of this component (models, lifecycle)
-          oView.addDependent(oDialog);
-
-          // bindList(oDialog, oModel, oView);
-          oDialog.open();
-        });
-      } else {
-        var oDialog = this.getView().byId("taxcodeDialog");
-        if (sBukrs) {
-          //oDialog.getBinding("items").filter(new Filter("Bukrs", FilterOperator.EQ, sBukrs));
-        }
-        // bindList(oDialog, oModel, oView);
-
-        oDialog.open();
-
-      }
-    },
-
-    onSearchTaxCode: function (oEvent) {
-      var oDialog = this.getView().byId("taxcodeDialog");
-      var sTerm = oEvent.getParameter('value');
-
-      // build filter array
-      var aFilter = [];
-
-      if (sTerm) {
-        var filters = new Filter([
-          new Filter("Taxcode", FilterOperator.Contains, sTerm),
-          new Filter("Text", FilterOperator.Contains, sTerm)],
-          false);
-        aFilter.push(filters);
-      }
-
-      // filter binding
-      var oBinding = oDialog.getBinding("items");
-      oBinding.filter(aFilter);
-
-    },
-
-    onConfirmTaxCode: function (oEvent) {
-      var oPath = oEvent.getParameter("listItem").getBindingContext("appmodel").sPath;
-      var sKostl = oEvent.getParameter("listItem").getBindingContext("appmodel").getObject(oPath).Taxcode;
-      this.oInput.setValue(sKostl);
-      this.getView().byId("taxcodeDialog").getContent()[1].removeSelections(true);
-      this.getView().byId("taxcodeDialog").close();
-    },
-
-    onCancelTaxCode: function (oEvent) {
-      // Mysterious code
     },
 
     /* WBS Element */

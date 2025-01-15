@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idTaxCodesDialog_VH" 
+		noDataText="{i18n>NoTaxCodesFound}"
+		items="{path: 'detailDetailModel>/valuehelps/taxCodes'}"
+		title="{i18n>TitleSearchTaxCodes}"
+		search="onSearchTaxCodes"
+		confirm="onConfirmTaxCode">
+		<StandardListItem 
+			title="{detailDetailModel>TaxCode}" 
+			description="{detailDetailModel>TaxCodeName}"/>	
+	</SelectDialog>
+</core:FragmentDefinition>
