@@ -1,0 +1,110 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<TableSelectDialog 
+		id="idPoItemRefDialog_VH" 
+        resizable="true"
+		noDataText="{i18n>NoPoItemReferementsFound}"
+		items="{path: 'detailDetailModel>/valuehelps/poItemReferements'}"
+		title="{i18n>TitleSearchPoItemReferements}"
+		search="onSearchPoItemReferements"
+		confirm="onConfirmPoItemReferement">
+        <ColumnListItem vAlign="Middle">
+            <cells>
+                <ObjectIdentifier
+                    title="{detailDetailModel>PurchaseOrderItem}"/>
+                <Text
+                    text="{detailDetailModel>PurchaseOrderItemText}" />
+                <Text
+                    text="{detailDetailModel>PurchaseOrder}" />
+                <Text
+                    text="{detailDetailModel>MaterialGroup}" />
+                <Text
+                    text="{detailDetailModel>Material}" />
+                <Text
+                    text="{detailDetailModel>MaterialType}" />
+                <Text
+                    text="{detailDetailModel>Plant}" />
+                <Text
+                    text="{detailDetailModel>PurchaseOrderQuantityUnit}" />
+                <Text
+                    text="{detailDetailModel>NetPriceQuantity}" />
+                <Text
+                    text="{detailDetailModel>OrderQuantity}" />
+                <Text
+                    text="{detailDetailModel>NetPriceAmount}" />
+                <Text
+                    text="{detailDetailModel>DocumentCurrency}" />
+            </cells>
+        </ColumnListItem>
+		<columns>
+			<Column width="12em">
+				<header>
+					<Text text="{i18n>PurchaseOrderItem}" />
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true"
+				hAlign="End">
+				<header>
+					<Text text="{i18n>PurchaseOrderItemText}" />
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Desktop"
+				demandPopin="true"
+				hAlign="Center">
+				<header>
+					<Text text="{i18n>PurchaseOrder}" />
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Desktop"
+				demandPopin="true"
+				hAlign="Center">
+				<header>
+					<Text text="{i18n>MaterialGroup}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>Material}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>MaterialType}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>Plant}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>PurchaseOrderQuantityUnit}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>NetPriceQuantity}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>OrderQuantity}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>NetPriceAmount}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>Currency}" />
+				</header>
+			</Column>
+		</columns>
+	</TableSelectDialog>
+</core:FragmentDefinition>

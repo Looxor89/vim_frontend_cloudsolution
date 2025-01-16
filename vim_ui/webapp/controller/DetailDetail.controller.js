@@ -804,7 +804,7 @@ sap.ui.define([
       this.oInputWithholdingTaxCode.fireChangeEvent(sWithholdingTaxCode);
     },
 
-    onAddPORow: function (oEvent) {
+    _addPORow: function (oData) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
         oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
         sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
@@ -815,37 +815,44 @@ sap.ui.define([
         "bodyInvoiceItalianTrace_Id": sBodyInvoiceItalianTrace_Id,
         "bodyPOIntegrationInfo_Id": null,
         "SupplierInvoiceItem": null,
-        "PurchaseOrder": null,
-        "PurchaseOrderItem": null,
-        "Plant": null,
+        "PurchaseOrder": oData? oData.PurchaseOrder : null,
+        "PurchaseOrderItem": oData? oData.PurchaseOrderItem : null,
+        "Plant": oData? oData.Plant : null,
         "IsSubsequentDebitCredit": this.getValueMappedToIsSubsequentDebitCredit(),
-        "TaxCode": null,
+        "TaxCode": oData? oData.TaxCode : null,
         "DocumentCurrency": this.getValueMappedToDocumentCurrency(),
-        "SupplierInvoiceItemAmount": null,
-        "PurchaseOrderQuantityUnit": null,
-        "QuantityInPurchaseOrderUnit": null,
+        "SupplierInvoiceItemAmount": oData? oData.SupplierInvoiceItemAmount : null,
+        "PurchaseOrderQuantityUnit": oData? oData.PurchaseOrderQuantityUnit : null,
+        "QuantityInPurchaseOrderUnit": oData? oData.QuantityInPurchaseOrderUnit : null,
         "QtyInPurchaseOrderPriceUnit": null,
         "PurchaseOrderPriceUnit": null,
         "SupplierInvoiceItemText": null,
         "IsNotCashDiscountLiable": null,
         "ServiceEntrySheet": null,
         "ServiceEntrySheetItem": null,
-        "IsFinallyInvoiced": null,
+        "IsFinallyInvoiced": oData? oData.IsFinallyInvoiced : null,
+        "CostCenter": oData? oData.CostCenter : null,
         "TaxDeterminationDate": null,
-        "ControllingArea": null,
-        "BusinessArea": null,
-        "ProfitCenter": null,
-        "FunctionalArea": null,
-        "SalesOrder": null,
-        "SalesOrderItem": null,
-        "CommitmentItem": null,
-        "FundsCenter": null,
-        "Fund": null,
-        "GrantID": null,
-        "ProfitabilitySegment": null,
-        "BudgetPeriod": null
+        "ControllingArea": oData? oData.ControllingArea : null,
+        "BusinessArea": oData? oData.BusinessArea : null,
+        "ProfitCenter": oData? oData.ProfitCenter : null,
+        "FunctionalArea": oData? oData.FunctionalArea : null,
+        "InternalOrder": oData? oData.InternalOrder : null,
+        "SalesOrder": oData? oData.SalesOrder : null,
+        "SalesOrderItem": oData? oData.SalesOrderItem : null,
+        "CommitmentItem": oData? oData.CommitmentItem : null,
+        "FundsCenter": oData? oData.FundsCenter : null,
+        "Fund": oData? oData.Fund : null,
+        "GrantID": oData? oData.GrantID : null,
+        "ProfitabilitySegment": oData? oData.ProfitabilitySegment : null,
+        "BudgetPeriod": oData? oData.BudgetPeriod : null,
+        "WBSElement": oData? oData.WBSElem : null
       });
       oDetailDetailModel.setProperty("/currentInvoice/PORecords", aPORecords);
+    },
+
+    onAddPORow: function (oEvent) {
+      this._addPORow();
     },
 
     onAddGLAccountRow: function (oEvent) {
@@ -1742,6 +1749,48 @@ sap.ui.define([
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
+    //Purchase Order Items referements
+    onPoItemRefVH: function (oEvent) {
+      this.oInputPoItemRefs = oEvent.getSource();
+      var sPathPoReferements = this.oInputPoItemRefs.getBindingContext("detailDetailModel").getPath() + "/PurchaseOrder";
+      var oView = this.getView();
+      var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue(sPathPoReferements, oBundle.getText("MissingInputAlert", [oBundle.getText("To_SelectedPurchaseOrders_PurchaseOrder")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      var sPoReferementsValue = sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getPurchaseOrderItemRef()?CompanyCode=" + sCompanyCode + "&PurchaseOrderRef=" + sPoReferementsValue;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/poItemReferements", data.value[0].result.value)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idPoItemRefDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.PoItemRefVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idPoItemRefDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
     //Gl Account
     onGLAcctVH: function (oEvent) {
       this.oInputGlAccount = oEvent.getSource();
@@ -1947,6 +1996,31 @@ sap.ui.define([
       oBinding.filter(sFilter);
     },
 
+    onSearchPoItemReferements: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+        var sFilter = new Filter({
+          filters: [
+            new Filter("PurchaseOrderItem", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrderItemText", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrder", FilterOperator.Contains, sValue),
+            new Filter("MaterialGroup", FilterOperator.Contains, sValue),
+            new Filter("Material", FilterOperator.Contains, sValue),
+            new Filter("MaterialType", FilterOperator.Contains, sValue),
+            new Filter("Plant", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrderQuantityUnit", FilterOperator.Contains, sValue),
+            new Filter("NetPriceQuantity", FilterOperator.Contains, sValue),
+            new Filter("OrderQuantity", FilterOperator.Contains, sValue),
+            new Filter("NetPriceAmount", FilterOperator.Contains, sValue),
+            new Filter("DocumentCurrency", FilterOperator.Contains, sValue)
+          ]
+        });
+      }
+      var oList = this.getView().byId("idPOrefDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
     onSearchCostCenters: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
@@ -2006,6 +2080,59 @@ sap.ui.define([
           }
         }
       }
+    },
+
+
+    onConfirmPoItemReferement: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sPoItemRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem");
+      this.oInputPoItemRefs.setValue(sPoItemRef);
+      this.oInputPoItemRefs.fireChangeEvent(sPoItemRef);
+
+      var sPathPoRef = this.oInputPoItemRefs.getBindingContext("detailDetailModel").getPath() + "/PurchaseOrder";
+      var sPoRef = this.getView().getModel("detailDetailModel").getProperty(sPathPoRef);
+      var aURL = baseManifestUrl + "/odata/getPOAccountAssignment()?PurchaseOrderRef=" + sPoRef + "&PurchaseOrderItemRef=" + sPoItemRef;
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        let retrievedData = data.value[0].result[0];
+        this.getView().byId('DDPage').setBusy(false);
+        let oData = {
+          "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
+          "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
+          "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
+          "TaxCode": this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode"),
+          "SupplierInvoiceItemAmount": this.getView().getModel("detailDetailModel").getProperty(sPath + "/NetAmount"),
+          "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderQuantityUnit"),
+          "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/OrderQuantity"),
+          "IsFinallyInvoiced": this.getView().getModel("detailDetailModel").getProperty(sPath + "/IsFinallyInvoiced"),
+          "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
+          "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
+          "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
+          "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
+          "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
+          "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
+          "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
+          "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
+          "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
+          "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
+          "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
+          "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
+          "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
+          "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
+          "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
+        };
+        this._addPORow(oData);
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
 
