@@ -420,6 +420,7 @@
     }
   },
   "sap.cloud": {
-    "service": "vim_ui"
+    "public": true,
+    "service": "Vim_App_CloudSolution"
   }
 }
