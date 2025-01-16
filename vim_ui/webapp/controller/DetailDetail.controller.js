@@ -655,7 +655,7 @@ sap.ui.define([
     },
 
     _getDefaultWithholdingTaxValues: function (sInvoicingParty) {
-      var aURL = baseManifestUrl + "/odata/getWithholdingTax()?Supplier="+sInvoicingParty;
+      var aURL = baseManifestUrl + "/odata/getWithholdingTax()?Supplier=" + sInvoicingParty;
       this.getView().byId('DDPage').setBusy(true);
 
       const oSuccessFunction = (data) => {
@@ -676,9 +676,9 @@ sap.ui.define([
         oWhldgValues = null,
         sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
 
-        if (sInvoicingParty && sInvoicingParty !== '') {
-          oWhldgValues = await this._getDefaultWithholdingTaxValues(sInvoicingParty)
-        }
+      if (sInvoicingParty && sInvoicingParty !== '') {
+        oWhldgValues = await this._getDefaultWithholdingTaxValues(sInvoicingParty)
+      }
       // Retrieve the PORecords data from the model
       var aTo_SupplierInvoiceWhldgTax = oDetailDetailModel.getProperty("/currentInvoice/To_SupplierInvoiceWhldgTax");
       aTo_SupplierInvoiceWhldgTax.push({
@@ -729,11 +729,11 @@ sap.ui.define([
     onSearchWhldgTaxType: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("WithholdingTaxType", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("WithholdingTaxType", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idWhldgTaxTypeDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -785,11 +785,11 @@ sap.ui.define([
     onSearchWhldgTaxName: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("WithholdingTaxCode", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("WithholdingTaxCode", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idWhldgTaxCodeDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -1701,12 +1701,53 @@ sap.ui.define([
 
     },
 
+    //Purchase Orders referements
+    onPOrefVH: function (oEvent) {
+      this.oInputPoRefs = oEvent.getSource();
+      var oView = this.getView();
+      var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/InvoicingParty", oBundle.getText("MissingInputError", [oBundle.getText("InvoicingParty")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      var sSupplier = sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getPurchaseOrderRef()?CompanyCode=" + sCompanyCode + "&Supplier=" + sSupplier;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/poReferements", data.value[0].result.value)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idPOrefDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.POrefVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idPOrefDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
     //Gl Account
     onGLAcctVH: function (oEvent) {
       this.oInputGlAccount = oEvent.getSource();
       var oView = this.getView();
       var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
-      var aURL = baseManifestUrl + "/odata/getGlAccount()?CompanyCode="+sCompanyCode;
+      var aURL = baseManifestUrl + "/odata/getGlAccount()?CompanyCode=" + sCompanyCode;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -1736,7 +1777,7 @@ sap.ui.define([
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
-    
+
     onPayTermsVH: function (oEvent) {
       this.oInput = oEvent.getSource();
       var oView = this.getView();
@@ -1770,13 +1811,13 @@ sap.ui.define([
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
-    
+
     //Cost Centers
     onCostCentersVH: function (oEvent) {
       this.oInputCostCenter = oEvent.getSource();
       var oView = this.getView();
       var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
-      var aURL = baseManifestUrl + "/odata/getCostCenters()?CompanyCode="+sCompanyCode;
+      var aURL = baseManifestUrl + "/odata/getCostCenters()?CompanyCode=" + sCompanyCode;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -1846,12 +1887,12 @@ sap.ui.define([
     onSearchTaxCodes: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                new Filter("TaxCode", FilterOperator.Contains, sValue),
-                new Filter("TaxCodeName", FilterOperator.Contains, sValue),
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("TaxCode", FilterOperator.Contains, sValue),
+            new Filter("TaxCodeName", FilterOperator.Contains, sValue),
+          ]
+        });
       }
       var oList = this.getView().byId("idTaxCodesDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -1861,12 +1902,12 @@ sap.ui.define([
     onSearchPayTerms: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("PaymentTerms", FilterOperator.Contains, sValue),
-                  new Filter("PaymentTermsName", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("PaymentTerms", FilterOperator.Contains, sValue),
+            new Filter("PaymentTermsName", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idPayDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -1876,14 +1917,32 @@ sap.ui.define([
     onSearchGlAccounts: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("GLAccount", FilterOperator.Contains, sValue),
-                  new Filter("GLAccountLongName", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("GLAccount", FilterOperator.Contains, sValue),
+            new Filter("GLAccountLongName", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idGlAccountsDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+    onSearchPOreferements: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+        var sFilter = new Filter({
+          filters: [
+            new Filter("PurchaseOrder", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrderType", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrderDate", FilterOperator.Contains, sValue),
+            new Filter("Supplier", FilterOperator.Contains, sValue),
+            new Filter("DocumentCurrency", FilterOperator.Contains, sValue)
+          ]
+        });
+      }
+      var oList = this.getView().byId("idPOrefDialog_VH");
       var oBinding = oList.getBinding("items");
       oBinding.filter(sFilter);
     },
@@ -1891,13 +1950,13 @@ sap.ui.define([
     onSearchCostCenters: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                new Filter("CostCenter", FilterOperator.Contains, sValue),
-                new Filter("CostCenterName", FilterOperator.Contains, sValue),
-                new Filter("ValidityEndDate", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("CostCenter", FilterOperator.Contains, sValue),
+            new Filter("CostCenterName", FilterOperator.Contains, sValue),
+            new Filter("ValidityEndDate", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idCostCentersDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -1924,6 +1983,29 @@ sap.ui.define([
       var sGLAccount = this.getView().getModel("detailDetailModel").getProperty(sPath + "/GLAccount");
       this.oInputGlAccount.setValue(sGLAccount);
       this.oInputGlAccount.fireChangeEvent(sGLAccount);
+    },
+
+
+    onConfirmPOreferement: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sPoRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder");
+      this.oInputPoRefs.setValue(sPoRef);
+      this.oInputPoRefs.fireChangeEvent(sPoRef);
+
+      // Find the sibling Input control in the same row
+      var oParentRow = this.oInputPoRefs.getParent(); // Get the parent (row template)
+      if (oParentRow) {
+        // Find all content within the row
+        var aCells = oParentRow.getCells();
+        if (aCells && aCells.length > 1) {
+          // Assuming the second Input is the sibling
+          var oSiblingInput = aCells[1]; // The second cell
+          if (oSiblingInput && oSiblingInput.setValue) {
+            oSiblingInput.setValue(""); // Clear the value
+            oSiblingInput.fireChangeEvent(""); // Trigger the change event
+          }
+        }
+      }
     },
 
 
@@ -1959,7 +2041,7 @@ sap.ui.define([
       }
       this.oInput = oEvent.getSource();
       var oView = this.getView();
-      var aURL = baseManifestUrl + "/odata/getBusinessPartnerBank()?BusinessPartner="+sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getBusinessPartnerBank()?BusinessPartner=" + sConsistentValue;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -1996,14 +2078,14 @@ sap.ui.define([
     onSearchBusinessPartnerBanks: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("BankIdentification", FilterOperator.Contains, sValue),
-                  new Filter("BankName", FilterOperator.Contains, sValue),
-                  new Filter("BankNumber", FilterOperator.Contains, sValue),
-                  new Filter("IBAN", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("BankIdentification", FilterOperator.Contains, sValue),
+            new Filter("BankName", FilterOperator.Contains, sValue),
+            new Filter("BankNumber", FilterOperator.Contains, sValue),
+            new Filter("IBAN", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idPartnerBankDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -2023,7 +2105,7 @@ sap.ui.define([
       this.oInput = oEvent.getSource();
       var oView = this.getView();
       var sID = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/header_Id_ItalianInvoiceTrace");
-      var aURL = baseManifestUrl + "/odata/getPaymentMethods()?header_Id_ItalianInvoiceTrace="+sID;
+      var aURL = baseManifestUrl + "/odata/getPaymentMethods()?header_Id_ItalianInvoiceTrace=" + sID;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -2057,12 +2139,12 @@ sap.ui.define([
     onSearchPayMethods: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("PaymentMethod", FilterOperator.Contains, sValue),
-                  new Filter("PaymentMethodName", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("PaymentMethod", FilterOperator.Contains, sValue),
+            new Filter("PaymentMethodName", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idPayMethodsDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -2082,7 +2164,7 @@ sap.ui.define([
       this.oInput = oEvent.getSource();
       var oView = this.getView();
       var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
-      var aURL = baseManifestUrl + "/odata/getHouseBanks()?CompanyCode="+sCompanyCode;
+      var aURL = baseManifestUrl + "/odata/getHouseBanks()?CompanyCode=" + sCompanyCode;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -2119,14 +2201,14 @@ sap.ui.define([
     onSearchHouseBanks: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("HouseBank", FilterOperator.Contains, sValue),
-                  new Filter("BankName", FilterOperator.Contains, sValue),
-                  new Filter("SWIFTCode", FilterOperator.Contains, sValue),
-                  new Filter("Bank", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("HouseBank", FilterOperator.Contains, sValue),
+            new Filter("BankName", FilterOperator.Contains, sValue),
+            new Filter("SWIFTCode", FilterOperator.Contains, sValue),
+            new Filter("Bank", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idHouseBankDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -2149,7 +2231,7 @@ sap.ui.define([
       var sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/CompanyCode");
       this.oInput = oEvent.getSource();
       var oView = this.getView();
-      var aURL = baseManifestUrl + "/odata/getHouseBanksAccounts()?CompanyCode="+sCompanyCode+"&HouseBank="+sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getHouseBanksAccounts()?CompanyCode=" + sCompanyCode + "&HouseBank=" + sConsistentValue;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -2186,13 +2268,13 @@ sap.ui.define([
     onSearchHouseBanksAccount: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("HouseBankAccount", FilterOperator.Contains, sValue),
-                  new Filter("IBAN", FilterOperator.Contains, sValue),
-                  new Filter("BankAccountDescription", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("HouseBankAccount", FilterOperator.Contains, sValue),
+            new Filter("IBAN", FilterOperator.Contains, sValue),
+            new Filter("BankAccountDescription", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idHouseBanksAccountDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -2219,7 +2301,7 @@ sap.ui.define([
       this.oInput = oEvent.getSource();
       var oView = this.getView();
       var sID = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/header_Id_ItalianInvoiceTrace");
-      var aURL = baseManifestUrl + "/odata/getAccountingDocumentType()?header_Id_ItalianInvoiceTrace="+sID;
+      var aURL = baseManifestUrl + "/odata/getAccountingDocumentType()?header_Id_ItalianInvoiceTrace=" + sID;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
@@ -2253,12 +2335,12 @@ sap.ui.define([
     onSearchAccDocumentType: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
-          var sFilter = new Filter({
-              filters: [
-                  new Filter("AccountingDocumentType", FilterOperator.Contains, sValue),
-                  new Filter("AccountingDocumentTypeName", FilterOperator.Contains, sValue)
-              ]
-          });
+        var sFilter = new Filter({
+          filters: [
+            new Filter("AccountingDocumentType", FilterOperator.Contains, sValue),
+            new Filter("AccountingDocumentTypeName", FilterOperator.Contains, sValue)
+          ]
+        });
       }
       var oList = this.getView().byId("idAccDocumentTypeDialog_VH");
       var oBinding = oList.getBinding("items");
@@ -3048,7 +3130,7 @@ sap.ui.define([
           // Store attachments (if any)
           // oDetailDetailModel.setProperty("/Filelist", record.Allegati);
           // delete record.Allegati;
-          
+
           oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
           delete record.ErrorLog
           oDetailDetailModel.setProperty("/currentInvoice", record);
