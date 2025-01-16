@@ -404,7 +404,7 @@
                                                     <Column >
                                                         <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}"/>
                                                         <template>
-                                                            <m:Input value="{detailDetailModel>PurchaseOrder}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrder" maxLength="10"/>
+                                                            <m:Input value="{detailDetailModel>PurchaseOrder}" showValueHelp="true"  valueHelpRequest="onPOrefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrder" maxLength="10"/>
                                                         </template>
                                                     </Column>
                                                     
