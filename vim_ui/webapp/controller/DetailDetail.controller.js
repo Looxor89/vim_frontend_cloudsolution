@@ -828,8 +828,8 @@ sap.ui.define([
         "PurchaseOrderPriceUnit": null,
         "SupplierInvoiceItemText": null,
         "IsNotCashDiscountLiable": null,
-        "ServiceEntrySheet": null,
-        "ServiceEntrySheetItem": null,
+        "ServiceEntrySheet": oData? oData.ServiceEntrySheet : null,
+        "ServiceEntrySheetItem": oData? oData.ServiceEntrySheetItem : null,
         "IsFinallyInvoiced": oData? oData.IsFinallyInvoiced : null,
         "CostCenter": oData? oData.CostCenter : null,
         "TaxDeterminationDate": null,
@@ -1792,7 +1792,7 @@ sap.ui.define([
     },
     
 
-    //Purchase Orders referements
+    //Delivery Note referements
     onDeliveryNoteRefVH: function (oEvent) {
       this.oInputDeliveryNoteRefs = oEvent.getSource();
       var oView = this.getView();
@@ -1819,6 +1819,87 @@ sap.ui.define([
           });
         } else {
           this.getView().byId("idDeliveryNoteRefDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    //Service entry sheet referements
+    onServiceEntrySheetRefVH: function (oEvent) {
+      this.oInputServiceEntrySheetRefs = oEvent.getSource();
+      var oView = this.getView();
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/InvoicingParty", oBundle.getText("MissingInputError", [oBundle.getText("InvoicingParty")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      var sSupplier = sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getServiceEntrySheetRef()?Supplier=" + sSupplier;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/serviceEntrySheetReferements", data.value[0].result.value)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idServiceEntrySheetRefDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.ServiceEntrySheetRefVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idServiceEntrySheetRefDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    //Service entry sheet items referements
+    onServiceEntrySheetItemRefVH: function (oEvent) {
+      this.oInputServiceEntrySheetItemRefs = oEvent.getSource();
+      var sPathServiceEntrySheetReferements = this.oInputServiceEntrySheetItemRefs.getBindingContext("detailDetailModel").getPath() + "/ServiceEntrySheet";
+      var oView = this.getView();
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue(sPathServiceEntrySheetReferements, oBundle.getText("MissingInputAlert", [oBundle.getText("To_SelectedServiceEntrySheets_ServiceEntrySheet")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      var sServiceEntrySheetReferementsValue = sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getServiceEntrySheetItemRef()?ServiceEntrySheetRef=" + sServiceEntrySheetReferementsValue;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/serviceEntrySheetItemReferements", data.value[0].result.value)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idServiceEntrySheetItemRefDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.ServiceEntrySheetItemRefVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idServiceEntrySheetItemRefDialog_VH").open();
         }
       }
 
@@ -2062,7 +2143,7 @@ sap.ui.define([
       oBinding.filter(sFilter);
     },
 
-    onSearchPOreferements: function (oEvent) {
+    onSearchDeliveryNoteReferements: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
         var sFilter = new Filter({
@@ -2091,6 +2172,53 @@ sap.ui.define([
         });
       }
       var oList = this.getView().byId("idDeliveryNoteRefDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+    onSearchServiceEntrySheets: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+        var sFilter = new Filter({
+          filters: [
+            new Filter("ServiceEntrySheet", FilterOperator.Contains, sValue),
+            new Filter("CreatedByUser", FilterOperator.Contains, sValue),
+            new Filter("CreationDateTime", FilterOperator.Contains, sValue),
+            new Filter("PurchasingOrganization", FilterOperator.Contains, sValue),
+            new Filter("PurchasingGroup", FilterOperator.Contains, sValue),
+            new Filter("MaterialDocument", FilterOperator.Contains, sValue),
+            new Filter("MaterialDocumentYear", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrder", FilterOperator.Contains, sValue),
+            new Filter("Supplier", FilterOperator.Contains, sValue)
+          ]
+        });
+      }
+      var oList = this.getView().byId("idServiceEntrySheetRefDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
+    onSearchServiceEntrySheetsItem: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+        var sFilter = new Filter({
+          filters: [
+            new Filter("ServiceEntrySheet", FilterOperator.Contains, sValue),
+            new Filter("ServiceEntrySheetItem", FilterOperator.Contains, sValue),
+            new Filter("AccountAssignmentCategory", FilterOperator.Contains, sValue),
+            new Filter("CreatedByUser", FilterOperator.Contains, sValue),
+            new Filter("CreationDateTime", FilterOperator.Contains, sValue),
+            new Filter("PurchasingOrganization", FilterOperator.Contains, sValue),
+            new Filter("PurchasingGroup", FilterOperator.Contains, sValue),
+            new Filter("Plant", FilterOperator.Contains, sValue),
+            new Filter("Currency", FilterOperator.Contains, sValue),
+            new Filter("MaterialGroup", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrder", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrderItem", FilterOperator.Contains, sValue)
+          ]
+        });
+      }
+      var oList = this.getView().byId("idServiceEntrySheetItemRefDialog_VH");
       var oBinding = oList.getBinding("items");
       oBinding.filter(sFilter);
     },
@@ -2230,6 +2358,83 @@ sap.ui.define([
           "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
           "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/DeliveryQuantityUnit"),
           "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ActualDeliveryQuantity"),
+          "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
+          "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
+          "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
+          "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
+          "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
+          "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
+          "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
+          "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
+          "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
+          "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
+          "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
+          "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
+          "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
+          "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
+          "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
+        };
+        this._addPORow(oData);
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+
+    onConfirmServiceEntrySheet: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sServiceEntrySheetRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheet");
+      this.oInputServiceEntrySheetRefs.setValue(sServiceEntrySheetRef);
+      this.oInputServiceEntrySheetRefs.fireChangeEvent(sServiceEntrySheetRef);
+
+      // Find the sibling Input control in the same row
+      var oParentRow = this.oInputServiceEntrySheetRefs.getParent(); // Get the parent (row template)
+      if (oParentRow) {
+        // Find all content within the row
+        var aCells = oParentRow.getCells();
+        if (aCells && aCells.length > 1) {
+          // Assuming the second Input is the sibling
+          var oSiblingInput = aCells[1]; // The second cell
+          if (oSiblingInput && oSiblingInput.setValue) {
+            oSiblingInput.setValue(""); // Clear the value
+            oSiblingInput.fireChangeEvent(""); // Trigger the change event
+          }
+        }
+      }
+    },
+
+
+    onConfirmServiceEntrySheetItem: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sServiceEntrySheetItemRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheetItem");
+      var sPoRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder");
+      var sPoItemRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem");
+      this.oInputServiceEntrySheetItemRefs.setValue(sServiceEntrySheetItemRef);
+      this.oInputServiceEntrySheetItemRefs.fireChangeEvent(sServiceEntrySheetItemRef);
+
+      var aURL = baseManifestUrl + "/odata/getPOAccountAssignment()?PurchaseOrderRef=" + sPoRef + "&PurchaseOrderItemRef=" + sPoItemRef;
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        let retrievedData = data.value[0].result[0];
+        this.getView().byId('DDPage').setBusy(false);
+        let oData = {
+          "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
+          "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
+          "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
+          "TaxCode": this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode"),
+          "SupplierInvoiceItemAmount": this.getView().getModel("detailDetailModel").getProperty(sPath + "/NetAmount"),
+          "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/QuantityUnit"),
+          "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ConfirmedQuantity"),
+          "ServiceEntrySheet": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheet"),
+          "ServiceEntrySheetItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheetItem"),
           "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
           "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
           "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
@@ -3351,211 +3556,25 @@ sap.ui.define([
 
     // Function to read saved data from the backend for the current package
     readSavedData: function () {
-      // var aURL = baseManifestUrl + "/odata/DOC_PACK?$expand=InvoiceIntegrationInfo($expand=bodyPOIntegrationInfo,bodyGLAccountIntegrationInfo),InvoiceItalianTrace($expand=body($expand=datiGenerali_DatiGeneraliDocumento_DatiRitenuta,datiGenerali_DatiGeneraliDocumento_DatiCassaPrevidenziale,datiGenerali_DatiGeneraliDocumento_ScontoMaggiorazione,datiGenerali_DatiGeneraliDocumento_Causale,datiGenerali_DatiOrdineAcquisto($expand=riferimentoNumeroLinea),datiBeniServizi_DettaglioLinee($expand=codiceArticolo,scontoMaggiorazione,altriDatiGestionali),datiBeniServizi_DatiRiepilogo,datiPagamento($expand=dettaglioPagamento),allegati,datiGenerali_DatiDDT($expand=riferimentoNumeroLinea)))&$filter=PackageId eq " + this.I_PACKAGEID;
       var aURL = baseManifestUrl + "/odata/getInvoice()?PackageId=" + this.I_PACKAGEID;
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
         try {
           var record = data.value[0].result, // Get the main record
-            // oBodyInvoiceItalianTrace = record.InvoiceItalianTrace.body[0], // Extract the body of the InvoiceItalianTrace
-            // oBodyPOInvoiceIntegrationInfo = record.InvoiceIntegrationInfo ? record.InvoiceIntegrationInfo.bodyPOIntegrationInfo : null, // Extract the bodyPOIntegrationInfo of the InvoiceIntegrationInfo
-            // oBodyGLAccountIntegrationInfo = record.InvoiceIntegrationInfo ? record.InvoiceIntegrationInfo.bodyGLAccountIntegrationInfo : null, // Extract the bodyGLAccountIntegrationInfo of the InvoiceIntegrationInfo
-            // oBody = this._assemblyInvoiceBodies(oBodyInvoiceItalianTrace, oBodyPOInvoiceIntegrationInfo, oBodyGLAccountIntegrationInfo),
-            // aLineDetails = oBody.datiBeniServizi_DettaglioLinee, // Get line details
-            // oHeaderInvoiceItalianTrace = record.InvoiceItalianTrace, // Header info of the InvoiceItalianTrace
-            // oHeaderInvoiceIntegrationInfo = record.InvoiceIntegrationInfo, // Header info of the InvoiceIntegrationInfo
-            // oHeader = this._assemblyInvoiceHeaders(oHeaderInvoiceItalianTrace, oHeaderInvoiceIntegrationInfo),
+            
             bPOMode = oDetailDetailModel.getProperty("/props/POMode"), // Check if in PO mode
             bMultiplePO = false, // Flag for multiple POs
             sPOnumber = null, // PO number
             oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
-          // aLineItems = [], // Array to store PO line items
-          // aLineItems2 = []; // Array to store Non-PO line items
-
-          // Store InvoiceItalianTrace with body inside
-          // this.getView().setModel(new JSONModel(record.InvoiceItalianTrace), "currentInvoiceItalianTrace");
-          // Store InvoiceIntegrationInfo with body inside
-          // this.getView().setModel(new JSONModel(record.InvoiceIntegrationInfo), "currentInvoiceIntegrationInfo");
-
-          // Store attachments (if any)
-          // oDetailDetailModel.setProperty("/Filelist", record.Allegati);
-          // delete record.Allegati;
+          
 
           oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
           delete record.ErrorLog
           oDetailDetailModel.setProperty("/currentInvoice", record);
 
-
-
-          // Process data differently for PO mode and Non-PO mode
-          // if (bPOMode) {
-          //   let aPurchaseOrderData = oBody.datiGenerali_DatiOrdineAcquisto;
-          //   let aLineDetailRefNumberAlreadyProcessed = [];
-
-          //   // Check if there are multiple POs
-          //   bMultiplePO = aPurchaseOrderData.length > 1;
-
-          //   // If invoice contains just one purchase order
-          //   if (!bMultiplePO) {
-          //     sPOnumber = aPurchaseOrderData[0].idDocumento; // Get PO number
-          //   }
-
-          //   // Helper function to create a PO line item
-          //   function createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder) {
-          //     return {
-          //       "ID": oLineDetail.ID,
-          //       "body_Id": oLineDetail.body_Id,
-          //       "InvoiceLineItem": index + 1,
-          //       "Description": oLineDetail.descrizione || null,
-          //       "Amount": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
-          //       "Quantity": oLineDetail.quantita || 1,
-          //       "PONumber": oPurchaseOrder.idDocumento || null,
-          //       "POLineItem": oLineDetail.numeroLinea || null,
-          //       "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
-          //       "BusinessArea": null,
-          //       "CostCenter": null,
-          //       "WbsElem": null,
-          //       "Order": null,
-          //       "OrderUnit": null,
-          //       "Supplier": null,
-          //       "Material": null,
-          //       "ValuationType": null,
-          //       "MaterialGroup": null,
-          //       "Plant": null,
-          //       "ValuationArea": null
-          //     };
-          //   }
-
-          //   // Process line items based on PO references
-          //   aPurchaseOrderData.forEach(oPurchaseOrder => {
-          //     if (oPurchaseOrder.riferimentoNumeroLinea.length > 0) {
-          //       oPurchaseOrder.riferimentoNumeroLinea.forEach(oLineNumberRef => {
-          //         let nRefLineNumber = oLineNumberRef.riferimentoNumeroLinea;
-          //         aLineDetailRefNumberAlreadyProcessed.push(nRefLineNumber);
-          //         aLineDetails.forEach((oLineDetail, index) => {
-          //           if (nRefLineNumber == oLineDetail.numeroLinea) {
-          //             aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, oPurchaseOrder));
-          //           }
-          //         });
-          //       });
-          //     }
-          //   });
-
-          //   // Add remaining line items
-          //   let afilteredLineDetails = aLineDetails.filter(item => !aLineDetailRefNumberAlreadyProcessed.includes(item.numeroLinea));
-          //   afilteredLineDetails.forEach((oLineDetail, index) => {
-          //     aLineItems.push(createLineItemForPOInvoices(index, oLineDetail, {}));
-          //   });
-
-          // } else {
-          //   // Helper function to create a Non-PO line item
-          //   function createLineItemForNONPOInvoices(index, oLineDetail) {
-          //     // return {
-          //     //   "InvoiceLineItem": index + 1,
-          //     //   "Description": null,
-          //     //   "CompanyCode": null,
-          //     //   "Amount": null,
-          //     //   "Currency": null,
-          //     //   "Quantity": 1,
-          //     //   "UoM": null,
-          //     //   "TaxCode": null,
-          //     //   "TaxAmount": null,
-          //     //   "UoM": null,
-          //     //   "Bukrs": null,
-          //     //   "GLAcc": null,
-          //     //   "AmountInDocCurrency": null,
-          //     //   "Assignment": null,
-          //     //   "Text": null,
-          //     //   "WBSElem": null,
-          //     //   "ProfitCen": null,
-          //     //   "TaxName": null,
-          //     //   "BusinessArea": null,
-          //     //   "CostCenter": null,
-          //     //   "WbsElem": null,
-          //     //   "Order": null,
-          //     //   "SalesOrder": null,
-          //     //   "Supplier": null,
-          //     //   "Material": null,
-          //     //   "ValuationType": null,
-          //     //   "MaterialGroup": null,
-          //     //   "Plant": null,
-          //     //   "ValuationArea": null,
-          //     //   "AssetSecondaryNumber": null,
-          //     //   "AssetValueDate": null
-          //     // };
-          //     return {
-          //       "ID": oLineDetail.ID,
-          //       "body_Id": oLineDetail.body_Id,
-          //       "InvoiceLineItem": index + 1,
-          //       "TaxCode": oLineDetail.aliquotaIVA + " " + oLineDetail.natura || null,
-          //       "GLAcc": null,
-          //       "AmountInDocCurrency": oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento || null,
-          //       "Assignment": null,
-          //       "Text": oLineDetail.descrizione || null,
-          //       "WBSElem": null,
-          //       "ProfitCen": null,
-          //       "CostCenter": null
-          //     };
-          //   }
-
-          //   // Process Non-PO line items
-          //   aLineDetails.forEach((oLineDetail, index) => {
-          //     aLineItems2.push(createLineItemForNONPOInvoices(index, oLineDetail));
-          //   });
-          // }
-
-          // Update the model with the line items for PO and Non-PO invoices
-          // oDetailDetailModel.setProperty("/DocxLines", aLineItems);
           oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", record.PORecords);
-          // oDetailDetailModel.setProperty("/NonPoDocxLines", aLineItems2);
-
-          // Set header information like dates, amounts, and tax info
-          // General data
-          // let sTransaction = "", 
-          //   sCompanyCode = "",
-          //   sText = "",
-          //   sTaxIsCalculatedAutomatically = "",
-          //   dInvoiceReceiptDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
-          //   dInvoiceDate = oBody.datiGenerali_DatiGeneraliDocumento_Data,
-          //   sReference = oBody.datiGenerali_DatiGeneraliDocumento_Numero,
-          //   sCurrency = oBody.datiGenerali_DatiGeneraliDocumento_Divisa,
-          //   sDocumentType = oBody.datiGenerali_DatiGeneraliDocumento_TipoDocumento,
-          //   sInvoicingPartyVendorCode = oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdPaese + " " + oHeader.cedentePrestatore_DatiAnagrafici_IdFiscaleIVA_IdCodice,
-          //   // Amounts
-          //   sAmount = oBody.datiGenerali_DatiGeneraliDocumento_ImportoTotaleDocumento,
-          //   // Payment
-          //   sManualCashDiscount = "",
-          //   sCashDiscount1Days = "",
-          //   sCashDiscount1Percent = "",
-          //   sCashDiscount2Days = "",
-          //   sCashDiscount2Percent = "",
-          //   sFixedCashDiscount = "",
-          //   sNetPaymentDays = "",
-          //   sBpBankAccountInternalId = "",
-          //   sInvoiceReference = "",
-          //   sInvoiceReferenceFiscalYear = "",
-          //   sHouseBank = "",
-          //   sHouseBankAccount = "",
-          //   sPaymentBlockingReason = "",
-          //   sPaymentReason = "",
-          //   sUnplannedDeliveryCost = "",
-          //   sSupplyingCountry = "",
-          //   sIsEuTriangularDate = "",
-          //   sTaxDeterminationDate = "",
-          //   sTaxReportingDate = "",
-          //   sTaxFulfillmentDate = "",
-          //   sWithholdingTaxType = "",
-          //   sWithholdingTaxBaseAmount = "",
-          //   sPaymentMethod = oBody.datiPagamento[0].dettaglioPagamento[0] ? oBody.datiPagamento[0].dettaglioPagamento[0].modalitaPagamento : null,
-          //   // Banking Details
-          //   // Tax
-          //   sTaxAmount = oBody.datiBeniServizi_DatiRiepilogo[0] ? oBody.datiBeniServizi_DatiRiepilogo[0].imposta : null,
-          //   sTaxCode = oBody.datiBeniServizi_DettaglioLinee[0].aliquotaIVA + " " + oBody.datiBeniServizi_DettaglioLinee[0].natura,
-          //   sWithholdingTaxCode = oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0] ? oBody.datiGenerali_DatiGeneraliDocumento_DatiRitenuta[0].tipoRitenuta : null,
-          //   // Unplanned Freight
-          //   // Goods and services data
-          //   sBusinessArea;
+          
 
           oDetailDetailModel.setProperty("/props/bMultiplePO", bMultiplePO);
           if (bMultiplePO) {
@@ -3564,58 +3583,6 @@ sap.ui.define([
           } else if (!sPOnumber) {
             this.setPOMode(sPOnumber);
           }
-
-          // oDetailDetailModel.setProperty("/header/transaction", sTransaction);
-          // oDetailDetailModel.setProperty("/header/companyCode", sCompanyCode);
-          // oDetailDetailModel.setProperty("/header/text", sText);
-          // oDetailDetailModel.setProperty("/header/taxIsCalculatedAutomatically", sTaxIsCalculatedAutomatically);
-          // oDetailDetailModel.setProperty("/header/manualCashDiscount", sManualCashDiscount);
-          // oDetailDetailModel.setProperty("/header/cashDiscount1Days", sCashDiscount1Days);
-          // oDetailDetailModel.setProperty("/header/cashDiscount1Percent", sCashDiscount1Percent);
-          // oDetailDetailModel.setProperty("/header/cashDiscount2Days", sCashDiscount2Days);
-          // oDetailDetailModel.setProperty("/header/cashDiscount2Percent", sCashDiscount2Percent);
-          // oDetailDetailModel.setProperty("/header/fixedCashDiscount", sFixedCashDiscount);
-          // oDetailDetailModel.setProperty("/header/documentDate", dInvoiceReceiptDate);
-          // // oDetailDetailModel.setProperty("/header/baselineDate", dBaselineDate);
-          // oDetailDetailModel.setProperty("/header/invoiceDate", dInvoiceDate);
-          // oDetailDetailModel.setProperty("/header/invoicingPartyVendorCode", sInvoicingPartyVendorCode);
-          // oDetailDetailModel.setProperty("/header/reference", sReference);
-          // // oDetailDetailModel.setProperty("/header/headerText", sHeaderText);
-          // oDetailDetailModel.setProperty("/header/businessArea", sBusinessArea);
-          // // oDetailDetailModel.setProperty("/header/assignment", sAssignment);
-          // oDetailDetailModel.setProperty("/header/postingDate", dPostingDate);
-          // oDetailDetailModel.setProperty("/header/currency", sCurrency);
-          // oDetailDetailModel.setProperty("/header/netAmount", sAmount);
-          // // oDetailDetailModel.setProperty("/header/paymentTerms", sPaymentTerms);
-          // oDetailDetailModel.setProperty("/header/paymentMethod", sPaymentMethod);
-          // oDetailDetailModel.setProperty("/header/netPaymentDays", sNetPaymentDays);
-          // oDetailDetailModel.setProperty("/header/bpBankAccountInternalId", sBpBankAccountInternalId);
-          // oDetailDetailModel.setProperty("/header/invoiceReference", sInvoiceReference);
-          // oDetailDetailModel.setProperty("/header/invoiceReferenceFiscalYear", sInvoiceReferenceFiscalYear);
-          // oDetailDetailModel.setProperty("/header/houseBank", sHouseBank);
-          // oDetailDetailModel.setProperty("/header/houseBankAccount", sHouseBankAccount);
-          // oDetailDetailModel.setProperty("/header/paymentReason", sPaymentReason);
-          // oDetailDetailModel.setProperty("/header/paymentBlockingReason", sPaymentBlockingReason);
-          // oDetailDetailModel.setProperty("/header/unplannedDeliveryCost", sUnplannedDeliveryCost);
-          // oDetailDetailModel.setProperty("/header/supplyingCountry", sSupplyingCountry);
-          // oDetailDetailModel.setProperty("/header/isEuTriangularDate", sIsEuTriangularDate);
-          // oDetailDetailModel.setProperty("/header/taxDeterminationDate", sTaxDeterminationDate);
-          // oDetailDetailModel.setProperty("/header/taxReportingDate", sTaxReportingDate);
-          // oDetailDetailModel.setProperty("/header/taxFulfillmentDate", sTaxFulfillmentDate);
-          // oDetailDetailModel.setProperty("/header/withholdingTaxType", sWithholdingTaxType);
-          // oDetailDetailModel.setProperty("/header/withholdingTaxBaseAmount", sWithholdingTaxBaseAmount);
-          // oDetailDetailModel.setProperty("/header/documentType", sDocumentType);
-          // oDetailDetailModel.setProperty("/header/taxAmount", sTaxAmount);
-          // oDetailDetailModel.setProperty("/header/taxCode", sTaxCode);
-          // oDetailDetailModel.setProperty("/header/withholdingTaxCode", sWithholdingTaxCode);
-
-          // if (!oDetailDetailModel.getProperty("/props/POMode")) {
-          //   if (oDetailDetailModel.getProperty("/props/NONPOModeGLaccount")) {
-          //     this.getView().byId("idLineItemsType").setSelectedKey("idGLAccountItem");
-          //   } else {
-          //     this.getView().byId("idLineItemsType").setSelectedKey("idAssetItem");
-          //   }
-          // }
           let sTransactionKey = record.Transaction;
           if (sTransactionKey) {
             let oSelectTransaction = this.getView().byId("idTransaction"),

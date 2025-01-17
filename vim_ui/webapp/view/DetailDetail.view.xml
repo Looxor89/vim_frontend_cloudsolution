@@ -358,31 +358,6 @@
                                                     <core:Item key="keyRefDocCategory2" text="{i18n>DeliveryNote}" />
                                                     <core:Item key="keyRefDocCategoryS" text="{i18n>ServiceEntrySheet}" />
                                                 </m:Select>
-                                                
-                                                <!-- <m:HBox> 
-                                                    <m:Label text="{i18n>RefDocCategory}" class="sapUiSmallMargin"/>
-                                                    <m:Select id="idRefDocCategory" change=".onChangeRefDocCategory" class="sapUiSmallMargin" enabled="{detailDetailModel>/props/lineItemTable/editMode}">
-                                                        <core:Item key="keyRefDocCategory0" />
-                                                        <core:Item key="keyRefDocCategory1" text="{i18n>PurchaseOrder}" />
-                                                        <core:Item key="keyRefDocCategory2" text="{i18n>DeliveryNote}" />
-                                                        <core:Item key="keyRefDocCategoryS" text="{i18n>ServiceEntrySheet}" />
-                                                    </m:Select>
-
-                                                    <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}"/>
-                                                    <m:Input id="idTo_SelectedPurchaseOrders_PurchaseOrder" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders'], formatter:'.formatter.fillTo_SelectedPurchaseOrders_PurchaseOrder'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrder" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}" maxLength="10"/>
-
-                                                    <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrderItem}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}"/>
-                                                    <m:Input id="idTo_SelectedPurchaseOrders_PurchaseOrderItem" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders'], formatter:'.formatter.fillTo_SelectedPurchaseOrders_PurchaseOrderItem'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrderItem" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedPurchaseOrders_PurchaseOrder'}" maxLength="5"/>
-
-                                                    <m:Label text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedDeliveryNotes_InboundDeliveryNote'}"/>
-                                                    <m:Input id="idTo_SelectedDeliveryNotes_InboundDeliveryNote" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedDeliveryNotes'], formatter:'.formatter.fillTo_SelectedDeliveryNotes_InboundDeliveryNote'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedDeliveryNotes_InboundDeliveryNote'}" maxLength="16"/>
-
-                                                    <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheet}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}"/>
-                                                    <m:Input id="idTo_SelectedServiceEntrySheets_ServiceEntrySheet" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedServiceEntrySheets'], formatter:'.formatter.fillTo_SelectedServiceEntrySheets_ServiceEntrySheet'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}" maxLength="10"/>
-
-                                                    <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheetItem}" class="sapUiSmallMargin" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}"/>
-                                                    <m:Input id="idTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" class="sapUiSmallMargin" value="{parts: ['detailDetailModel>/currentInvoice/RefDocumentCategory', 'detailDetailModel>/currentInvoice/To_SelectedServiceEntrySheets'], formatter:'.formatter.fillTo_SelectedServiceEntrySheets_ServiceEntrySheetItem'}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" visible="{path:'detailDetailModel>/currentInvoice/RefDocumentCategory', formatter:'.formatter.showTo_SelectedServiceEntrySheets_ServiceEntrySheet'}" maxLength="5"/>
-                                                </m:HBox> -->
 
                                                 <Table id="idTo_SelectedPurchaseOrdersTable" rows="{
                                                         path: 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders'
@@ -461,14 +436,14 @@
                                                     <Column >
                                                         <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheet}"/>
                                                         <template>
-                                                            <m:Input value="{detailDetailModel>ServiceEntrySheet}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet" maxLength="10"/>
+                                                            <m:Input value="{detailDetailModel>ServiceEntrySheet}" showValueHelp="true"  valueHelpRequest="onServiceEntrySheetRefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheet" maxLength="10"/>
                                                         </template>
                                                     </Column>
                                                     
                                                     <Column >
                                                         <m:Label text="{i18n>To_SelectedServiceEntrySheets_ServiceEntrySheetItem}"/>
                                                         <template>
-                                                            <m:Input value="{detailDetailModel>ServiceEntrySheetItem}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" maxLength="5"/>
+                                                            <m:Input value="{detailDetailModel>ServiceEntrySheetItem}" showValueHelp="true"  valueHelpRequest="onServiceEntrySheetItemRefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedServiceEntrySheets_ServiceEntrySheetItem" maxLength="5"/>
                                                         </template>
                                                     </Column>
                                                 </Table>
