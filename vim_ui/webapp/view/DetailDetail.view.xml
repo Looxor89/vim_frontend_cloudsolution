@@ -436,7 +436,7 @@
                                                     <Column >
                                                         <m:Label text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}"/>
                                                         <template>
-                                                            <m:Input value="{detailDetailModel>InboundDeliveryNote}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote" maxLength="16"/>
+                                                            <m:Input value="{detailDetailModel>InboundDeliveryNote}" showValueHelp="true"  valueHelpRequest="onDeliveryNoteRefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedDeliveryNotes_InboundDeliveryNote" maxLength="16"/>
                                                         </template>
                                                     </Column>
                                                 </Table>

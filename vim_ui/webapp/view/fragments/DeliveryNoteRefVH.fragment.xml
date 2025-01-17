@@ -1,0 +1,163 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<TableSelectDialog 
+		id="idDeliveryNoteRefDialog_VH" 
+        resizable="true"
+		noDataText="{i18n>NoDeliveryNoteRefFound}"
+		items="{path: 'detailDetailModel>/valuehelps/deliveryNoteReferements'}"
+		title="{i18n>TitleSearchDeliveryNoteReferements}"
+		search="onSearchDeliveryNoteReferements"
+		confirm="onConfirmDeliveryNoteReferement">
+        <ColumnListItem vAlign="Middle">
+            <cells>
+                <ObjectIdentifier
+                    title="{detailDetailModel>InboundDelivery}"/>
+                <Text
+                    text="{detailDetailModel>InboundDeliveryItem}" />
+                <Text
+                    text="{detailDetailModel>CreatedByUser}" />
+                <Text
+                    text="{detailDetailModel>CreationDate}" />
+                <Text
+                    text="{detailDetailModel>CreationTime}" />
+                <Text
+                    text="{detailDetailModel>Supplier}" />
+                <Text
+                    text="{detailDetailModel>Material}" />
+                <Text
+                    text="{detailDetailModel>MaterialGroup}" />
+                <Text
+                    text="{detailDetailModel>MaterialFreightGroup}" />
+                <Text
+                    text="{detailDetailModel>Plant}" />
+                <Text
+                    text="{detailDetailModel>DeliveryDocumentItemText}" />
+                <Text
+                    text="{detailDetailModel>ActualDeliveryQuantity}" />
+                <Text
+                    text="{detailDetailModel>OriginalDeliveryQuantity}" />
+                <Text
+                    text="{detailDetailModel>DeliveryQuantityUnit}" />
+                <Text
+                    text="{detailDetailModel>BaseUnit}" />
+                <Text
+                    text="{detailDetailModel>StockType}" />
+                <Text
+                    text="{detailDetailModel>IsCompletelyDelivered}" />
+                <Text
+                    text="{detailDetailModel>CostCenter}" />
+                <Text
+                    text="{detailDetailModel>PurchaseOrder}" />
+                <Text
+                    text="{detailDetailModel>PurchaseOrderItem}" />
+            </cells>
+        </ColumnListItem>
+		<columns>
+			<Column width="12em">
+				<header>
+					<Text text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNote}" />
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true"
+				hAlign="End">
+				<header>
+					<Text text="{i18n>To_SelectedDeliveryNotes_InboundDeliveryNoteItem}" />
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Desktop"
+				demandPopin="true"
+				hAlign="Center">
+				<header>
+					<Text text="{i18n>CreatedByUser}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>CreationDate}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>CreationTime}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>Supplier}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>Material}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>MaterialGroup}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>MaterialFreightGroup}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>Plant}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>DeliveryDocumentItemText}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>ActualDeliveryQuantity}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>OriginalDeliveryQuantity}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>DeliveryQuantityUnit}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>BaseUnit}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>StockType}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>IsCompletelyDelivered}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>CostCenter}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>PurchaseOrder}" />
+				</header>
+			</Column>
+			<Column hAlign="End">
+				<header>
+					<Text text="{i18n>PurchaseOrderItem}" />
+				</header>
+			</Column>
+		</columns>
+	</TableSelectDialog>
+</core:FragmentDefinition>

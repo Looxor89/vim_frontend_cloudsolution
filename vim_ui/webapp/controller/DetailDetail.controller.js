@@ -1790,6 +1790,47 @@ sap.ui.define([
 
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
+    
+
+    //Purchase Orders referements
+    onDeliveryNoteRefVH: function (oEvent) {
+      this.oInputDeliveryNoteRefs = oEvent.getSource();
+      var oView = this.getView();
+      var sConsistentValue = this._checkConsistencyOfPreparatoryValue("/currentInvoice/InvoicingParty", oBundle.getText("MissingInputError", [oBundle.getText("InvoicingParty")]));
+      if (!sConsistentValue) {
+        return;
+      }
+      var sSupplier = sConsistentValue;
+      var aURL = baseManifestUrl + "/odata/getDeliveryNoteRef()?Supplier=" + sSupplier;
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/deliveryNoteReferements", data.value[0].result)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idDeliveryNoteRefDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.DeliveryNoteRefVH",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idDeliveryNoteRefDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
 
     //Gl Account
     onGLAcctVH: function (oEvent) {
@@ -2021,6 +2062,39 @@ sap.ui.define([
       oBinding.filter(sFilter);
     },
 
+    onSearchPOreferements: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+        var sFilter = new Filter({
+          filters: [
+            new Filter("InboundDelivery", FilterOperator.Contains, sValue),
+            new Filter("InboundDeliveryItem", FilterOperator.Contains, sValue),
+            new Filter("CreatedByUser", FilterOperator.Contains, sValue),
+            new Filter("CreationDate", FilterOperator.Contains, sValue),
+            new Filter("CreationTime", FilterOperator.Contains, sValue),
+            new Filter("Supplier", FilterOperator.Contains, sValue),
+            new Filter("Material", FilterOperator.Contains, sValue),
+            new Filter("MaterialGroup", FilterOperator.Contains, sValue),
+            new Filter("MaterialFreightGroup", FilterOperator.Contains, sValue),
+            new Filter("Plant", FilterOperator.Contains, sValue),
+            new Filter("DeliveryDocumentItemText", FilterOperator.Contains, sValue),
+            new Filter("ActualDeliveryQuantity", FilterOperator.Contains, sValue),
+            new Filter("OriginalDeliveryQuantity", FilterOperator.Contains, sValue),
+            new Filter("DeliveryQuantityUnit", FilterOperator.Contains, sValue),
+            new Filter("BaseUnit", FilterOperator.Contains, sValue),
+            new Filter("StockType", FilterOperator.Contains, sValue),
+            new Filter("IsCompletelyDelivered", FilterOperator.Contains, sValue),
+            new Filter("CostCenter", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrder", FilterOperator.Contains, sValue),
+            new Filter("PurchaseOrderItem", FilterOperator.Contains, sValue)
+          ]
+        });
+      }
+      var oList = this.getView().byId("idDeliveryNoteRefDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
     onSearchCostCenters: function (oEvent) {
       var sValue = oEvent.getParameter("value");
       if (sValue) {
@@ -2106,6 +2180,56 @@ sap.ui.define([
           "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderQuantityUnit"),
           "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/OrderQuantity"),
           "IsFinallyInvoiced": this.getView().getModel("detailDetailModel").getProperty(sPath + "/IsFinallyInvoiced"),
+          "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
+          "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
+          "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
+          "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
+          "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
+          "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
+          "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
+          "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
+          "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
+          "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
+          "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
+          "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
+          "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
+          "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
+          "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
+        };
+        this._addPORow(oData);
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+
+    onConfirmDeliveryNoteReferement: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sInboundDeliveryRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/InboundDelivery");
+      var sPoRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder");
+      var sPoItemRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem");
+      this.oInputDeliveryNoteRefs.setValue(sInboundDeliveryRef);
+      this.oInputDeliveryNoteRefs.fireChangeEvent(sInboundDeliveryRef);
+
+      var aURL = baseManifestUrl + "/odata/getPOAccountAssignment()?PurchaseOrderRef=" + sPoRef + "&PurchaseOrderItemRef=" + sPoItemRef;
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        let retrievedData = data.value[0].result[0];
+        this.getView().byId('DDPage').setBusy(false);
+        let oData = {
+          "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
+          "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
+          "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
+          "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/DeliveryQuantityUnit"),
+          "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ActualDeliveryQuantity"),
           "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
           "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
           "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
