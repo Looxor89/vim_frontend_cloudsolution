@@ -25,9 +25,9 @@ sap.ui.define([
   var aRemovedSupplierInvoiceWhldgTaxRecords;
   var aRemovedPoLineDetails;
   var aRemovedGlAccountLineDetails;
-  var aRemovedSelectedPurchaseOrdersRecords;
-  var aRemovedSelectedDeliveryNotesRecords;
-  var aRemovedSelectedServiceEntrySheetsRecords;
+  var aNewSelectedPurchaseOrdersRecords;
+  var aNewSelectedDeliveryNotesRecords;
+  var aNewSelectedServiceEntrySheetsRecords;
 
   return BaseController.extend("vim_ui.controller.DetailDetail", {
     formatter: formatter,
@@ -41,9 +41,9 @@ sap.ui.define([
       aRemovedSupplierInvoiceWhldgTaxRecords = [];
       aRemovedPoLineDetails = [];
       aRemovedGlAccountLineDetails = [];
-      aRemovedSelectedPurchaseOrdersRecords = [];
-      aRemovedSelectedDeliveryNotesRecords = [];
-      aRemovedSelectedServiceEntrySheetsRecords = [];
+      aNewSelectedPurchaseOrdersRecords = [];
+      aNewSelectedDeliveryNotesRecords = [];
+      aNewSelectedServiceEntrySheetsRecords = [];
 
       // Retrieve the buttons for full-screen exit and enter and store them for later use
       var oExitButton = this.getView().byId("exitFullScreenBtn"),
@@ -323,45 +323,45 @@ sap.ui.define([
       this.getView().setModel(new JSONModel(oModel), "detailDetailModel");
     },
 
+    onCloseAddByCopyRow: function () {
+      MessageBox.warning(oBundle.getText("AlertCancelCloseAddByCopyPORow"), {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if(sAction === "YES") {
+            aNewSelectedPurchaseOrdersRecords = [];
+            aNewSelectedDeliveryNotesRecords = [];
+            aNewSelectedServiceEntrySheetsRecords = [];
+            this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+            this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
+            this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
+            this.getView().byId("addPoCopyDialog").close();
+          }
+        }.bind(this)
+      });
+    },
+
+    onAddByCopyPORow: function (oEvent) {
+      this.oInput = oEvent.getSource();
+      var oView = this.getView();
+      //create dialog
+      if (!this.getView().byId("addPoCopyDialog")) {
+        //load asynchronous fragment (XML)
+        Fragment.load({
+          id: oView.getId(),
+          name: "vim_ui.view.fragments.AddCopyPo",
+          controller: this
+        }).then(function (oDialog) {
+          //connect Menu to rootview of this component (models, lifecycle)
+          oView.addDependent(oDialog);
+          oDialog.open();
+        });
+      } else {
+        this.getView().byId("addPoCopyDialog").open();
+      }
+    },
+
     resetUIState: function () {
-      // this.appmodel.setProperty("/props/POMode", false);
-
-
-      // Clear all fields which are not using data binding
-      // this.getView().byId("idFreeTxt").setValue(null);
-      // this.getView().byId("idCompanyCodeTxt").setText(null); CAP refactory
-      // this.getView().byId("idDiscountAmt").setValue(null); CAP refactory
-      // this.getView().byId("idInvDocType").setValue(null);
-
-      // payement terms
-      // this.getView().byId("idPaymentTerms").setSelectedKey(null);
-
-      // tax code
-      // this.getView().byId("idTaxCode").setSelectedKey(null);
-
-      // bank
-      // this.getView().byId("idBankKey").setSelectedKey(null); CAP refactory
-      // this.getView().byId("bankntxt").setText(null); CAP refactory
-      // this.getView().byId("routingtxt").setText(null); CAP refactory
-      // this.getView().byId("ibantxt").setText(null); CAP refactory
-
-      // tax
-      // this.getView().byId("idHTaxAmt").setValue(null);
-      // this.getView().byId("idTaxExemptAmt").setValue(null); CAP refactory
-      // this.getView().byId("idWithholdingTaxCode").setValue(null);
-      // this.getView().byId("idCalcTaxInd").setSelected(false); CAP refactory
-
-      // credit memo check
-      // this.getView().byId("idInvInd").setSelected(false); CAP refactory
-      // this.getView().byId("idShippingAmount").setValue(null); CAP refactory
-
-      // Bind read only template
-      var oTable = this.getView().byId("idTo_SelectedPurchaseOrdersTable");
-      oTable.setSelectionMode("None");
-      var oTable = this.getView().byId("idTo_SelectedDeliveryNotesTable");
-      oTable.setSelectionMode("None");
-      var oTable = this.getView().byId("idTo_SelectedServiceEntrySheetsTable");
-      oTable.setSelectionMode("None");
       var oTable = this.getView().byId("idInvLineItemTable");
       oTable.setSelectionMode("None");
       var oTable = this.getView().byId("idNPOInvGLAccountLineTable");
@@ -404,9 +404,6 @@ sap.ui.define([
       this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
-      this.aRemovedSelectedPurchaseOrdersRecords = [];
-      this.aRemovedSelectedDeliveryNotesRecords = [];
-      this.aRemovedSelectedServiceEntrySheetsRecords = [];
     },
 
     // Function to fetch notes associated with a package ID from the backend
@@ -504,9 +501,6 @@ sap.ui.define([
       this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
-      this.aRemovedSelectedPurchaseOrdersRecords = [];
-      this.aRemovedSelectedDeliveryNotesRecords = [];
-      this.aRemovedSelectedServiceEntrySheetsRecords = [];
       // Build the request payload
       var body = {
         payload: {
@@ -530,9 +524,6 @@ sap.ui.define([
 
         // this.rebindTable(this.oReadOnlyTemplate, "Navigation", true);
         this.getView().byId("idInvLineItemTable").setSelectionMode("None");  // Disable table actions
-        this.getView().byId("idTo_SelectedPurchaseOrdersTable").setSelectionMode("None");
-        this.getView().byId("idTo_SelectedDeliveryNotesTable").setSelectionMode("None");
-        this.getView().byId("idTo_SelectedServiceEntrySheetsTable").setSelectionMode("None");
         // this.rebindTable(this.oReadOnlyGLAccountTemplateNPo, "Navigation", false);
         this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("None");  // Disable table actions
         this.getView().byId("idSupplierInvoiceWhldgTaxTable").setSelectionMode("None");  // Disable table actions
@@ -559,9 +550,6 @@ sap.ui.define([
       this.aRemovedSupplierInvoiceWhldgTaxRecords = [];
       this.aRemovedPoLineDetails = [];
       this.aRemovedGlAccountLineDetails = [];
-      this.aRemovedSelectedPurchaseOrdersRecords = [];
-      this.aRemovedSelectedDeliveryNotesRecords = [];
-      this.aRemovedSelectedServiceEntrySheetsRecords = [];
 
       const oSuccessFunction = (data) => {
         // if success means lock was set
@@ -574,9 +562,6 @@ sap.ui.define([
         MessageToast.show(oBundle.getText("DocumentLocked"));
 
         this.getView().byId("idInvLineItemTable").setSelectionMode("MultiToggle");
-        this.getView().byId("idTo_SelectedPurchaseOrdersTable").setSelectionMode("MultiToggle");
-        this.getView().byId("idTo_SelectedDeliveryNotesTable").setSelectionMode("MultiToggle");
-        this.getView().byId("idTo_SelectedServiceEntrySheetsTable").setSelectionMode("MultiToggle");
         // this.rebindTable(this.oEditableTemplate, "Edit", true);
         this.getView().byId("idNPOInvGLAccountLineTable").setSelectionMode("MultiToggle");
         this.getView().byId("idSupplierInvoiceWhldgTaxTable").setSelectionMode("MultiToggle");
@@ -612,13 +597,10 @@ sap.ui.define([
 
     onAddTo_SelectedPurchaseOrdersRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice");
       // Retrieve the PORecords data from the model
       var aTo_SelectedPurchaseOrders = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedPurchaseOrders");
       aTo_SelectedPurchaseOrders.push({
-        "selectedPurchaseOrders_Id": null,
-        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
         "PurchaseOrder": null,
         "PurchaseOrderItem": null
       });
@@ -627,13 +609,10 @@ sap.ui.define([
 
     onAddTo_SelectedDeliveryNotesRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice");
       // Retrieve the PORecords data from the model
       var aTo_SelectedDeliveryNotes = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedDeliveryNotes");
       aTo_SelectedDeliveryNotes.push({
-        "selectedDeliveryNotes_Id": null,
-        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
         "InboundDeliveryNote": null
       });
       oDetailDetailModel.setProperty("/currentInvoice/To_SelectedDeliveryNotes", aTo_SelectedDeliveryNotes);
@@ -641,13 +620,10 @@ sap.ui.define([
 
     onAddTo_SelectedServiceEntrySheetsRow: function (oEvent) {
       var oDetailDetailModel = this.getView().getModel("detailDetailModel"),
-        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice"),
-        sHeader_Id_InvoiceIntegrationInfo = oCurrentInvoice.header_Id_InvoiceIntegrationInfo;
+        oCurrentInvoice = oDetailDetailModel.getProperty("/currentInvoice");
       // Retrieve the PORecords data from the model
       var aTo_SelectedServiceEntrySheets = oDetailDetailModel.getProperty("/currentInvoice/To_SelectedServiceEntrySheets");
       aTo_SelectedServiceEntrySheets.push({
-        "selectedServiceEntrySheets_Id": null,
-        "header_Id_InvoiceIntegrationInfo": sHeader_Id_InvoiceIntegrationInfo,
         "ServiceEntrySheet": null,
         "ServiceEntrySheetItem": null
       });
@@ -810,7 +786,7 @@ sap.ui.define([
         sBodyInvoiceItalianTrace_Id = oCurrentInvoice.PORecords.length > 0 ? oCurrentInvoice.PORecords[0].bodyInvoiceItalianTrace_Id : oCurrentInvoice.GLAccountRecords[0].bodyInvoiceItalianTrace_Id;
       // Retrieve the PORecords data from the model
       var aPORecords = oDetailDetailModel.getProperty("/currentInvoice/PORecords");
-      aPORecords.push({
+      aPORecords.unshift({
         "lineDetail_ID": null,
         "bodyInvoiceItalianTrace_Id": sBodyInvoiceItalianTrace_Id,
         "bodyPOIntegrationInfo_Id": null,
@@ -997,36 +973,6 @@ sap.ui.define([
           // remove inconsistent object if any
           this.aRemovedGlAccountLineDetails = this.aRemovedGlAccountLineDetails.filter(item => item && item.lineDetail_ID !== null && item.lineDetail_ID !== '' && item.bodyGLAccountIntegrationInfo_Id !== null && item.bodyGLAccountIntegrationInfo_Id !== '');
           break;
-        case "idTo_SelectedPurchaseOrdersTable":
-          this.aRemovedSelectedPurchaseOrdersRecords = selectedContexts.map(oContext => {
-            let sSelectedPurchaseOrders_Id = oDetailDetailModel.getProperty(oContext.sPath + "/selectedPurchaseOrders_Id");
-            if (sSelectedPurchaseOrders_Id) {
-              return { "selectedPurchaseOrders_Id": sSelectedPurchaseOrders_Id };
-            }
-          });
-          // remove inconsistent object if any
-          this.aRemovedSelectedPurchaseOrdersRecords = this.aRemovedSelectedPurchaseOrdersRecords.filter(item => item && item.selectedPurchaseOrders_Id !== null && item.selectedPurchaseOrders_Id !== '');
-          break;
-        case "idTo_SelectedDeliveryNotesTable":
-          this.aRemovedSelectedDeliveryNotesRecords = selectedContexts.map(oContext => {
-            let sSelectedDeliveryNotes_Id = oDetailDetailModel.getProperty(oContext.sPath + "/selectedDeliveryNotes_Id");
-            if (sSelectedDeliveryNotes_Id) {
-              return { "selectedDeliveryNotes_Id": sSelectedDeliveryNotes_Id };
-            }
-          });
-          // remove inconsistent object if any
-          this.aRemovedSelectedDeliveryNotesRecords = this.aRemovedSelectedDeliveryNotesRecords.filter(item => item && item.selectedDeliveryNotes_Id !== null && item.selectedDeliveryNotes_Id !== '');
-          break;
-        case "idTo_SelectedServiceEntrySheetsTable":
-          this.aRemovedSelectedServiceEntrySheetsRecords = selectedContexts.map(oContext => {
-            let sSelectedServiceEntrySheets_Id = oDetailDetailModel.getProperty(oContext.sPath + "/selectedServiceEntrySheets_Id");
-            if (sSelectedServiceEntrySheets_Id) {
-              return { "selectedServiceEntrySheets_Id": sSelectedServiceEntrySheets_Id };
-            }
-          });
-          // remove inconsistent object if any
-          this.aRemovedSelectedServiceEntrySheetsRecords = this.aRemovedSelectedServiceEntrySheetsRecords.filter(item => item && item.selectedServiceEntrySheets_Id !== null && item.selectedServiceEntrySheets_Id !== '');
-          break;
         default:
           this.aRemovedSupplierInvoiceWhldgTaxRecords = selectedContexts.map(oContext => {
             let sSupplierInvoiceWhldgTax_Id = oDetailDetailModel.getProperty(oContext.sPath + "/supplierInvoiceWhldgTax_Id");
@@ -1046,21 +992,18 @@ sap.ui.define([
     },
 
     onDeleteTo_SelectedPurchaseOrdersRows: function () {
-      this._handleRemovedLineDetailCache("idTo_SelectedPurchaseOrdersTable");
       this._onDeleteSelectedRows("idTo_SelectedPurchaseOrdersTable", "/currentInvoice/To_SelectedPurchaseOrders");
-      this.onSelectionTo_SelectedPurchaseOrdersChange();
+      // this.onSelectionTo_SelectedPurchaseOrdersChange();
     },
 
     onDeleteTo_SelectedDeliveryNotesRows: function () {
-      this._handleRemovedLineDetailCache("idTo_SelectedDeliveryNotesTable");
       this._onDeleteSelectedRows("idTo_SelectedDeliveryNotesTable", "/currentInvoice/To_SelectedDeliveryNotes");
-      this.onSelectionTo_SelectedDeliveryNotesChange();
+      // this.onSelectionTo_SelectedDeliveryNotesChange();
     },
 
     onDeleteTo_SelectedServiceEntrySheetsRows: function () {
-      this._handleRemovedLineDetailCache("idTo_SelectedServiceEntrySheetsTable");
       this._onDeleteSelectedRows("idTo_SelectedServiceEntrySheetsTable", "/currentInvoice/To_SelectedServiceEntrySheets");
-      this.onSelectionTo_SelectedServiceEntrySheetsChange();
+      // this.onSelectionTo_SelectedServiceEntrySheetsChange();
     },
 
     onDeleteSelectedSupplierInvoiceWhldgTaxRows: function () {
@@ -2261,6 +2204,35 @@ sap.ui.define([
       this.oInputGlAccount.fireChangeEvent(sGLAccount);
     },
 
+    onConfirmAddByCopy: function () {
+      MessageBox.warning(oBundle.getText("AlertConfirmCloseAddByCopyPORow"), {
+        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        emphasizedAction: MessageBox.Action.NO,
+        onClose: function (sAction) {
+          if(sAction === "YES") {
+            aNewSelectedPurchaseOrdersRecords.forEach(oData => {
+              this._addPORow(oData);
+            });
+      
+            aNewSelectedDeliveryNotesRecords.forEach(oData => {
+              this._addPORow(oData);
+            });
+            
+            aNewSelectedServiceEntrySheetsRecords.forEach(oData => {
+              this._addPORow(oData);
+            });
+            aNewSelectedPurchaseOrdersRecords = [];
+            aNewSelectedDeliveryNotesRecords = [];
+            aNewSelectedServiceEntrySheetsRecords = [];
+            this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+            this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
+            this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
+            this.getView().byId("addPoCopyDialog").close();
+          }
+        }.bind(this)
+      });
+    },
+
 
     onConfirmPOreferement: function (oEvent) {
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
@@ -2324,7 +2296,8 @@ sap.ui.define([
           "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
           "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
         };
-        this._addPORow(oData);
+        // this._addPORow(oData);
+        aNewSelectedPurchaseOrdersRecords.push(oData);
       }
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -2374,7 +2347,8 @@ sap.ui.define([
           "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
           "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
         };
-        this._addPORow(oData);
+        // this._addPORow(oData);
+        aNewSelectedDeliveryNotesRecords.push(oData);
       }
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -2451,7 +2425,8 @@ sap.ui.define([
           "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
           "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
         };
-        this._addPORow(oData);
+        // this._addPORow(oData);
+        aNewSelectedServiceEntrySheetsRecords.push(oData);
       }
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -3567,13 +3542,14 @@ sap.ui.define([
             bMultiplePO = false, // Flag for multiple POs
             sPOnumber = null, // PO number
             oApProcessModel = this.getOwnerComponent().getModel("ApProcessModel");
-          
+            oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
+            delete record.ErrorLog
+            oDetailDetailModel.setProperty("/currentInvoice", record);
+            oDetailDetailModel.setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+            oDetailDetailModel.setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
+            oDetailDetailModel.setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
 
-          oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
-          delete record.ErrorLog
-          oDetailDetailModel.setProperty("/currentInvoice", record);
-
-          oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", record.PORecords);
+            oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", record.PORecords);
           
 
           oDetailDetailModel.setProperty("/props/bMultiplePO", bMultiplePO);
@@ -4963,45 +4939,6 @@ sap.ui.define([
       this._onChangeEventHandler(oEvent, "/WithholdingTaxBaseAmount");
     },
 
-    _removeAllRefDocumentCategoryValues: function (sKey) {
-      let aTo_SelectedPurchaseOrders = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedPurchaseOrders");
-      let aTo_SelectedDeliveryNotes = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedDeliveryNotes");
-      let aTo_SelectedServiceEntrySheets = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/To_SelectedServiceEntrySheets");
-      switch (sKey) {
-        case "keyRefDocCategory1":
-          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
-          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({ selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id }));
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
-          break;
-        case "keyRefDocCategory2":
-          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({ selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id }));
-          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({ selectedServiceEntrySheets_Id: oRecord.selectedServiceEntrySheets_Id }));
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
-          break;
-        case "keyRefDocCategoryS":
-          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({ selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id }));
-          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
-          break;
-        default:
-          this.aRemovedSelectedPurchaseOrdersRecords = aTo_SelectedPurchaseOrders.map((oRecord) => ({ selectedPurchaseOrders_Id: oRecord.selectedPurchaseOrders_Id }));
-          this.aRemovedSelectedDeliveryNotesRecords = aTo_SelectedDeliveryNotes.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
-          this.aRemovedSelectedServiceEntrySheetsRecords = aTo_SelectedServiceEntrySheets.map((oRecord) => ({ selectedDeliveryNotes_Id: oRecord.selectedDeliveryNotes_Id }));
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
-          this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
-      }
-    },
-
-    onChangeRefDocCategory: function (oEvent) {
-      var sKey = oEvent.getParameters().selectedItem.getKey();
-      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/RefDocumentCategory", sKey);
-      this._removeAllRefDocumentCategoryValues(sKey);
-    },
-
     onChangeTo_SelectedPurchaseOrders_PurchaseOrder: function (oEvent) {
       this._onChangeEventHandler(oEvent, "/PurchaseOrder");
     },
@@ -5197,14 +5134,14 @@ sap.ui.define([
       var body = {}; // Initialize request body
       var sUrl = baseManifestUrl + `/odata/save`; // API endpoint for saving data
       var oCurrentInvoice = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice");
+      delete oCurrentInvoice.To_SelectedPurchaseOrders;
+      delete oCurrentInvoice.To_SelectedDeliveryNotes;
+      delete oCurrentInvoice.To_SelectedServiceEntrySheets;
       // Build the request payload
       body = {
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: oCurrentInvoice,  // Convert invoice data to JSON string
-          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords ? this.aRemovedSelectedPurchaseOrdersRecords : [],
-          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords ? this.aRemovedSelectedDeliveryNotesRecords : [],
-          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords ? this.aRemovedSelectedServiceEntrySheetsRecords : [],
           RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords ? this.aRemovedSupplierInvoiceWhldgTaxRecords : [],
           RemovedPoLineDetails: this.aRemovedPoLineDetails ? this.aRemovedPoLineDetails : [],
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails ? this.aRemovedGlAccountLineDetails : []
@@ -5317,9 +5254,6 @@ sap.ui.define([
         payload: {
           PackageId: this._packageId,  // Package ID
           Invoice: oCurrentInvoice,  // Convert invoice data to JSON string
-          RemovedSelectedPurchaseOrdersRecords: this.aRemovedSelectedPurchaseOrdersRecords ? this.aRemovedSelectedPurchaseOrdersRecords : [],
-          RemovedSelectedDeliveryNotesRecords: this.aRemovedSelectedDeliveryNotesRecords ? this.aRemovedSelectedDeliveryNotesRecords : [],
-          RemovedSelectedServiceEntrySheetsRecords: this.aRemovedSelectedServiceEntrySheetsRecords ? this.aRemovedSelectedServiceEntrySheetsRecords : [],
           RemovedSupplierInvoiceWhldgTaxRecords: this.aRemovedSupplierInvoiceWhldgTaxRecords ? this.aRemovedSupplierInvoiceWhldgTaxRecords : [],
           RemovedPoLineDetails: this.aRemovedPoLineDetails ? this.aRemovedPoLineDetails : [],
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails ? this.aRemovedGlAccountLineDetails : []
