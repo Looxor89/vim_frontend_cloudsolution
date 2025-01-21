@@ -69,64 +69,6 @@
                 "$XSAPPNAME.assign",
                 "$XSAPPNAME.forward"
             ]
-        },
-        {
-            "name": "ZRT_TCL_AP_SuperAdmin",
-            "description": "Role for Super-Admin",
-            "scope-references": [
-                "uaa.user",
-                "$XSAPPNAME.admin"
-            ]
-        },
-        {
-            "name": "ZRT_TCL_AP_Manager",
-            "description": "Role for Manager (read, assign, edit, forward all documents)",
-            "scope-references": [
-                "uaa.user",
-                "$XSAPPNAME.readall",
-                "$XSAPPNAME.write",
-                "$XSAPPNAME.process",
-                "$XSAPPNAME.comment",
-                "$XSAPPNAME.upload",
-                "$XSAPPNAME.download",
-                "$XSAPPNAME.assign",
-                "$XSAPPNAME.forward"
-            ]
-        },
-        {
-            "name": "ZRT_TCL_AP_Operator",
-            "description": "Role for Operator (read, edit, forward assigned documents)",
-            "scope-references": [
-                "uaa.user",
-                "$XSAPPNAME.read",
-                "$XSAPPNAME.write",
-                "$XSAPPNAME.process",
-                "$XSAPPNAME.comment",
-                "$XSAPPNAME.upload",
-                "$XSAPPNAME.download",
-                "$XSAPPNAME.forward"
-            ]
-        },
-        {
-            "name": "ZRT_TCL_AP_Reviewer",
-            "description": "Role for Reviewer (add comments, view assigned documents)",
-            "scope-references": [
-                "uaa.user",
-                "$XSAPPNAME.read",
-                "$XSAPPNAME.comment",
-                "$XSAPPNAME.upload",
-                "$XSAPPNAME.download",
-                "$XSAPPNAME.forward"
-            ]
-        },
-        {
-            "name": "ZRT_TCL_AP_Auditor",
-            "description": "Role for Auditor (read all data)",
-            "scope-references": [
-                "uaa.user",
-                "$XSAPPNAME.readall",
-                "$XSAPPNAME.download"
-            ]
         }
     ]
 }
