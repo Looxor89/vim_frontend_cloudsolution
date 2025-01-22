@@ -3,40 +3,10 @@ xmlns="sap.ui.table"
 	xmlns:m="sap.m"
 	xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core">
-    <m:Dialog id="addPoCopyDialog" title="{i18n>AddByCopy}">
+    <m:Dialog id="addPoCopyDialog" title="{i18n>AddByCopy}" contentWidth="30%">
 
 		<m:content>
             <m:VBox>
-                <Table id="idTo_SelectedPurchaseOrdersTable" rows="{
-                        path: 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders'
-                    }" class="sapUiSmallMargin"
-                        rowSelectionChange="onSelectionTo_SelectedPurchaseOrdersChange"
-                        selectionMode="MultiToggle"
-                        visibleRowCount="5">
-                    <extension>
-                        <m:Toolbar>
-                            <m:Title text="{parts: [{path: 'i18n>To_SelectedPurchaseOrders_PurchaseOrder'}, {path: 'detailDetailModel>/currentInvoice/To_SelectedPurchaseOrders/length'}], 
-                                formatter: '.formatter.getI18nTextWithCount'}" level="H2" />
-                            <m:ToolbarSpacer />
-                            <m:Button text="{i18n>AddButton}" press="onAddTo_SelectedPurchaseOrdersRow" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                            <m:Button id="deleteTo_SelectedPurchaseOrdersTable" text="{i18n>DeleteButton}" press="onDeleteTo_SelectedPurchaseOrdersRows" visible="{detailDetailModel>/props/lineItemTable/editMode}" />
-                        </m:Toolbar>
-                    </extension>
-                    
-                    <Column >
-                        <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrder}"/>
-                        <template>
-                            <m:Input value="{detailDetailModel>PurchaseOrder}" showValueHelp="true"  valueHelpRequest="onPOrefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrder" maxLength="10"/>
-                        </template>
-                    </Column>
-                    
-                    <Column >
-                        <m:Label text="{i18n>To_SelectedPurchaseOrders_PurchaseOrderItem}"/>
-                        <template>
-                            <m:Input value="{detailDetailModel>PurchaseOrderItem}" showValueHelp="true"  valueHelpRequest="onPoItemRefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeTo_SelectedPurchaseOrders_PurchaseOrderItem" maxLength="5"/>
-                        </template>
-                    </Column>
-                </Table>
 
                 <Table id="idTo_SelectedDeliveryNotesTable" rows="{
                         path: 'detailDetailModel>/currentInvoice/To_SelectedDeliveryNotes'

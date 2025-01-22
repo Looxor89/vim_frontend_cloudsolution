@@ -344,6 +344,9 @@ sap.ui.define([
     onAddByCopyPORow: function (oEvent) {
       this.oInput = oEvent.getSource();
       var oView = this.getView();
+      oView.getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
+      oView.getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
+      oView.getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
       //create dialog
       if (!this.getView().byId("addPoCopyDialog")) {
         //load asynchronous fragment (XML)
@@ -357,7 +360,7 @@ sap.ui.define([
           oDialog.open();
         });
       } else {
-        this.getView().byId("addPoCopyDialog").open();
+        oView.byId("addPoCopyDialog").open();
       }
     },
 
@@ -838,7 +841,7 @@ sap.ui.define([
 
       // Retrieve the GLAccountRecords data from the model
       var aGLAccountRecords = oDetailDetailModel.getProperty("/currentInvoice/GLAccountRecords");
-      aGLAccountRecords.push({
+      aGLAccountRecords.unshift({
         "lineDetail_ID": null,
         "bodyInvoiceItalianTrace_Id": sBodyInvoiceItalianTrace_Id,
         "bodyGLAccountIntegrationInfo_Id": null,
@@ -997,13 +1000,17 @@ sap.ui.define([
     },
 
     onDeleteTo_SelectedDeliveryNotesRows: function () {
-      this._onDeleteSelectedRows("idTo_SelectedDeliveryNotesTable", "/currentInvoice/To_SelectedDeliveryNotes");
-      // this.onSelectionTo_SelectedDeliveryNotesChange();
+      var oTable = this.getView().byId("idTo_SelectedDeliveryNotesTable"),
+      aSelectedIndices = oTable.getSelectedIndices();
+      aNewSelectedDeliveryNotesRecords = aNewSelectedDeliveryNotesRecords.filter((_, index) => !aSelectedIndices.includes(index));
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedDeliveryNotes", aNewSelectedDeliveryNotesRecords);
     },
 
     onDeleteTo_SelectedServiceEntrySheetsRows: function () {
-      this._onDeleteSelectedRows("idTo_SelectedServiceEntrySheetsTable", "/currentInvoice/To_SelectedServiceEntrySheets");
-      // this.onSelectionTo_SelectedServiceEntrySheetsChange();
+      var oTable = this.getView().byId("idTo_SelectedServiceEntrySheetsTable"),
+      aSelectedIndices = oTable.getSelectedIndices();
+      aNewSelectedServiceEntrySheetsRecords = aNewSelectedServiceEntrySheetsRecords.filter((_, index) => !aSelectedIndices.includes(index));
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/To_SelectedServiceEntrySheets", aNewSelectedServiceEntrySheetsRecords);
     },
 
     onDeleteSelectedSupplierInvoiceWhldgTaxRows: function () {
@@ -1962,6 +1969,41 @@ sap.ui.define([
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
+    //Debit Credit codes
+    onDebitCreditCodesVH: function (oEvent) {
+      this.oInputDebitCreditCode = oEvent.getSource();
+      var oView = this.getView();
+      var aURL = baseManifestUrl + "/odata/SubsequentDebitCredit";
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+      this.getView().byId('DDPage').setBusy(true);
+
+      const oSuccessFunction = (data) => {
+        oDetailDetailModel.setProperty("/valuehelps/debitCredits", data.value)
+        this.getView().byId('DDPage').setBusy(false);
+        if (!this.getView().byId("idSubsequentDebitCreditDialog_VH")) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "vim_ui.view.fragments.SubsequentDebitCredit",
+            controller: this
+          }).then(function (oDialog) {
+            oView.addDependent(oDialog);
+            oDialog.open();
+          });
+        } else {
+          this.getView().byId("idSubsequentDebitCreditDialog_VH").open();
+        }
+      }
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
+        let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+        MessageToast.show(sMsg);
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
 
     //Tax Code
     onTaxCodeVH: function (oEvent) {
@@ -2182,6 +2224,20 @@ sap.ui.define([
       oBinding.filter(sFilter);
     },
 
+    onSearchDebitCredits: function (oEvent) {
+      var sValue = oEvent.getParameter("value");
+      if (sValue) {
+        var sFilter = new Filter({
+          filters: [
+            new Filter("subsequentValue", FilterOperator.Contains, sValue)
+          ]
+        });
+      }
+      var oList = this.getView().byId("idSubsequentDebitCreditDialog_VH");
+      var oBinding = oList.getBinding("items");
+      oBinding.filter(sFilter);
+    },
+
     onConfirmTaxCode: function (oEvent) {
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
       var sTaxCode = this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode");
@@ -2209,11 +2265,7 @@ sap.ui.define([
         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
         emphasizedAction: MessageBox.Action.NO,
         onClose: function (sAction) {
-          if(sAction === "YES") {
-            aNewSelectedPurchaseOrdersRecords.forEach(oData => {
-              this._addPORow(oData);
-            });
-      
+          if(sAction === "YES") {      
             aNewSelectedDeliveryNotesRecords.forEach(oData => {
               this._addPORow(oData);
             });
@@ -2258,28 +2310,31 @@ sap.ui.define([
 
 
     onConfirmPoItemReferement: function (oEvent) {
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
-      var sPoItemRef = this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem");
+      var sPoItemRef = oDetailDetailModel.getProperty(sPath + "/PurchaseOrderItem");
       this.oInputPoItemRefs.setValue(sPoItemRef);
       this.oInputPoItemRefs.fireChangeEvent(sPoItemRef);
 
       var sPathPoRef = this.oInputPoItemRefs.getBindingContext("detailDetailModel").getPath() + "/PurchaseOrder";
-      var sPoRef = this.getView().getModel("detailDetailModel").getProperty(sPathPoRef);
+      var sPoRef = oDetailDetailModel.getProperty(sPathPoRef);
       var aURL = baseManifestUrl + "/odata/getPOAccountAssignment()?PurchaseOrderRef=" + sPoRef + "&PurchaseOrderItemRef=" + sPoItemRef;
       this.getView().byId('DDPage').setBusy(true);
+
+      var sLineDetailPath = this.oInputPoItemRefs.getBindingContext("detailDetailModel").getPath();
 
       const oSuccessFunction = (data) => {
         let retrievedData = data.value[0].result[0];
         this.getView().byId('DDPage').setBusy(false);
         let oData = {
-          "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
-          "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
-          "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
-          "TaxCode": this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode"),
-          "SupplierInvoiceItemAmount": this.getView().getModel("detailDetailModel").getProperty(sPath + "/NetAmount"),
-          "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderQuantityUnit"),
-          "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/OrderQuantity"),
-          "IsFinallyInvoiced": this.getView().getModel("detailDetailModel").getProperty(sPath + "/IsFinallyInvoiced"),
+          "PurchaseOrder": oDetailDetailModel.getProperty(sPath + "/PurchaseOrder"),
+          "PurchaseOrderItem": oDetailDetailModel.getProperty(sPath + "/PurchaseOrderItem"),
+          "Plant": oDetailDetailModel.getProperty(sPath + "/Plant"),
+          "TaxCode": oDetailDetailModel.getProperty(sPath + "/TaxCode"),
+          "SupplierInvoiceItemAmount": oDetailDetailModel.getProperty(sPath + "/NetAmount"),
+          "PurchaseOrderQuantityUnit": oDetailDetailModel.getProperty(sPath + "/PurchaseOrderQuantityUnit"),
+          "QuantityInPurchaseOrderUnit": oDetailDetailModel.getProperty(sPath + "/OrderQuantity"),
+          "IsFinallyInvoiced": oDetailDetailModel.getProperty(sPath + "/IsFinallyInvoiced"),
           "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
           "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
           "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
@@ -2297,7 +2352,8 @@ sap.ui.define([
           "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
         };
         // this._addPORow(oData);
-        aNewSelectedPurchaseOrdersRecords.push(oData);
+        // aNewSelectedPurchaseOrdersRecords.push(oData);
+        this.assignValueToLineItemField(oData, sLineDetailPath, oDetailDetailModel);
       }
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -2310,6 +2366,14 @@ sap.ui.define([
       return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
     },
 
+    assignValueToLineItemField: function (oData, sLineDetailPath, oDetailDetailModel) {
+      let aDataKeys = Object.keys(oData);
+      aDataKeys.forEach(sKey => {
+        if (!oDetailDetailModel.getProperty(sLineDetailPath+"/"+sKey)) {
+          oDetailDetailModel.setProperty(sLineDetailPath+"/"+sKey, oData[sKey]);
+        }
+      });
+    },
 
     onConfirmDeliveryNoteReferement: function (oEvent) {
       var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
@@ -2445,6 +2509,14 @@ sap.ui.define([
       var sCostCenter = this.getView().getModel("detailDetailModel").getProperty(sPath + "/CostCenter");
       this.oInputCostCenter.setValue(sCostCenter);
       this.oInputCostCenter.fireChangeEvent(sCostCenter);
+    },
+
+
+    onConfirmDebitCredit: function (oEvent) {
+      var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("detailDetailModel");
+      var sDebitCreditCode = this.getView().getModel("detailDetailModel").getProperty(sPath + "/subsequentValue");
+      this.oInputDebitCreditCode.setValue(sDebitCreditCode);
+      this.oInputDebitCreditCode.fireChangeEvent(sDebitCreditCode);
     },
 
     _checkConsistencyOfPreparatoryValue: function (sPath, sMessage) {
@@ -3420,6 +3492,7 @@ sap.ui.define([
       this.getView().byId('DDPage').setBusy(true);
       // Fetch data based on the package ID and handle further actions
       this.fetchData(this._packageId)
+        .then(this.fetchSelectTransactionValues.bind(this))
         .then(this.readSavedData.bind(this)) // Fetch saved data from the backend
         .then(function () {
           this.getView().byId('DDPage').setBusy(false); // Once done, mark the page as not busy
@@ -3474,6 +3547,30 @@ sap.ui.define([
         } else {
           oDetailDetailModel.setProperty("/props/POMode", true); // PO mode
         }
+        return record;
+      };
+
+      const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        console.log(errorThrown);
+      };
+
+      return this.executeRequest(aURL, 'GET', null, oSuccessFunction, oErrorFunction);
+    },
+
+    // Function to fetch data for the provided package ID
+    fetchSelectTransactionValues: function () {
+      var aURL = baseManifestUrl + "/odata/Transaction"; // Create API URL
+      var oDetailDetailModel = this.getView().getModel("detailDetailModel");
+
+      const oSuccessFunction = (data) => {
+        var record = data.value; // Extract relevant record
+        var aTransaction = [];
+        aTransaction = record.map(item => {
+          return {transactionKey : item.transaction.replace(" ",""), transactionValue: item.transaction}
+        })
+
+        // Update the data in the model
+        oDetailDetailModel.setProperty("/transactionData", aTransaction);
         return record;
       };
 
@@ -3545,10 +3642,6 @@ sap.ui.define([
             oDetailDetailModel.setProperty("/errorLog", record.ErrorLog);
             delete record.ErrorLog
             oDetailDetailModel.setProperty("/currentInvoice", record);
-            oDetailDetailModel.setProperty("/currentInvoice/To_SelectedPurchaseOrders", []);
-            oDetailDetailModel.setProperty("/currentInvoice/To_SelectedDeliveryNotes", []);
-            oDetailDetailModel.setProperty("/currentInvoice/To_SelectedServiceEntrySheets", []);
-
             oDetailDetailModel.setProperty("/valuehelps/multiplePOValueHelp", record.PORecords);
           
 
@@ -4703,10 +4796,8 @@ sap.ui.define([
     },
 
     onChangeTransaction: function (oEvent) {
-      var sKey = oEvent.getParameters().selectedItem.getKey(),
-        oSelect = oEvent.getSource(),
-        sPath = oSelect.getBindingContext("detailDetailModel").getPath() + "/Transaction";
-      this.getView().getModel("detailDetailModel").setProperty(sPath, sKey);
+      var sKey = oEvent.getParameters().selectedItem.getKey();
+      this.getView().getModel("detailDetailModel").setProperty("/currentInvoice/Transaction", sKey);
       this.setIsSubsequentDebitCredit(sKey);
     },
 
@@ -4732,7 +4823,8 @@ sap.ui.define([
       }
 
       switch (sKey) {
-        case ("keyTransaction1" || "keyTransaction3"):
+        case "Invoice":
+        case "Subsequentdebit":
           return "S";
         default:
           return "H";
@@ -5147,8 +5239,10 @@ sap.ui.define([
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails ? this.aRemovedGlAccountLineDetails : []
         }
       };
+      this.getView().byId('DDPage').setBusy(true);
 
       const oSuccessFunction = (data) => {
+        this.getView().byId('DDPage').setBusy(false);
         console.log(data);  // Log the successful response
         // Show success message to the user
         MessageBox.success(oBundle.getText("SuccessfullySavedRecord"), {
@@ -5162,6 +5256,7 @@ sap.ui.define([
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
         console.log(JSON.parse(XMLHttpRequest.responseText).error.message);  // Log the error
         let that = this;
         // Show error message to the user

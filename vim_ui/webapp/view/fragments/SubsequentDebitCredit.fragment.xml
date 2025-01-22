@@ -1,0 +1,12 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idSubsequentDebitCreditDialog_VH" 
+		noDataText="{i18n>NoDebitCreditFound}"
+		title="{i18n>TitleSearchDebitCredit}"
+		items="{path: 'detailDetailModel>/valuehelps/debitCredits'}"
+		search="onSearchDebitCredits"
+		confirm="onConfirmDebitCredit">
+		<StandardListItem 
+			title="{detailDetailModel>subsequentValue}" />
+	</SelectDialog>
+</core:FragmentDefinition>

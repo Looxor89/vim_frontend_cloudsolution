@@ -70,11 +70,13 @@
                                     <l:BlockLayoutCell>
 
                                         <m:Label text="{i18n>Transaction}" />
-                                        <m:Select id="idTransaction" change=".onChangeTransaction">
-                                            <core:Item key="keyTransaction1" text="{i18n>Invoice}" />
-                                            <core:Item key="keyTransaction2" text="{i18n>CreditMemo}" />
-                                            <core:Item key="keyTransaction3" text="{i18n>SubsequentDebit}" />
-                                            <core:Item key="keyTransaction4" text="{i18n>SubsequentCredit}" />
+                                        <m:Select id="idTransaction" change=".onChangeTransaction"
+                                            forceSelection="false"
+                                            selectedKey="{detailDetailModel>/Transaction}"
+                                            items="{
+                                                path: 'detailDetailModel>/transactionData'
+                                            }">
+                                            <core:Item key="{detailDetailModel>transactionKey}" text="{detailDetailModel>transactionValue}" />
                                         </m:Select>
 
                                         <form:SimpleForm id="invoiceHeaderSimpleForm" editable="true" layout="ResponsiveGridLayout" columnsM="2" columnsL="2" columnsXL="3">
@@ -372,13 +374,13 @@
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>PurchaseOrder}"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>PurchaseOrder}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrder" maxLength="10"/>
+                                                                <m:Input value="{detailDetailModel>PurchaseOrder}" showValueHelp="true"  valueHelpRequest="onPOrefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrder" maxLength="10"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
                                                             <m:Label text="{i18n>PurchaseOrderItem}"/>
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>PurchaseOrderItem}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrderItem" maxLength="5"/>
+                                                                <m:Input value="{detailDetailModel>PurchaseOrderItem}" showValueHelp="true"  valueHelpRequest="onPoItemRefVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangePurchaseOrderItem" maxLength="5"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem" >
@@ -589,7 +591,7 @@
                                                         <Column width="8rem">
                                                             <m:Label text="{i18n>DebitCreditCode}" />
                                                             <template>
-                                                                <m:Input value="{detailDetailModel>DebitCreditCode}" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeDebitCreditCode" maxLength="1"/>
+                                                                <m:Input value="{detailDetailModel>DebitCreditCode}" showValueHelp="true" valueHelpRequest="onDebitCreditCodesVH" enabled="{detailDetailModel>/props/lineItemTable/editMode}" change=".onChangeDebitCreditCode" maxLength="1"/>
                                                             </template>
                                                         </Column>
                                                         <Column width="8rem">
