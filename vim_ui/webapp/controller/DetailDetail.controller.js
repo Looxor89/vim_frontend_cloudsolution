@@ -5375,7 +5375,7 @@ sap.ui.define([
       const oSuccessFunction = (data) => {
         console.log(data);  // Log the successful response
         // Show success message to the user
-        MessageBox.success(oBundle.getText("SuccessfullySavedRecord"), {
+        MessageBox.success(oBundle.getText("SuccessfullySubmittedRecord"), {
           title: "Success",
           details: data,  // Provide details of the response
           styleClass: sResponsivePaddingClasses
