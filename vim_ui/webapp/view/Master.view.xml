@@ -168,6 +168,11 @@
                     <Column hAlign="Initial" width="5%">
                         <Text text="{i18n>Action}" />
                     </Column>
+
+                    <!-- LockedBy -->
+                    <Column hAlign="Initial" width="5%">
+                        <Text text="{i18n>Locked}" />
+                    </Column>
                 </columns>
 
                 <!-- Table Items -->
@@ -210,6 +215,7 @@
 
                             <!-- Edit Button -->
                             <Button tooltip="{i18n>EditButtonTooltip}" icon="sap-icon://edit" press="onQuickEditPress" type="Transparent" />
+                            <Button press="onQuickUnlockPress" tooltip="{path:'masterModel>LOCKEDBYNAME', formatter:'.formatter.formatLockedByName'}" icon="sap-icon://locked" type="Transparent" visible="{path:'masterModel>LOCKEDBYNAME', formatter:'.formatter.formatLock'}"/>
                         </cells>
                     </ColumnListItem>
                 </items>

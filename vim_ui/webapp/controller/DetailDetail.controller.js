@@ -544,6 +544,18 @@ sap.ui.define([
     },
 
     handleGEdit: function () {
+      this.getLockStatus(this._packageId).then(function (data) {
+        if (data.value[0].result.locked) {
+          MessageBox.warning(oBundle.getText("AlertEdit", data.value[0].result.lockedBy), {
+            styleClass: sResponsivePaddingClasses
+          });
+        } else {
+          this._editDocument();
+        }
+      }.bind(this));
+    },
+
+    _editDocument: function () {
       let body = {
         payload: {
           PackageId: this._packageId
@@ -1973,12 +1985,13 @@ sap.ui.define([
     onDebitCreditCodesVH: function (oEvent) {
       this.oInputDebitCreditCode = oEvent.getSource();
       var oView = this.getView();
-      var aURL = baseManifestUrl + "/odata/SubsequentDebitCredit";
+      var aURL = baseManifestUrl + "/odata/getDebitCreditCodes()";
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
       this.getView().byId('DDPage').setBusy(true);
 
       const oSuccessFunction = (data) => {
-        oDetailDetailModel.setProperty("/valuehelps/debitCredits", data.value)
+        let aSubsequentValues = data.value[0].result.map(sValue => {return {"subsequentValue": sValue}})
+        oDetailDetailModel.setProperty("/valuehelps/debitCredits", aSubsequentValues)
         this.getView().byId('DDPage').setBusy(false);
         if (!this.getView().byId("idSubsequentDebitCreditDialog_VH")) {
           Fragment.load({
@@ -2324,7 +2337,7 @@ sap.ui.define([
       var sLineDetailPath = this.oInputPoItemRefs.getBindingContext("detailDetailModel").getPath();
 
       const oSuccessFunction = (data) => {
-        let retrievedData = data.value[0].result[0];
+        let retrievedData = data.value[0].result.length>0? data.value[0].result[0] : {};
         this.getView().byId('DDPage').setBusy(false);
         let oData = {
           "PurchaseOrder": oDetailDetailModel.getProperty(sPath + "/PurchaseOrder"),
@@ -3559,14 +3572,14 @@ sap.ui.define([
 
     // Function to fetch data for the provided package ID
     fetchSelectTransactionValues: function () {
-      var aURL = baseManifestUrl + "/odata/Transaction"; // Create API URL
+      var aURL = baseManifestUrl + "/odata/getTransactionData()"; // Create API URL
       var oDetailDetailModel = this.getView().getModel("detailDetailModel");
 
       const oSuccessFunction = (data) => {
-        var record = data.value; // Extract relevant record
+        var record = data.value[0].result; // Extract relevant record
         var aTransaction = [];
         aTransaction = record.map(item => {
-          return {transactionKey : item.transaction.replace(" ",""), transactionValue: item.transaction}
+          return {transactionKey : item.replace(" ",""), transactionValue: item}
         })
 
         // Update the data in the model
@@ -4818,16 +4831,20 @@ sap.ui.define([
     },
 
     getValueMappedToIsSubsequentDebitCredit: function (sKey) {
+      let oItem = this.getView().byId("idTransaction").getSelectedItem();
       if (!sKey) {
-        sKey = this.getView().byId("idTransaction").getSelectedItem().getKey();
+        sKey = oItem? oItem.getKey(): null;
       }
 
       switch (sKey) {
         case "Invoice":
         case "Subsequentdebit":
           return "S";
+        case "Creditmemo":
+        case "Subsequentcredit":
+          return "H"
         default:
-          return "H";
+          return "";
       }
     },
 

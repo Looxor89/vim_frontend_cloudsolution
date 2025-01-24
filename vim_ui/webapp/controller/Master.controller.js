@@ -43,7 +43,7 @@ sap.ui.define([
 
         _setDefaultDocumentStatus() {
             // Set default document status 
-            this.getView().byId("idSelectDocStatus").setSelectedKeys(["INITIAL","ASSIGN","PROCESSING","ERROR"]);
+            this.getView().byId("idSelectDocStatus").setSelectedKeys(["INITIAL", "ASSIGN", "PROCESSING", "ERROR"]);
         },
 
         /**
@@ -62,7 +62,7 @@ sap.ui.define([
          */
         onGoPress: function (oEvent) {
             this._iSkip = 0; // Reset skip counter on new search
-            this._iTop = 2*this.getView().byId("masterTable").getGrowingThreshold();
+            this._iTop = 2 * this.getView().byId("masterTable").getGrowingThreshold();
             this.getView().getModel("masterModel").setProperty("/list", []);
             this._loadData();
         },
@@ -178,6 +178,7 @@ sap.ui.define([
          * Unlocks a document by sending an AJAX POST request.
          */
         onUnlock: function (oEvent) {
+            var that = this;
             var url = baseManifestUrl + "/odata/unlock";
             var sPackageId = this.getView().getModel("masterModel").getProperty(this.oCtx + "/PACKAGEID");
 
@@ -204,12 +205,20 @@ sap.ui.define([
                 data: JSON.stringify(body),
                 success: function (data) {
                     let sMsg = oBundle.getText("DocumentUnlocked");
-                    MessageToast.show(sMsg);
+                    MessageBox.information(sMsg, {
+                        onClose: function () {
+                            that.onGoPress();
+                        }
+                    });
                 },
                 error: function (err) {
                     let sMsg = oBundle.getText("UnableToUnlock");
                     console.log("FAILED TO REMOVE LOCK", err);
-                    MessageToast.show(sMsg);
+                    MessageBox.information(sMsg, {
+                        onClose: function () {
+                            that.onGoPress();
+                        }
+                    });
                 }
             });
         },
@@ -243,40 +252,72 @@ sap.ui.define([
             }
         },
 
+
+        onQuickUnlockPress: function (oEvent) {
+            this.oCtx = oEvent.getSource().getBindingContext('masterModel');
+            this._quickUnlockPress(oEvent);
+        },
+
+        _quickUnlockPress: function (oEvent) {
+            var oControl = oEvent.getSource(),
+                oView = this.getView();
+
+            if (!this._oLockMenuFragment) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "vim_ui.view.fragments.LockMenu",
+                    controller: this
+                }).then(function (oMenu) {
+                    oView.addDependent(oMenu);
+                    oMenu.openBy(oControl);
+                    this._oLockMenuFragment = oMenu;
+                }.bind(this));
+            } else {
+                this._oLockMenuFragment.openBy(oControl);
+            }
+        },
+
         onQuickMassiveEditPress: function (oEvent) {
             this.oCtx = null;
             this._quickEditPress(oEvent);
         },
 
         onAssignPressHandler: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel");
+            var sLockedByName = oMasterModel.getProperty(this.oCtx + "/LOCKEDBYNAME");
+            if (sLockedByName) {
+                MessageBox.warning(oBundle.getText("AlertLocked", sLockedByName));
+                return
+            }
             this.onAssignPress(this.getView(), this);
         },
 
         _confirmAssignation: function (sUrl, body) {
-          const oSuccessFunction = (data) => {
-            MessageBox.success(oBundle.getText("SuccessfullyAssigned"), {
-              actions: [MessageBox.Action.CLOSE],
-              title: "Success",
-              details: data,  // Provide details of the response
-              onClose: function () {
+            const oSuccessFunction = (data) => {
+                MessageBox.success(oBundle.getText("SuccessfullyAssigned"), {
+                    actions: [MessageBox.Action.CLOSE],
+                    title: "Success",
+                    details: data,  // Provide details of the response
+                    onClose: function () {
+                        this.onGoPress();
+                    }.bind(this)
+                });
+            };
+
+            const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+                sap.ui.core.BusyIndicator.hide();
+                let sMsg = oBundle.getText("UnexpectedErrorOccurred");
+                MessageToast.show(sMsg);
+                console.log(errorThrown);
                 this.onGoPress();
-              }.bind(this)
-            });
-          };
-    
-          const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
-            sap.ui.core.BusyIndicator.hide();
-            let sMsg = oBundle.getText("UnexpectedErrorOccurred");
-            MessageToast.show(sMsg);
-            console.log(errorThrown);
-            this.onGoPress();
-          };
-    
-          return this.executeRequest(sUrl, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
+            };
+
+            return this.executeRequest(sUrl, 'POST', JSON.stringify(body), oSuccessFunction, oErrorFunction);
         },
 
-        onAssignConfirm: function (oEvent) {            
+        onAssignConfirm: function (oEvent) {
             var oTable = this.getView().byId("masterTable"),
+                oMasterModel = this.getView().getModel("masterModel"),
                 aSelectedItems = oTable.getSelectedItems(),
                 aPackagesId = [],
                 bIsMassiveAction = this.oCtx !== null ? false : true,
@@ -286,32 +327,48 @@ sap.ui.define([
                 that = this;
 
             if (!bIsMassiveAction) {
+                var sLockedByName = oMasterModel.getProperty(this.oCtx + "/LOCKEDBYNAME");
+                if (sLockedByName) {
+                    MessageBox.warning(oBundle.getText("AlertLocked", sLockedByName));
+                    return
+                }
                 let sPath = this.oCtx.getPath();
-                aPackagesId.push(this.getView().getModel("masterModel").getProperty(sPath+"/PACKAGEID"));
+                aPackagesId.push(this.getView().getModel("masterModel").getProperty(sPath + "/PACKAGEID"));
             } else {
-                aPackagesId = aSelectedItems.map((oItem) => 
+                let bIsDocumentLocked = false;
+                aSelectedItems.forEach(oItem => {
+                    if (oItem.getBindingContext("masterModel").getProperty("LOCKEDBYNAME") !== null) {
+                        bIsDocumentLocked = true;
+                    }
+                });
+
+                if (bIsDocumentLocked) {
+                    MessageBox.warning(oBundle.getText("MassiveAlertLocked"));
+                    return;
+                }
+                aPackagesId = aSelectedItems.map((oItem) =>
                     oItem.getBindingContext("masterModel").getProperty("PACKAGEID")
                 );
             }
-      
+
             sUrl = baseManifestUrl + '/odata/assign';
             body = {
-              payload: {
-                PackagesId: aPackagesId,
-                AssignedTo: assignTo
-              }
-            };
-      
-            MessageBox.warning(oBundle.getText("AlertAssign", [assignTo]), {
-              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-              emphasizedAction: MessageBox.Action.NO,
-              onClose: function (sAction) {
-                if (sAction === MessageBox.Action.YES) {
-                  that._confirmAssignation(sUrl, body);
+                payload: {
+                    PackagesId: aPackagesId,
+                    AssignedTo: assignTo
                 }
-              }
+            };
+
+            MessageBox.warning(oBundle.getText("AlertAssign", [assignTo]), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.NO,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._confirmAssignation(sUrl, body);
+                    }
+                }
             });
-          },
+        },
 
 
         /**
@@ -321,6 +378,11 @@ sap.ui.define([
             var oMasterModel = this.getView().getModel("masterModel");
             var sDocStatus = oMasterModel.getProperty(this.oCtx + "/DOC_STATUS");
             var sPackage_Id = oMasterModel.getProperty(this.oCtx + "/PACKAGEID");
+            var sLockedByName = oMasterModel.getProperty(this.oCtx + "/LOCKEDBYNAME");
+            if (sLockedByName) {
+                MessageBox.warning(oBundle.getText("AlertLocked", sLockedByName));
+                return
+            }
             this.onAssignPress();
         },
 
@@ -357,16 +419,33 @@ sap.ui.define([
 
         onDeletePress: function () {
             var oTable = this.getView().byId("masterTable"),
+                oMasterModel = this.getView().getModel("masterModel"),
                 aSelectedItems = oTable.getSelectedItems(),
                 aPackagesId = [],
                 bIsMassiveAction = this.oCtx !== null ? false : true,
                 that = this;
 
             if (!bIsMassiveAction) {
+                var sLockedByName = oMasterModel.getProperty(this.oCtx + "/LOCKEDBYNAME");
+                if (sLockedByName) {
+                    MessageBox.warning(oBundle.getText("AlertLocked", sLockedByName));
+                    return
+                }
                 let sPath = this.oCtx.getPath();
-                aPackagesId.push(this.getView().getModel("masterModel").getProperty(sPath+"/PACKAGEID"));
+                aPackagesId.push(this.getView().getModel("masterModel").getProperty(sPath + "/PACKAGEID"));
             } else {
-                aPackagesId = aSelectedItems.map((oItem) => 
+                let bIsDocumentLocked = false;
+                aSelectedItems.forEach(oItem => {
+                    if (oItem.getBindingContext("masterModel").getProperty("LOCKEDBYNAME") !== null) {
+                        bIsDocumentLocked = true;
+                    }
+                });
+
+                if (bIsDocumentLocked) {
+                    MessageBox.warning(oBundle.getText("MassiveAlertLocked"));
+                    return;
+                }
+                aPackagesId = aSelectedItems.map((oItem) =>
                     oItem.getBindingContext("masterModel").getProperty("PACKAGEID")
                 );
             }
@@ -386,7 +465,19 @@ sap.ui.define([
             var oTable = this.getView().byId("masterTable"),
                 oMasterModel = this.getView().getModel("masterModel"),
                 aSelectedItems = oTable.getSelectedItems(),
+                bIsDocumentLocked = false,
                 that = this;
+
+            aSelectedItems.forEach(oItem => {
+                if (oItem.getBindingContext("masterModel").getProperty("LOCKEDBYNAME") !== null) {
+                    bIsDocumentLocked = true;
+                }
+            });
+
+            if (bIsDocumentLocked) {
+                MessageBox.warning(oBundle.getText("MassiveAlertLocked"));
+                return;
+            }
 
             aSelectedItems = aSelectedItems.map(oItem => {
                 if (oItem.getBindingContext("masterModel").getProperty("DOC_STATUS") !== "SUBMITTED") {
@@ -409,45 +500,36 @@ sap.ui.define([
                             var aErrorInvoicesPackageIds = oData.value[0].ErrorInvoicesPackageIds;
                             if (aErrorInvoicesPackageIds.length > 0) {
                                 let sMsg = oBundle.getText("MassiveSubmitFailed");
-                                MessageBox.error(sMsg);
-                                that._highlightErrorRows(aErrorInvoicesPackageIds);
+                                MessageBox.error(sMsg, {
+                                    onClose: function () {
+                                        that.onGoPress();
+                                    }
+                                });
                             } else {
                                 let sMsg = oBundle.getText("MassiveSubmitSucceded");
-                                MessageBox.success(sMsg);
+                                MessageBox.success(sMsg, {
+                                    onClose: function () {
+                                        that.onGoPress();
+                                    }
+                                });
                             }
                         };
 
                         const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
                             sap.ui.core.BusyIndicator.hide();
                             let sMsg = oBundle.getText("BackendRequestFailed");
-                            MessageBox.error(sMsg);
-                            aSelectedItems = aSelectedItems.map((oItem) => {
-                                return oItem.PackageId;
+                            MessageBox.error(sMsg, {
+                                onClose: function () {
+                                    that.onGoPress();
+                                }
                             });
-                            that._highlightErrorRows(aSelectedItems);
                         };
                         const oBody = {
                             payload: aSelectedItems
                         }
+
                         that.executeRequest(sUrl, "POST", JSON.stringify(oBody), oSuccessFunction, oErrorFunction);
                     }
-                }
-            });
-        },
-
-        _highlightErrorRows: function (aErrorPackageIds) {
-            var oTable = this.byId("masterTable");
-            var aItems = oTable.getItems();
-
-            // Iterate over table rows and check if PACKAGEID is in the error list
-            aItems.forEach(function (oItem) {
-                var sPackageId = oItem.getBindingContext("masterModel").getProperty("PACKAGEID");
-
-                // If the PACKAGEID is in the error list, set the highlight to 'Error'
-                if (aErrorPackageIds.includes(sPackageId)) {
-                    oItem.setHighlight(ValueState.Error); // Set the row color to red
-                } else {
-                    oItem.setHighlight(ValueState.None);  // Reset the highlight for non-error rows
                 }
             });
         }
