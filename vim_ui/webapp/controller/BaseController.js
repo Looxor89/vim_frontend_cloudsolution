@@ -13,9 +13,15 @@ sap.ui.define([
 ], function (Controller, JSONModel, UIComponent, Fragment, MessageBox, MessageToast, deepExtend, History, Filter, FilterOperator) {
 
     var sResponsivePaddingClasses = "sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer";
+    var detailController = null;
     "use strict";
 
     return Controller.extend("vim_ui.controller.BaseController", {
+        setDetailController(controller) {
+            detailController = controller;
+        },
+
+        getDetailController() { return detailController; },
         /**
          * Function which execute AJAX requests
          * @param {String} sUrl - the url api to forward the requests

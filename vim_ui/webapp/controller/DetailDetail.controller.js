@@ -4049,7 +4049,7 @@ sap.ui.define([
 
       if (aFiles && aFiles.length) {
         var oFile = aFiles[0],  // Get the first file
-          sBodyId = this.getView().getModel("currentInvoiceItalianTrace").getProperty("/body")[0].ID,
+          sHeader_Id_ItalianInvoiceTrace = this.getView().getModel("detailDetailModel").getProperty("/currentInvoice/header_Id_ItalianInvoiceTrace"),
           sCompanyCode = this.getView().getModel("detailDetailModel").getProperty("/detail/header/COMPANYCODE"),
           sFiscalYear = this.getView().getModel("detailDetailModel").getProperty("/detail/header/FISCALYEAR"),
           sName = oFile.name,
@@ -4059,29 +4059,38 @@ sap.ui.define([
           sReferenceDocument = this.getView().getModel("detailDetailModel").getProperty("/detail/header/REFERENCEDOCUMENT"),
           sPackageId = this._packageId;
 
-        // Define what to do when file is successfully read
-        oReader.onload = function (oEvent) {
-          var sBase64 = oEvent.target.result;  // The Base64 encoded file content
-          console.log("Base64 file content:", sBase64);
-
-          // If you want only the base64 part, remove the prefix like "data:image/png;base64,"
-          var sBase64Data = sBase64.split(",")[1];
-          // Set property model NewUploadedFile
-          oDetailDetailModel.setProperty("/NewUploadedFile", {
-            "PackageId": sPackageId,
-            "CompanyCode": sCompanyCode,
-            "ReferenceDocument": sReferenceDocument,
-            "FiscalYear": sFiscalYear,
-            "BodyId": sBodyId,
-            "AttachmentName": sName,
-            "AttachmentType": sType,
-            "AttachmentExtension": sExtension,
-            "Attachment": sBase64Data
+        if (sName.length > 60) {
+          MessageBox.error(oBundle.getText("AttachmentUploadingNameLengthError"), {
+            actions: [MessageBox.Action.CLOSE],
+            title: "Error",
+            styleClass: sResponsivePaddingClasses,
+            onClose: function () {
+              this.getView().byId("fileUploader").clear();
+            }.bind(this)
           });
-        };
+        } else {
+          // Define what to do when file is successfully read
+          oReader.onload = function (oEvent) {
+            var sBase64 = oEvent.target.result;  // The Base64 encoded file content
+            // If you want only the base64 part, remove the prefix like "data:image/png;base64,"
+            var sBase64Data = sBase64.split(",")[1];
+            // Set property model NewUploadedFile
+            oDetailDetailModel.setProperty("/NewUploadedFile", {
+              "PackageId": sPackageId,
+              "CompanyCode": sCompanyCode,
+              "ReferenceDocument": sReferenceDocument,
+              "FiscalYear": sFiscalYear,
+              "Header_Id_ItalianInvoiceTrace": sHeader_Id_ItalianInvoiceTrace,
+              "AttachmentName": sName,
+              "AttachmentType": sType,
+              "AttachmentExtension": sExtension,
+              "Attachment": sBase64Data
+            });
+          };
 
-        // Read the file as Data URL to get Base64
-        oReader.readAsDataURL(oFile);
+          // Read the file as Data URL to get Base64
+          oReader.readAsDataURL(oFile);
+        }       
       }
     },
 
@@ -4106,7 +4115,9 @@ sap.ui.define([
             details: data,  // Provide details of the response
             styleClass: sResponsivePaddingClasses,
             onClose: function () {
-              this.fetchFileList(this._packageId);
+              // this.fetchFileList(this._packageId);
+              this.getDetailController().fetchAttachments(this._packageId);
+              this._getData();
             }.bind(this)
           });
           oFileUploader.clear();
@@ -5371,8 +5382,10 @@ sap.ui.define([
           RemovedGlAccountLineDetails: this.aRemovedGlAccountLineDetails ? this.aRemovedGlAccountLineDetails : []
         }
       };
+      this.getView().byId('DDPage').setBusy(true);
 
       const oSuccessFunction = (data) => {
+        this.getView().byId('DDPage').setBusy(false);
         console.log(data);  // Log the successful response
         // Show success message to the user
         MessageBox.success(oBundle.getText("SuccessfullySubmittedRecord"), {
@@ -5382,10 +5395,11 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock
-        return this._confirmCancelEdit();
+        return this._confirmCancelEdit().then(result => this._getData());
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
+        this.getView().byId('DDPage').setBusy(false);
         console.log(errorThrown);  // Log the error
         let that = this;
         // Show error message to the user

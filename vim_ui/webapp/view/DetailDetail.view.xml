@@ -21,7 +21,7 @@
                     <m:Button type="Emphasized" text="{i18n>EditDocumentButton}" icon="sap-icon://edit" press="handleGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS', 'props>/action/admin'], formatter: '.formatter.detailDetailEdit' }" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS'], formatter: '.formatter.allowActions' }" />
                     <m:Button type="Emphasized" text="{i18n>CancelEditButton}" icon="sap-icon://edit-outside" press="handleCancelGEdit" visible="{ parts:['detailDetailModel>/props/gEditMode', 'detailDetailModel>/detail/header/DOC_STATUS' , 'props>/action/admin'] , formatter: '.formatter.detailDetailEditCancel' }" />
                     
-                    <m:Button type="Accept" text="{i18n>SubmitButton}" icon="sap-icon://accept" enabled="{= !${detailDetailModel>/props/lineItemTable/editMode} }" press=".onSubmitPress" />   
+                    <m:Button type="Accept" text="{i18n>SubmitButton}" icon="sap-icon://accept" enabled="{ parts:['detailDetailModel>/props/lineItemTable/editMode','detailDetailModel>/detail/header/DOC_STATUS'], formatter: '.formatter.formatSubmit' }" press=".onSubmitPress" />   
                     <m:Button text="{i18n>AssignButton}" icon="sap-icon://add-employee" enabled="{= !${detailDetailModel>/props/lineItemTable/editMode} }" press=".onAssignPressHandler" />
                     <m:Button text="{i18n>DeleteButton}" icon="sap-icon://employee-rejections" press="onDeletePress" 
                         type="Reject"

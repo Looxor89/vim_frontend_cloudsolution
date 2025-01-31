@@ -27,6 +27,7 @@ sap.ui.define([
     _onRouteMatched: function (oEvent) {
       this._packageId = oEvent.getParameter("arguments").packageId || this._packageId || "0";
       this.getView().setModel(new JSONModel({}), "detailModel");
+      this.setDetailController(this);
       this.fetchAttachments(this._packageId);
       
       //   .then(this.getDoxData.bind(this))

@@ -20,6 +20,10 @@ sap.ui.define([
       return false;
     },
 
+    formatSubmit: function (bEdit, sStatus) {
+      return !bEdit && sStatus !== "POSTED";
+    },
+
     detailDetailEdit: function (bEdit, sStatus, bAdmin) {
       if(bAdmin) {
         return !bEdit;
