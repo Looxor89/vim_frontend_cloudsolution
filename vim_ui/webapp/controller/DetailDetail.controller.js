@@ -4056,7 +4056,7 @@ sap.ui.define([
           sExtension = this._getExtensionType(oFile.type.toLowerCase()),
           sType = oFile.type,
           oReader = new FileReader(),
-          sReferenceDocument = this.getView().getModel("detailDetailModel").getProperty("/detail/header/REFERENCEDOCUMENT"),
+          sInvoiceReference = this.getView().getModel("detailDetailModel").getProperty("/detail/header/INVOICEREFERENCE"),
           sPackageId = this._packageId;
 
         if (sName.length > 60) {
@@ -4078,7 +4078,7 @@ sap.ui.define([
             oDetailDetailModel.setProperty("/NewUploadedFile", {
               "PackageId": sPackageId,
               "CompanyCode": sCompanyCode,
-              "ReferenceDocument": sReferenceDocument,
+              "ReferenceDocument": sInvoiceReference,
               "FiscalYear": sFiscalYear,
               "Header_Id_ItalianInvoiceTrace": sHeader_Id_ItalianInvoiceTrace,
               "AttachmentName": sName,
