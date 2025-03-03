@@ -91,7 +91,7 @@ sap.ui.define([
 
     formatLockedByName: function (sLockedByName) {
       if (sLockedByName) {
-        return "Locked by: " + sLockedByName;;
+        return "Locked by: " + sLockedByName;
       }
     },
 

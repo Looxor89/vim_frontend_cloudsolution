@@ -812,7 +812,7 @@
                                                     <m:Title text="{i18n>Files}" level="H2" />
                                                     <m:ToolbarSpacer />
 
-                                                    <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="txt,jpg,png,doc,docx,xls,xlsx,pdf,ppt,pptx,zip" placeholder="Choose a file for Upload..." visible="{detailDetailModel>/props/FileEditMode}" />
+                                                    <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="txt,jpg,png,doc,docx,xls,xlsx,pdf,ppt,pptx,zip,csv" placeholder="Choose a file for Upload..." visible="{detailDetailModel>/props/FileEditMode}" />
 
                                                     <m:Button icon="sap-icon://upload" press="handleUploadPress" tooltip="Upload file" visible="{detailDetailModel>/props/FileEditMode}" />
                                                     <m:ToggleButton icon="sap-icon://edit" press="onFileListEdit" visible="{props>/action/upload}" enabled="{ parts:['detailDetailModel>/detail/header/DOC_STATUS'], formatter: '.formatter.allowAddAttachment' }"/>

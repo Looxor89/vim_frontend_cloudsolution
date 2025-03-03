@@ -808,6 +808,9 @@ sap.ui.define([
         "SupplierInvoiceItem": null,
         "PurchaseOrder": oData? oData.PurchaseOrder : null,
         "PurchaseOrderItem": oData? oData.PurchaseOrderItem : null,
+        "ReferenceDocument": oData? oData.ReferenceDocument : null,
+        "ReferenceDocumentFiscalYear": oData? oData.ReferenceDocumentFiscalYear : null,
+        "ReferenceDocumentItem": oData? oData.ReferenceDocumentItem : null,
         "Plant": oData? oData.Plant : null,
         "IsSubsequentDebitCredit": this.getValueMappedToIsSubsequentDebitCredit(),
         "TaxCode": oData? oData.TaxCode : null,
@@ -2348,6 +2351,9 @@ sap.ui.define([
           "PurchaseOrderQuantityUnit": oDetailDetailModel.getProperty(sPath + "/PurchaseOrderQuantityUnit"),
           "QuantityInPurchaseOrderUnit": oDetailDetailModel.getProperty(sPath + "/OrderQuantity"),
           "IsFinallyInvoiced": oDetailDetailModel.getProperty(sPath + "/IsFinallyInvoiced"),
+          "ReferenceDocument": retrievedData.ReferenceDocument != "" ? retrievedData.ReferenceDocument : null,
+          "ReferenceDocumentFiscalYear": retrievedData.ReferenceDocumentFiscalYear != "" ? retrievedData.ReferenceDocumentFiscalYear : null,
+          "ReferenceDocumentItem": retrievedData.ReferenceDocumentItem != "" ? retrievedData.ReferenceDocumentItem : null,
           "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
           "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
           "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
@@ -2402,30 +2408,37 @@ sap.ui.define([
       const oSuccessFunction = (data) => {
         let retrievedData = data.value[0].result[0];
         this.getView().byId('DDPage').setBusy(false);
-        let oData = {
-          "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
-          "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
-          "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
-          "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/DeliveryQuantityUnit"),
-          "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ActualDeliveryQuantity"),
-          "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
-          "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
-          "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
-          "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
-          "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
-          "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
-          "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
-          "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
-          "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
-          "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
-          "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
-          "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
-          "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
-          "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
-          "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
-        };
-        // this._addPORow(oData);
-        aNewSelectedDeliveryNotesRecords.push(oData);
+        if (retrievedData) {
+          let oData = {
+            "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
+            "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
+            "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
+            "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/DeliveryQuantityUnit"),
+            "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ActualDeliveryQuantity"),
+            "ReferenceDocument": retrievedData.ReferenceDocument != "" ? retrievedData.ReferenceDocument : null,
+            "ReferenceDocumentFiscalYear": retrievedData.ReferenceDocumentFiscalYear != "" ? retrievedData.ReferenceDocumentFiscalYear : null,
+            "ReferenceDocumentItem": retrievedData.ReferenceDocumentItem != "" ? retrievedData.ReferenceDocumentItem : null,
+            "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
+            "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
+            "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
+            "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
+            "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
+            "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
+            "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
+            "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
+            "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
+            "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
+            "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
+            "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
+            "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
+            "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
+            "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
+          };
+          // this._addPORow(oData);
+          aNewSelectedDeliveryNotesRecords.push(oData);
+        } else {
+          MessageBox.warning(oBundle.getText("NoDataFoundForPurchaseOrderAndPurchaseOrderItem", [this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"), this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem")]));
+        }
       }
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -2476,34 +2489,41 @@ sap.ui.define([
       const oSuccessFunction = (data) => {
         let retrievedData = data.value[0].result[0];
         this.getView().byId('DDPage').setBusy(false);
-        let oData = {
-          "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
-          "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
-          "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
-          "TaxCode": this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode"),
-          "SupplierInvoiceItemAmount": this.getView().getModel("detailDetailModel").getProperty(sPath + "/NetAmount"),
-          "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/QuantityUnit"),
-          "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ConfirmedQuantity"),
-          "ServiceEntrySheet": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheet"),
-          "ServiceEntrySheetItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheetItem"),
-          "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
-          "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
-          "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
-          "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
-          "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
-          "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
-          "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
-          "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
-          "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
-          "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
-          "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
-          "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
-          "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
-          "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
-          "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
-        };
-        // this._addPORow(oData);
-        aNewSelectedServiceEntrySheetsRecords.push(oData);
+        if (retrievedData) {
+          let oData = {
+            "PurchaseOrder": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"),
+            "PurchaseOrderItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem"),
+            "Plant": this.getView().getModel("detailDetailModel").getProperty(sPath + "/Plant"),
+            "TaxCode": this.getView().getModel("detailDetailModel").getProperty(sPath + "/TaxCode"),
+            "SupplierInvoiceItemAmount": this.getView().getModel("detailDetailModel").getProperty(sPath + "/NetAmount"),
+            "PurchaseOrderQuantityUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/QuantityUnit"),
+            "QuantityInPurchaseOrderUnit": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ConfirmedQuantity"),
+            "ServiceEntrySheet": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheet"),
+            "ServiceEntrySheetItem": this.getView().getModel("detailDetailModel").getProperty(sPath + "/ServiceEntrySheetItem"),
+            "ReferenceDocument": retrievedData.ReferenceDocument != "" ? retrievedData.ReferenceDocument : null,
+            "ReferenceDocumentFiscalYear": retrievedData.ReferenceDocumentFiscalYear != "" ? retrievedData.ReferenceDocumentFiscalYear : null,
+            "ReferenceDocumentItem": retrievedData.ReferenceDocumentItem != "" ? retrievedData.ReferenceDocumentItem : null,
+            "CostCenter": retrievedData.CostCenter != "" ? retrievedData.CostCenter : null,
+            "ControllingArea": retrievedData.ControllingArea != "" ? retrievedData.ControllingArea : null,
+            "BusinessArea": retrievedData.BusinessArea != "" ? retrievedData.BusinessArea : null,
+            "ProfitCenter": retrievedData.ProfitCenter != "" ? retrievedData.ProfitCenter : null,
+            "FunctionalArea": retrievedData.FunctionalArea != "" ? retrievedData.FunctionalArea : null,
+            "WBSElement": retrievedData.WBSElementInternalID_2 != "" ? retrievedData.WBSElementInternalID_2 : null,
+            "SalesOrder": retrievedData.SalesOrder != "" ? retrievedData.SalesOrder : null,
+            "SalesOrderItem": retrievedData.SalesOrderItem != "" ? retrievedData.SalesOrderItem : null,
+            "InternalOrder": retrievedData.OrderInternalID != "" ? retrievedData.OrderInternalID : null,
+            "CommitmentItem": retrievedData.CommitmentItemShortID != "" ? retrievedData.CommitmentItemShortID : null,
+            "FundsCenter": retrievedData.FundsCenter != "" ? retrievedData.FundsCenter : null,
+            "Fund": retrievedData.Fund != "" ? retrievedData.Fund : null,
+            "GrantID": retrievedData.GrantID != "" ? retrievedData.GrantID : null,
+            "ProfitabilitySegment": retrievedData.ProfitabilitySegment_2 != "" ? retrievedData.ProfitabilitySegment_2 : null,
+            "BudgetPeriod": retrievedData.BudgetPeriod != "" ? retrievedData.BudgetPeriod : null,
+          };
+          // this._addPORow(oData);
+          aNewSelectedServiceEntrySheetsRecords.push(oData);
+        } else {
+          MessageBox.warning(oBundle.getText("NoDataFoundForPurchaseOrderAndPurchaseOrderItem", [this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrder"), this.getView().getModel("detailDetailModel").getProperty(sPath + "/PurchaseOrderItem")]));
+        }
       }
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
@@ -5280,7 +5300,7 @@ sap.ui.define([
         });
 
         // Call the cancel handler to release the lock
-        return this._confirmCancelEdit();
+        return this._confirmCancelEdit().then(result => this._getData());
       };
 
       const oErrorFunction = (XMLHttpRequest, textStatus, errorThrown) => {
