@@ -4869,13 +4869,13 @@ sap.ui.define([
 
       switch (sKey) {
         case "Invoice":
+          return ""
         case "Subsequentdebit":
-          return "S";
         case "Creditmemo":
         case "Subsequentcredit":
-          return "H"
+          return "X"
         default:
-          return "";
+          return "X";
       }
     },
 
